@@ -1,524 +1,440 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADFGVX Cipher Terminal | Linux 2030 Edition</title>
+    <title>ADFGVX Шифратор (KRYPTOS-совместимый)</title>
     <style>
-        :root {
-            --bg-dark: #0a0a12;
-            --bg-light: #12121a;
-            --primary: #00ffaa;
-            --secondary: #ff00aa;
-            --text: #e0e0ff;
-            --terminal-font: 'Courier New', monospace;
-            --glow: 0 0 10px rgba(0, 255, 170, 0.5);
-        }
-        
         body {
-            background-color: var(--bg-dark);
-            color: var(--text);
-            font-family: var(--terminal-font);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        
-        .terminal {
-            width: 800px;
-            background-color: var(--bg-light);
-            border-radius: 8px;
-            box-shadow: var(--glow);
-            overflow: hidden;
-            border: 1px solid var(--primary);
-        }
-        
-        .terminal-header {
-            background: linear-gradient(90deg, #ff0088, #00ffaa);
-            padding: 8px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .terminal-title {
-            font-weight: bold;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
-        }
-        
-        .terminal-controls span {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-left: 8px;
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .terminal-body {
+            font-family: 'Courier New', monospace;
+            background-color: #0f0f23;
+            color: #00ff00;
+            max-width: 900px;
+            margin: 0 auto;
             padding: 20px;
         }
-        
+        h1 {
+            color: #ffff00;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
         .panel {
-            margin-bottom: 20px;
-            border: 1px solid #333344;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .panel-header {
-            background-color: #1a1a2a;
-            padding: 8px 15px;
-            border-bottom: 1px solid #333344;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .panel-title {
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .panel-content {
+            flex: 1;
+            min-width: 300px;
+            background: #1a1a2a;
             padding: 15px;
-            background-color: #161622;
+            border-radius: 5px;
+            border: 1px solid #333;
         }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-        
-        .grid-header {
-            color: var(--secondary);
-            text-align: center;
-            padding: 5px;
-            font-weight: bold;
-        }
-        
-        .grid-cell {
-            background-color: #1e1e2e;
-            border: 1px solid #333344;
-            padding: 8px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        
-        .grid-cell:hover {
-            background-color: #252538;
-            box-shadow: 0 0 5px var(--primary);
-        }
-        
-        .grid-cell input {
+        table {
+            border-collapse: collapse;
+            margin: 10px 0;
             width: 100%;
-            background: transparent;
-            border: none;
-            color: var(--text);
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 5px;
             text-align: center;
-            font-family: var(--terminal-font);
-            outline: none;
         }
-        
+        th {
+            background-color: #2a2a3a;
+        }
+        input[type="text"] {
+            background: #0a0a1a;
+            border: 1px solid #333;
+            color: #00ff00;
+            padding: 5px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
         button {
-            background-color: var(--primary);
-            color: var(--bg-dark);
-            border: none;
+            background: #2a2a3a;
+            color: #00ff00;
+            border: 1px solid #333;
             padding: 8px 15px;
-            border-radius: 4px;
+            margin: 5px;
             cursor: pointer;
-            font-family: var(--terminal-font);
-            font-weight: bold;
-            transition: all 0.2s;
-            margin-right: 10px;
+            font-family: 'Courier New', monospace;
         }
-        
         button:hover {
-            background-color: var(--secondary);
-            color: white;
-            box-shadow: var(--glow);
+            background: #3a3a4a;
         }
-        
         textarea {
             width: 100%;
             min-height: 100px;
-            background-color: #1e1e2e;
-            border: 1px solid #333344;
-            color: var(--text);
+            background: #0a0a1a;
+            border: 1px solid #333;
+            color: #00ff00;
             padding: 10px;
-            font-family: var(--terminal-font);
-            border-radius: 4px;
-            margin-bottom: 15px;
-            resize: vertical;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
         }
-        
-        .result {
-            background-color: #1a1a2a;
-            padding: 15px;
-            border-radius: 4px;
-            border-left: 3px solid var(--primary);
-            margin-top: 20px;
+        .error {
+            color: #ff5555;
         }
-        
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            color: #8888aa;
+        .success {
+            color: #55ff55;
+        }
+        .warning {
+            color: #ffaa00;
+        }
+        .debug {
             font-size: 0.9em;
-        }
-        
-        @media (max-width: 768px) {
-            .terminal {
-                width: 95%;
-            }
-            
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            color: #aaa;
         }
     </style>
 </head>
 <body>
-    <div class="terminal">
-        <div class="terminal-header">
-            <div class="terminal-title">ADFGVX Cipher Terminal v2.0.30</div>
-            <div class="terminal-controls">
-                <span></span>
-                <span></span>
-                <span></span>
+    <h1>ADFGVX Шифратор (KRYPTOS-совместимый)</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Конфигурация</h2>
+            
+            <table id="substitution-grid">
+                <tr>
+                    <th></th>
+                    <th>A</th>
+                    <th>D</th>
+                    <th>F</th>
+                    <th>G</th>
+                    <th>V</th>
+                    <th>X</th>
+                </tr>
+                <!-- Заполнится JavaScript -->
+            </table>
+            
+            <div>
+                <label for="transposition-key">Ключ перестановки:</label>
+                <input type="text" id="transposition-key" value="KRYPTOS">
             </div>
+            
+            <button id="encrypt-btn">Зашифровать</button>
+            <button id="decrypt-btn">Расшифровать</button>
+            <button id="reset-btn">Сбросить</button>
         </div>
         
-        <div class="terminal-body">
-            <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">Cipher Configuration</div>
-                </div>
-                <div class="panel-content">
-                    <div class="grid">
-                        <div class="grid-header">A</div>
-                        <div class="grid-header">D</div>
-                        <div class="grid-header">F</div>
-                        <div class="grid-header">G</div>
-                        <div class="grid-header">V</div>
-                        <div class="grid-header">X</div>
-                        
-                        <div class="grid-header">A</div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="A" id="AA"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="B" id="AD"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="C" id="AF"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="D" id="AG"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="E" id="AV"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="F" id="AX"></div>
-                        
-                        <div class="grid-header">D</div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="G" id="DA"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="H" id="DD"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="I" id="DF"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="J" id="DG"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="K" id="DV"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="L" id="DX"></div>
-                        
-                        <div class="grid-header">F</div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="M" id="FA"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="N" id="FD"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="O" id="FF"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="P" id="FG"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="Q" id="FV"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="R" id="FX"></div>
-                        
-                        <div class="grid-header">G</div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="S" id="GA"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="T" id="GD"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="U" id="GF"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="V" id="GG"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="W" id="GV"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="X" id="GX"></div>
-                        
-                        <div class="grid-header">V</div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="Y" id="VA"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="Z" id="VD"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="0" id="VF"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="1" id="VG"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="2" id="VV"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="3" id="VX"></div>
-                        
-                        <div class="grid-header">X</div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="4" id="XA"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="5" id="XD"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="6" id="XF"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="7" id="XG"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="8" id="XV"></div>
-                        <div class="grid-cell"><input type="text" maxlength="1" value="9" id="XX"></div>
-                    </div>
-                    
-                    <div>
-                        <label for="transposition-key">Transposition Key:</label>
-                        <input type="text" id="transposition-key" value="GERMANY" style="width: 200px; margin-left: 10px;">
-                    </div>
-                </div>
-            </div>
+        <div class="panel">
+            <h2>Обработка сообщения</h2>
             
-            <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">Message Processing</div>
-                </div>
-                <div class="panel-content">
-                    <textarea id="input-text" placeholder="Enter plaintext or ciphertext here..."></textarea>
-                    
-                    <div>
-                        <button id="encrypt-btn">Encrypt</button>
-                        <button id="decrypt-btn">Decrypt</button>
-                        <button id="randomize-btn">Randomize Alphabet</button>
-                        <button id="reset-btn">Reset to Default</button>
-                    </div>
-                    
-                    <div class="result" id="result">
-                        <strong>Result:</strong><br>
-                        <span id="output-text">No operation performed yet</span>
-                    </div>
-                </div>
-            </div>
+            <textarea id="input-text" placeholder="Введите текст...">HELLO</textarea>
             
-            <div class="status-bar">
-                <div>System: ADFGVX Cipher Terminal</div>
-                <div id="status">Status: Ready</div>
-            </div>
+            <h3>Результат:</h3>
+            <textarea id="output-text" readonly></textarea>
+            
+            <div id="status" class="success">Готов</div>
+            
+            <h3>Отладка</h3>
+            <div id="debug" class="debug"></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const encryptBtn = document.getElementById('encrypt-btn');
-            const decryptBtn = document.getElementById('decrypt-btn');
-            const randomizeBtn = document.getElementById('randomize-btn');
-            const resetBtn = document.getElementById('reset-btn');
-            const inputText = document.getElementById('input-text');
-            const outputText = document.getElementById('output-text');
-            const statusElement = document.getElementById('status');
-            const transpositionKey = document.getElementById('transposition-key');
+            // Стандартная таблица подстановки ADFGVX
+            const defaultGrid = [
+                ['A', 'B', 'C', 'D', 'E', 'F'],
+                ['G', 'H', 'I', 'J', 'K', 'L'],
+                ['M', 'N', 'O', 'P', 'Q', 'R'],
+                ['S', 'T', 'U', 'V', 'W', 'X'],
+                ['Y', 'Z', '0', '1', '2', '3'],
+                ['4', '5', '6', '7', '8', '9']
+            ];
             
-            // Default substitution grid (6x6)
-            const defaultGrid = {
-                AA: 'A', AD: 'B', AF: 'C', AG: 'D', AV: 'E', AX: 'F',
-                DA: 'G', DD: 'H', DF: 'I', DG: 'J', DV: 'K', DX: 'L',
-                FA: 'M', FD: 'N', FF: 'O', FG: 'P', FV: 'Q', FX: 'R',
-                GA: 'S', GD: 'T', GF: 'U', GG: 'V', GV: 'W', GX: 'X',
-                VA: 'Y', VD: 'Z', VF: '0', VG: '1', VV: '2', VX: '3',
-                XA: '4', XD: '5', XF: '6', XG: '7', XV: '8', XX: '9'
-            };
+            let currentGrid = JSON.parse(JSON.stringify(defaultGrid));
+            const gridTable = document.getElementById('substitution-grid');
             
-            // Initialize grid
-            function initializeGrid() {
-                for (const [id, value] of Object.entries(defaultGrid)) {
-                    document.getElementById(id).value = value;
+            // Инициализация таблицы подстановки
+            function renderGrid() {
+                // Очищаем таблицу (кроме заголовка)
+                while (gridTable.rows.length > 1) {
+                    gridTable.deleteRow(1);
+                }
+                
+                const rowLabels = ['A', 'D', 'F', 'G', 'V', 'X'];
+                for (let i = 0; i < 6; i++) {
+                    const row = gridTable.insertRow();
+                    const headerCell = row.insertCell();
+                    headerCell.textContent = rowLabels[i];
+                    headerCell.style.fontWeight = 'bold';
+                    
+                    for (let j = 0; j < 6; j++) {
+                        const cell = row.insertCell();
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.value = currentGrid[i][j];
+                        input.dataset.row = i;
+                        input.dataset.col = j;
+                        input.addEventListener('change', function() {
+                            currentGrid[this.dataset.row][this.dataset.col] = this.value.toUpperCase();
+                        });
+                        cell.appendChild(input);
+                    }
                 }
             }
             
-            // Get current grid values
-            function getCurrentGrid() {
-                const grid = {};
-                for (const key of Object.keys(defaultGrid)) {
-                    grid[key] = document.getElementById(key).value.toUpperCase();
-                }
-                return grid;
-            }
-            
-            // Create reverse mapping (character to ADFGVX code)
-            function createReverseGrid(grid) {
-                const reverseGrid = {};
-                for (const [code, char] of Object.entries(grid)) {
-                    reverseGrid[char] = code;
-                }
-                return reverseGrid;
-            }
-            
-            // Encrypt function
-            function encrypt() {
-                const grid = getCurrentGrid();
-                const reverseGrid = createReverseGrid(grid);
-                const key = transpositionKey.value.toUpperCase().replace(/[^A-Z]/g, '');
+            // Создаем карту "символ → код ADFGVX"
+            function getCharToCodeMap() {
+                const map = {};
+                const rowLabels = ['A', 'D', 'F', 'G', 'V', 'X'];
+                const colLabels = ['A', 'D', 'F', 'G', 'V', 'X'];
                 
-                if (key.length === 0) {
-                    statusElement.textContent = 'Status: Error - Transposition key cannot be empty';
-                    return;
-                }
-                
-                const plaintext = inputText.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (plaintext.length === 0) {
-                    statusElement.textContent = 'Status: Error - No input text to encrypt';
-                    return;
-                }
-                
-                // Step 1: Substitution
-                let substituted = '';
-                for (const char of plaintext) {
-                    if (reverseGrid[char]) {
-                        substituted += reverseGrid[char];
-                    } else {
-                        statusElement.textContent = `Status: Warning - Character '${char}' not in substitution grid`;
-                    }
-                }
-                
-                // Step 2: Transposition
-                // Create a matrix with the key length as number of columns
-                const numCols = key.length;
-                const numRows = Math.ceil(substituted.length / numCols);
-                
-                // Fill the matrix row-wise
-                const matrix = [];
-                for (let i = 0; i < numRows; i++) {
-                    const start = i * numCols;
-                    const end = start + numCols;
-                    matrix.push(substituted.slice(start, end).split(''));
-                }
-                
-                // Determine the column order based on the key
-                const keyChars = key.split('');
-                const keyOrder = keyChars
-                    .map((char, index) => ({ char, index }))
-                    .sort((a, b) => a.char.localeCompare(b.char))
-                    .map(item => item.index);
-                
-                // Read the ciphertext column-wise in the new order
-                let ciphertext = '';
-                for (const col of keyOrder) {
-                    for (let row = 0; row < numRows; row++) {
-                        if (col < matrix[row].length) {
-                            ciphertext += matrix[row][col];
-                        }
-                    }
-                }
-                
-                outputText.textContent = ciphertext;
-                statusElement.textContent = 'Status: Encryption complete';
-            }
-            
-            // Decrypt function
-            function decrypt() {
-                const grid = getCurrentGrid();
-                const key = transpositionKey.value.toUpperCase().replace(/[^A-Z]/g, '');
-                
-                if (key.length === 0) {
-                    statusElement.textContent = 'Status: Error - Transposition key cannot be empty';
-                    return;
-                }
-                
-                const ciphertext = inputText.value.toUpperCase().replace(/[^ADFGVX]/g, '');
-                if (ciphertext.length === 0) {
-                    statusElement.textContent = 'Status: Error - No input text to decrypt';
-                    return;
-                }
-                
-                // Step 1: Reverse transposition
-                const numCols = key.length;
-                const numRows = Math.ceil(ciphertext.length / numCols);
-                const totalChars = numRows * numCols;
-                const padding = totalChars - ciphertext.length;
-                
-                // Determine the column order based on the key
-                const keyChars = key.split('');
-                const keyOrder = keyChars
-                    .map((char, index) => ({ char, index }))
-                    .sort((a, b) => a.char.localeCompare(b.char))
-                    .map(item => item.index);
-                
-                // Create a map from original column to sorted column
-                const colMap = {};
-                keyOrder.forEach((originalCol, sortedCol) => {
-                    colMap[sortedCol] = originalCol;
-                });
-                
-                // Calculate how many characters are in each column
-                const colLengths = new Array(numCols).fill(numRows);
-                for (let i = 0; i < padding; i++) {
-                    colLengths[keyOrder[numCols - 1 - i]]--;
-                }
-                
-                // Reconstruct the transposed matrix
-                const matrix = new Array(numRows);
-                for (let i = 0; i < numRows; i++) {
-                    matrix[i] = new Array(numCols);
-                }
-                
-                let index = 0;
-                for (let sortedCol = 0; sortedCol < numCols; sortedCol++) {
-                    const originalCol = colMap[sortedCol];
-                    for (let row = 0; row < colLengths[originalCol]; row++) {
-                        matrix[row][originalCol] = ciphertext[index++];
-                    }
-                }
-                
-                // Read the substituted text row-wise
-                let substituted = '';
-                for (let row = 0; row < numRows; row++) {
-                    for (let col = 0; col < numCols; col++) {
-                        if (matrix[row][col]) {
-                            substituted += matrix[row][col];
-                        }
-                    }
-                }
-                
-                // Step 2: Reverse substitution
-                let plaintext = '';
-                for (let i = 0; i < substituted.length; i += 2) {
-                    const code = substituted.substr(i, 2);
-                    if (code.length === 2) {
-                        const char = grid[code];
+                for (let i = 0; i < 6; i++) {
+                    for (let j = 0; j < 6; j++) {
+                        const char = currentGrid[i][j];
                         if (char) {
-                            plaintext += char;
+                            map[char.toUpperCase()] = rowLabels[i] + colLabels[j];
+                        }
+                    }
+                }
+                return map;
+            }
+            
+            // Создаем карту "код ADFGVX → символ"
+            function getCodeToCharMap() {
+                const map = {};
+                const rowLabels = ['A', 'D', 'F', 'G', 'V', 'X'];
+                const colLabels = ['A', 'D', 'F', 'G', 'V', 'X'];
+                
+                for (let i = 0; i < 6; i++) {
+                    for (let j = 0; j < 6; j++) {
+                        const char = currentGrid[i][j];
+                        if (char) {
+                            map[rowLabels[i] + colLabels[j]] = char.toUpperCase();
+                        }
+                    }
+                }
+                return map;
+            }
+            
+            // Шифрование
+            function encrypt() {
+                const plaintext = document.getElementById('input-text').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                const key = document.getElementById('transposition-key').value.toUpperCase().replace(/[^A-Z]/g, '');
+                
+                if (!plaintext) {
+                    updateStatus('Ошибка: Нет текста для шифрования', 'error');
+                    return;
+                }
+                
+                if (!key) {
+                    updateStatus('Ошибка: Введите ключ перестановки', 'error');
+                    return;
+                }
+                
+                try {
+                    // Этап 1: Подстановка
+                    const charToCode = getCharToCodeMap();
+                    let substituted = '';
+                    let debugInfo = "<strong>Этап 1: Подстановка</strong><br>";
+                    
+                    for (const char of plaintext) {
+                        if (charToCode[char]) {
+                            substituted += charToCode[char];
+                            debugInfo += `${char} → ${charToCode[char]}<br>`;
+                        } else {
+                            updateStatus(`Ошибка: Символ '${char}' отсутствует в таблице`, 'error');
+                            return;
+                        }
+                    }
+                    
+                    debugInfo += `<strong>Результат подстановки:</strong> ${substituted}<br><br>`;
+                    
+                    // Этап 2: Перестановка
+                    const numCols = key.length;
+                    const numRows = Math.ceil(substituted.length / numCols);
+                    const padding = numCols * numRows - substituted.length;
+                    
+                    // Заполняем матрицу по строкам
+                    const matrix = [];
+                    for (let i = 0; i < numRows; i++) {
+                        const start = i * numCols;
+                        const end = start + numCols;
+                        matrix.push(substituted.slice(start, end).split(''));
+                    }
+                    
+                    // Добавляем padding при необходимости
+                    if (padding > 0) {
+                        for (let i = 0; i < padding; i++) {
+                            matrix[numRows-1].push(' ');
+                        }
+                    }
+                    
+                    debugInfo += `<strong>Этап 2: Перестановка</strong><br>`;
+                    debugInfo += `Ключ: ${key}<br>`;
+                    debugInfo += `Длина ключа: ${numCols} столбцов<br>`;
+                    debugInfo += `Количество строк: ${numRows}<br>`;
+                    debugInfo += `Дополнение: ${padding} символов<br><br>`;
+                    
+                    // Сортируем столбцы по ключу
+                    const keyChars = key.split('');
+                    const keyOrder = keyChars
+                        .map((char, index) => ({ char, index }))
+                        .sort((a, b) => a.char.localeCompare(b.char))
+                        .map(item => item.index);
+                    
+                    debugInfo += `<strong>Порядок столбцов:</strong><br>`;
+                    debugInfo += `Исходный: ${keyChars.join(' ')}<br>`;
+                    debugInfo += `Сортированный: ${keyOrder.map(i => keyChars[i]).join(' ')}<br>`;
+                    debugInfo += `Индексы: ${keyOrder.join(' ')}<br><br>`;
+                    
+                    // Читаем шифртекст по новым столбцам
+                    let ciphertext = '';
+                    for (const col of keyOrder) {
+                        for (let row = 0; row < numRows; row++) {
+                            if (matrix[row][col] && matrix[row][col] !== ' ') {
+                                ciphertext += matrix[row][col];
+                            }
+                        }
+                    }
+                    
+                    document.getElementById('output-text').value = ciphertext;
+                    updateStatus('Шифрование успешно', 'success');
+                    
+                    // Отображаем отладочную информацию
+                    debugInfo += `<strong>Матрица перестановки:</strong><br>`;
+                    debugInfo += `<table border="1" style="border-collapse: collapse; margin: 5px 0;">`;
+                    debugInfo += `<tr><th>Исх.\\Сорт.</th>${keyOrder.map(i => `<th>${keyChars[i]}</th>`).join('')}</tr>`;
+                    
+                    for (let row = 0; row < numRows; row++) {
+                        debugInfo += `<tr><td>${row+1}</td>`;
+                        for (const col of keyOrder) {
+                            debugInfo += `<td>${matrix[row][col] || ' '}</td>`;
+                        }
+                        debugInfo += `</tr>`;
+                    }
+                    
+                    debugInfo += `</table><br>`;
+                    debugInfo += `<strong>Итоговый шифртекст:</strong> ${ciphertext}`;
+                    
+                    document.getElementById('debug').innerHTML = debugInfo;
+                    
+                } catch (error) {
+                    updateStatus(`Ошибка: ${error.message}`, 'error');
+                }
+            }
+            
+            // Расшифрование
+            function decrypt() {
+                const ciphertext = document.getElementById('input-text').value.toUpperCase().replace(/[^ADFGVX]/g, '');
+                const key = document.getElementById('transposition-key').value.toUpperCase().replace(/[^A-Z]/g, '');
+                
+                if (!ciphertext) {
+                    updateStatus('Ошибка: Нет текста для расшифрования', 'error');
+                    return;
+                }
+                
+                if (!key) {
+                    updateStatus('Ошибка: Введите ключ перестановки', 'error');
+                    return;
+                }
+                
+                if (ciphertext.length % 2 !== 0) {
+                    updateStatus('Ошибка: Длина шифртекста должна быть четной', 'error');
+                    return;
+                }
+                
+                try {
+                    // Этап 1: Обратная перестановка
+                    const numCols = key.length;
+                    const numRows = Math.ceil(ciphertext.length / numCols);
+                    const padding = numCols * numRows - ciphertext.length;
+                    
+                    const keyChars = key.split('');
+                    const keyOrder = keyChars
+                        .map((char, index) => ({ char, index }))
+                        .sort((a, b) => a.char.localeCompare(b.char))
+                        .map(item => item.index);
+                    
+                    // Восстанавливаем порядок столбцов
+                    const colMap = {};
+                    keyOrder.forEach((originalCol, sortedCol) => {
+                        colMap[sortedCol] = originalCol;
+                    });
+                    
+                    // Создаем матрицу для расшифровки
+                    const matrix = new Array(numRows);
+                    for (let i = 0; i < numRows; i++) {
+                        matrix[i] = new Array(numCols).fill('');
+                    }
+                    
+                    // Заполняем матрицу по отсортированным столбцам
+                    let index = 0;
+                    for (let sortedCol = 0; sortedCol < numCols; sortedCol++) {
+                        const originalCol = colMap[sortedCol];
+                        const charsInCol = (originalCol >= numCols - padding) ? numRows - 1 : numRows;
+                        
+                        for (let row = 0; row < charsInCol; row++) {
+                            if (index < ciphertext.length) {
+                                matrix[row][originalCol] = ciphertext[index++];
+                            }
+                        }
+                    }
+                    
+                    // Читаем по строкам
+                    let substituted = '';
+                    for (let row = 0; row < numRows; row++) {
+                        for (let col = 0; col < numCols; col++) {
+                            if (matrix[row][col]) {
+                                substituted += matrix[row][col];
+                            }
+                        }
+                    }
+                    
+                    // Этап 2: Обратная подстановка
+                    const codeToChar = getCodeToCharMap();
+                    let plaintext = '';
+                    
+                    for (let i = 0; i < substituted.length; i += 2) {
+                        const code = substituted.substr(i, 2);
+                        if (codeToChar[code]) {
+                            plaintext += codeToChar[code];
                         } else {
                             plaintext += '?';
-                            statusElement.textContent = `Status: Warning - Code '${code}' not found in grid`;
+                            updateStatus(`Предупреждение: Код '${code}' не найден`, 'warning');
                         }
                     }
+                    
+                    document.getElementById('output-text').value = plaintext;
+                    updateStatus('Расшифрование успешно', 'success');
+                    
+                } catch (error) {
+                    updateStatus(`Ошибка: ${error.message}`, 'error');
                 }
-                
-                outputText.textContent = plaintext;
-                statusElement.textContent = 'Status: Decryption complete';
             }
             
-            // Randomize the substitution grid
-            function randomizeGrid() {
-                const chars = [];
-                // A-Z
-                for (let i = 65; i <= 90; i++) {
-                    chars.push(String.fromCharCode(i));
-                }
-                // 0-9
-                for (let i = 48; i <= 57; i++) {
-                    chars.push(String.fromCharCode(i));
-                }
-                
-                // Fisher-Yates shuffle
-                for (let i = chars.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [chars[i], chars[j]] = [chars[j], chars[i]];
-                }
-                
-                // Update the grid with shuffled characters
-                let index = 0;
-                for (const key of Object.keys(defaultGrid)) {
-                    document.getElementById(key).value = chars[index++];
-                }
-                
-                statusElement.textContent = 'Status: Grid randomized';
+            // Сброс настроек
+            function reset() {
+                currentGrid = JSON.parse(JSON.stringify(defaultGrid));
+                renderGrid();
+                document.getElementById('transposition-key').value = 'KRYPTOS';
+                document.getElementById('input-text').value = 'HELLO';
+                document.getElementById('output-text').value = '';
+                document.getElementById('debug').innerHTML = '';
+                updateStatus('Настройки сброшены', 'success');
             }
             
-            // Event listeners
-            encryptBtn.addEventListener('click', encrypt);
-            decryptBtn.addEventListener('click', decrypt);
-            randomizeBtn.addEventListener('click', randomizeGrid);
-            resetBtn.addEventListener('click', initializeGrid);
+            // Обновление статуса
+            function updateStatus(message, type) {
+                const statusElement = document.getElementById('status');
+                statusElement.textContent = message;
+                statusElement.className = type || '';
+            }
             
-            // Initialize
-            initializeGrid();
+            // Инициализация
+            renderGrid();
+            
+            // Обработчики событий
+            document.getElementById('encrypt-btn').addEventListener('click', encrypt);
+            document.getElementById('decrypt-btn').addEventListener('click', decrypt);
+            document.getElementById('reset-btn').addEventListener('click', reset);
         });
     </script>
 </body>
