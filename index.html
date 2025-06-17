@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed Cipher</title>
+    <title>Secure Cipher Pro</title>
     <style>
         :root {
             --primary: #6c5ce7;
@@ -89,21 +89,21 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔒 Fixed Cipher</h1>
+        <h1>🔒 Secure Cipher Pro</h1>
         
         <div class="input-group">
-            <label>Алфавит (минимум 26 символов):</label>
-            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
+            <label>Алфавит (ровно 26 символов):</label>
+            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="26">
         </div>
         
         <div class="input-group">
-            <label>Символы шифра (минимум 26 символов):</label>
-            <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ">
+            <label>Символы шифра (ровно 26 знаков):</label>
+            <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ" maxlength="26">
         </div>
         
         <div class="input-group">
-            <label>Ключ:</label>
-            <input type="text" id="key" placeholder="Введите ключ (минимум 8 символов)">
+            <label>Ключ (минимум 8 символов):</label>
+            <input type="text" id="key" placeholder="Введите ключ">
             <div class="strength-meter">
                 <div class="strength-fill" id="strength-fill"></div>
             </div>
@@ -189,10 +189,10 @@
                 const alphabet = alphabetInput.value;
                 const symbols = symbolsInput.value;
                 const key = keyInput.value;
-                const text = inputText.value;
+                const text = inputText.value.toUpperCase();
                 
-                if (alphabet.length < 26 || symbols.length < 26) {
-                    throw new Error('Алфавит и символы должны содержать минимум 26 знаков!');
+                if (alphabet.length !== 26 || symbols.length !== 26) {
+                    throw new Error('Алфавит и символы должны содержать ровно 26 знаков!');
                 }
                 if (key.length < 8) {
                     throw new Error('Ключ должен быть не короче 8 символов!');
@@ -210,7 +210,7 @@
                         continue;
                     }
                     
-                    const symbolIndex = (index + keystream[i]) % symbols.length;
+                    const symbolIndex = (index + keystream[i]) % 26;
                     result += symbols[symbolIndex];
                 }
                 
@@ -240,7 +240,7 @@
                         continue;
                     }
                     
-                    const originalIndex = (symbolIndex - keystream[i] + symbols.length) % symbols.length;
+                    const originalIndex = (symbolIndex - keystream[i] + 26) % 26;
                     result += alphabet[originalIndex];
                 }
                 
