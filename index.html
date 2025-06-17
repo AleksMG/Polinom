@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecurePolyCipher - Military-Grade Encryption</title>
+    <title>PolyCipher Pro - Secure Block Encryption</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #3b82f6;
-            --secondary: #1d4ed8;
-            --dark: #111827;
-            --darker: #030712;
-            --light: #f9fafb;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --danger: #dc2626;
+            --success: #10b981;
         }
 
         * {
@@ -31,7 +31,6 @@
             flex-direction: column;
         }
 
-        /* Header styles */
         header {
             background: var(--darker);
             padding: 1.5rem;
@@ -72,7 +71,6 @@
             font-size: 0.9rem;
         }
 
-        /* Main content */
         main {
             flex: 1;
             padding: 2rem;
@@ -82,7 +80,7 @@
         }
 
         .card {
-            background: rgba(17, 24, 39, 0.8);
+            background: rgba(15, 23, 42, 0.8);
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
@@ -114,7 +112,7 @@
         input, textarea, select {
             width: 100%;
             padding: 0.875rem;
-            background: rgba(3, 7, 18, 0.8);
+            background: rgba(2, 6, 23, 0.8);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
             color: var(--light);
@@ -125,7 +123,7 @@
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
         }
 
         .btn {
@@ -151,8 +149,8 @@
             transform: translateY(-1px);
         }
 
-        .btn-danger {
-            background: var(--danger);
+        .btn-success {
+            background: var(--success);
             color: white;
         }
 
@@ -168,7 +166,7 @@
         }
 
         .result-text {
-            background: rgba(3, 7, 18, 0.8);
+            background: rgba(2, 6, 23, 0.8);
             padding: 1.5rem;
             border-radius: 8px;
             font-family: monospace;
@@ -180,19 +178,18 @@
             word-break: break-all;
         }
 
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .error-message {
+            color: var(--danger);
             font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--primary);
-            animation: pulse 2s infinite;
+        .loading {
+            display: none;
+            color: var(--success);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
         }
 
         @keyframes pulse {
@@ -201,7 +198,6 @@
             100% { opacity: 0.6; }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .btn-group {
                 flex-direction: column;
@@ -219,206 +215,347 @@
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon"><i class="fas fa-lock"></i></div>
-                <div class="logo-text">SecurePolyCipher</div>
+                <div class="logo-text">PolyCipher Pro</div>
             </div>
             <div class="security-badge">
-                <i class="fas fa-shield-alt"></i> AES-256 + SHA-384
+                <i class="fas fa-shield-alt"></i> BLOCK CIPHER MODE
             </div>
         </div>
     </header>
 
     <main>
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-cog"></i> Encryption Settings</h2>
+            <h2 class="card-title"><i class="fas fa-cog"></i> Cipher Configuration</h2>
             
             <div class="form-group">
-                <label for="key"><i class="fas fa-key"></i> Encryption Key</label>
-                <input type="password" id="key" placeholder="Enter a strong passphrase" autocomplete="off">
+                <label for="alphabet"><i class="fas fa-font"></i> Alphabet</label>
+                <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="256">
+                <div id="alphabet-error" class="error-message"></div>
             </div>
             
             <div class="form-group">
-                <label for="iterations"><i class="fas fa-redo"></i> PBKDF2 Iterations</label>
-                <select id="iterations">
-                    <option value="100000">100,000 (Standard)</option>
-                    <option value="250000">250,000 (Enhanced)</option>
-                    <option value="500000">500,000 (Paranoid)</option>
+                <label for="symbols"><i class="fas fa-symbols"></i> Symbol Mapping (must match alphabet length)</label>
+                <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈ" maxlength="256">
+                <div id="symbols-error" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="key"><i class="fas fa-key"></i> Encryption Key</label>
+                <input type="password" id="key" value="SecureKey123!" placeholder="Enter a strong encryption key">
+                <div id="key-error" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="blockSize"><i class="fas fa-cube"></i> Block Size (characters)</label>
+                <select id="blockSize">
+                    <option value="8">8 (Fast)</option>
+                    <option value="16" selected>16 (Recommended)</option>
+                    <option value="32">32 (Maximum)</option>
                 </select>
             </div>
         </div>
 
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-edit"></i> Text Processing</h2>
+            <h2 class="card-title"><i class="fas fa-edit"></i> Text Input</h2>
             <div class="form-group">
                 <label for="inputText"><i class="fas fa-keyboard"></i> Input Text</label>
-                <textarea id="inputText" rows="5" placeholder="Enter text to encrypt or decrypt"></textarea>
+                <textarea id="inputText" rows="5">HELLO WORLD</textarea>
             </div>
             
             <div class="btn-group">
                 <button class="btn btn-primary" id="encryptBtn">
                     <i class="fas fa-lock"></i> Encrypt
                 </button>
-                <button class="btn btn-primary" id="decryptBtn">
+                <button class="btn btn-success" id="decryptBtn">
                     <i class="fas fa-lock-open"></i> Decrypt
                 </button>
-                <button class="btn btn-danger" id="resetBtn">
-                    <i class="fas fa-redo"></i> Clear All
+                <button class="btn btn-primary" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
                 </button>
+            </div>
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Processing...
             </div>
         </div>
 
         <div class="card result-container">
             <h2 class="card-title"><i class="fas fa-terminal"></i> Result</h2>
             <div class="result-text" id="outputText">
-                Results will appear here...
+                Encrypted/decrypted text will appear here...
             </div>
         </div>
     </main>
 
     <footer>
-        <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>System Ready</span>
-        </div>
-        <div>SecurePolyCipher v3.0 | Web Crypto API | PBKDF2 + AES-CBC</div>
+        <div>PolyCipher Pro v3.1 | Secure Block Cipher System</div>
     </footer>
 
     <script>
-        // Initialize the application
+        class PolyCipher {
+            constructor() {
+                this.encoder = new TextEncoder();
+                this.decoder = new TextDecoder();
+            }
+
+            async deriveKeys(password, salt, iterations = 100000) {
+                try {
+                    const keyMaterial = await crypto.subtle.importKey(
+                        'raw',
+                        this.encoder.encode(password),
+                        { name: 'PBKDF2' },
+                        false,
+                        ['deriveBits']
+                    );
+                    
+                    const derivedBits = await crypto.subtle.deriveBits(
+                        {
+                            name: 'PBKDF2',
+                            salt: this.encoder.encode(salt),
+                            iterations,
+                            hash: 'SHA-256'
+                        },
+                        keyMaterial,
+                        256
+                    );
+                    
+                    return arrayToHex(new Uint8Array(derivedBits));
+                } catch (error) {
+                    console.error("Key derivation failed:", error);
+                    throw new Error("Key derivation failed");
+                }
+            }
+
+            async encrypt(plaintext, alphabet, symbols, password, blockSize = 16) {
+                if (!this.validateInputs(alphabet, symbols, password)) {
+                    throw new Error("Invalid inputs");
+                }
+
+                // Generate random salt for this encryption
+                const salt = this.generateRandomString(32);
+                const derivedKey = await this.deriveKeys(password, salt);
+                
+                // Process in blocks
+                let ciphertext = '';
+                const blocks = this.splitIntoBlocks(plaintext, blockSize);
+                
+                for (let i = 0; i < blocks.length; i++) {
+                    const block = blocks[i];
+                    const encryptedBlock = await this.processBlock(
+                        block, 
+                        alphabet, 
+                        symbols, 
+                        derivedKey + i.toString()
+                    );
+                    ciphertext += encryptedBlock;
+                }
+                
+                return { ciphertext, salt };
+            }
+
+            async decrypt(ciphertext, alphabet, symbols, password, salt, blockSize = 16) {
+                if (!this.validateInputs(alphabet, symbols, password)) {
+                    throw new Error("Invalid inputs");
+                }
+
+                const derivedKey = await this.deriveKeys(password, salt);
+                let plaintext = '';
+                const blocks = this.splitIntoBlocks(ciphertext, blockSize);
+                
+                for (let i = 0; i < blocks.length; i++) {
+                    const block = blocks[i];
+                    const decryptedBlock = await this.processBlock(
+                        block, 
+                        symbols, 
+                        alphabet, 
+                        derivedKey + i.toString(),
+                        true
+                    );
+                    plaintext += decryptedBlock;
+                }
+                
+                return plaintext;
+            }
+
+            async processBlock(block, sourceAlphabet, targetAlphabet, key, isDecrypt = false) {
+                // Generate polynomial coefficients from key
+                const coeffs = await this.generateCoefficients(key, 3);
+                
+                let result = '';
+                for (let i = 0; i < block.length; i++) {
+                    const char = block[i];
+                    const index = sourceAlphabet.indexOf(char);
+                    
+                    if (index === -1) {
+                        result += char;
+                        continue;
+                    }
+                    
+                    // Non-linear transformation with position-dependent factor
+                    const positionFactor = (i % 7) + 1;
+                    const x = (index * positionFactor) % sourceAlphabet.length;
+                    
+                    const transformedIndex = this.polynomialTransform(
+                        x, 
+                        coeffs, 
+                        sourceAlphabet.length
+                    ) % targetAlphabet.length;
+                    
+                    result += targetAlphabet[transformedIndex];
+                }
+                
+                return result;
+            }
+
+            async generateCoefficients(key, degree) {
+                const hash = await crypto.subtle.digest(
+                    'SHA-256', 
+                    this.encoder.encode(key)
+                );
+                
+                const view = new DataView(hash);
+                const coeffs = [];
+                
+                for (let i = 0; i <= degree; i++) {
+                    coeffs.push(view.getUint32(i * 4) % 65537);
+                }
+                
+                return coeffs;
+            }
+
+            polynomialTransform(x, coeffs, mod) {
+                let result = 0;
+                for (let i = 0; i < coeffs.length; i++) {
+                    const exponent = coeffs.length - 1 - i;
+                    const term = this.modPow(x, exponent, mod);
+                    result = (result + coeffs[i] * term) % mod;
+                }
+                return result;
+            }
+
+            modPow(base, exponent, modulus) {
+                if (modulus === 1) return 0;
+                let result = 1;
+                base = base % modulus;
+                
+                while (exponent > 0) {
+                    if (exponent % 2 === 1) {
+                        result = (result * base) % modulus;
+                    }
+                    exponent = exponent >> 1;
+                    base = (base * base) % modulus;
+                }
+                return result;
+            }
+
+            splitIntoBlocks(text, blockSize) {
+                const blocks = [];
+                for (let i = 0; i < text.length; i += blockSize) {
+                    blocks.push(text.substr(i, blockSize));
+                }
+                return blocks;
+            }
+
+            generateRandomString(length) {
+                const array = new Uint8Array(length);
+                crypto.getRandomValues(array);
+                return Array.from(array, byte => 
+                    byte.toString(16).padStart(2, '0')).join('');
+            }
+
+            validateInputs(alphabet, symbols, password) {
+                if (alphabet.length !== symbols.length) {
+                    alert("Alphabet and symbols must be the same length");
+                    return false;
+                }
+                if (password.length < 8) {
+                    alert("Password must be at least 8 characters");
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        // Helper function
+        function arrayToHex(buffer) {
+            return Array.from(new Uint8Array(buffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        // UI Handling
         document.addEventListener('DOMContentLoaded', function() {
-            setupEventListeners();
-        });
-
-        // Set up all event listeners
-        function setupEventListeners() {
-            document.getElementById('encryptBtn').addEventListener('click', handleEncrypt);
-            document.getElementById('decryptBtn').addEventListener('click', handleDecrypt);
-            document.getElementById('resetBtn').addEventListener('click', resetAll);
-        }
-
-        // Generate derived key from passphrase using PBKDF2
-        async function deriveKey(passphrase, salt, iterations) {
-            const encoder = new TextEncoder();
-            const keyMaterial = await window.crypto.subtle.importKey(
-                'raw',
-                encoder.encode(passphrase),
-                { name: 'PBKDF2' },
-                false,
-                ['deriveKey']
-            );
+            const cipher = new PolyCipher();
+            let currentSalt = '';
             
-            return await window.crypto.subtle.deriveKey(
-                {
-                    name: 'PBKDF2',
-                    salt: salt,
-                    iterations: iterations,
-                    hash: 'SHA-384'
-                },
-                keyMaterial,
-                { name: 'AES-CBC', length: 256 },
-                false,
-                ['encrypt', 'decrypt']
-            );
-        }
-
-        // Generate random salt
-        function generateSalt() {
-            return window.crypto.getRandomValues(new Uint8Array(16));
-        }
-
-        // Encrypt handler
-        async function handleEncrypt() {
-            try {
-                const inputText = document.getElementById('inputText').value;
-                const passphrase = document.getElementById('key').value;
-                const iterations = parseInt(document.getElementById('iterations').value);
-                
-                if (!inputText || !passphrase) {
-                    alert("Please enter both text and passphrase");
-                    return;
+            // Event listeners
+            document.getElementById('encryptBtn').addEventListener('click', async () => {
+                try {
+                    showLoading(true);
+                    const alphabet = document.getElementById('alphabet').value;
+                    const symbols = document.getElementById('symbols').value;
+                    const key = document.getElementById('key').value;
+                    const text = document.getElementById('inputText').value;
+                    const blockSize = parseInt(document.getElementById('blockSize').value);
+                    
+                    const { ciphertext, salt } = await cipher.encrypt(
+                        text, 
+                        alphabet, 
+                        symbols, 
+                        key, 
+                        blockSize
+                    );
+                    
+                    currentSalt = salt;
+                    document.getElementById('outputText').textContent = ciphertext;
+                } catch (error) {
+                    console.error("Encryption failed:", error);
+                    document.getElementById('outputText').textContent = `Error: ${error.message}`;
+                } finally {
+                    showLoading(false);
                 }
-                
-                const salt = generateSalt();
-                const iv = window.crypto.getRandomValues(new Uint8Array(16));
-                const key = await deriveKey(passphrase, salt, iterations);
-                
-                const encoder = new TextEncoder();
-                const data = encoder.encode(inputText);
-                
-                const encrypted = await window.crypto.subtle.encrypt(
-                    {
-                        name: 'AES-CBC',
-                        iv: iv
-                    },
-                    key,
-                    data
-                );
-                
-                // Combine salt + iv + ciphertext
-                const result = new Uint8Array(salt.byteLength + iv.byteLength + encrypted.byteLength);
-                result.set(salt, 0);
-                result.set(iv, salt.byteLength);
-                result.set(new Uint8Array(encrypted), salt.byteLength + iv.byteLength);
-                
-                // Convert to Base64 for display/storage
-                const base64 = btoa(String.fromCharCode.apply(null, result));
-                document.getElementById('outputText').textContent = base64;
-                
-            } catch (error) {
-                console.error("Encryption error:", error);
-                alert("Encryption failed: " + error.message);
+            });
+            
+            document.getElementById('decryptBtn').addEventListener('click', async () => {
+                try {
+                    showLoading(true);
+                    const alphabet = document.getElementById('alphabet').value;
+                    const symbols = document.getElementById('symbols').value;
+                    const key = document.getElementById('key').value;
+                    const text = document.getElementById('inputText').value;
+                    const blockSize = parseInt(document.getElementById('blockSize').value);
+                    
+                    if (!currentSalt) {
+                        throw new Error("No salt found - encrypt first or reset");
+                    }
+                    
+                    const plaintext = await cipher.decrypt(
+                        text, 
+                        alphabet, 
+                        symbols, 
+                        key, 
+                        currentSalt, 
+                        blockSize
+                    );
+                    
+                    document.getElementById('outputText').textContent = plaintext;
+                } catch (error) {
+                    console.error("Decryption failed:", error);
+                    document.getElementById('outputText').textContent = `Error: ${error.message}`;
+                } finally {
+                    showLoading(false);
+                }
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                document.getElementById('inputText').value = "HELLO WORLD";
+                document.getElementById('outputText').textContent = "Encrypted/decrypted text will appear here...";
+                currentSalt = '';
+            });
+            
+            function showLoading(show) {
+                document.getElementById('loading').style.display = show ? 'block' : 'none';
             }
-        }
-
-        // Decrypt handler
-        async function handleDecrypt() {
-            try {
-                const inputText = document.getElementById('inputText').value.trim();
-                const passphrase = document.getElementById('key').value;
-                const iterations = parseInt(document.getElementById('iterations').value);
-                
-                if (!inputText || !passphrase) {
-                    alert("Please enter both encrypted data and passphrase");
-                    return;
-                }
-                
-                // Convert from Base64
-                const binaryString = atob(inputText);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                // Extract salt (first 16 bytes), iv (next 16 bytes), ciphertext (rest)
-                const salt = bytes.slice(0, 16);
-                const iv = bytes.slice(16, 32);
-                const ciphertext = bytes.slice(32);
-                
-                const key = await deriveKey(passphrase, salt, iterations);
-                
-                const decrypted = await window.crypto.subtle.decrypt(
-                    {
-                        name: 'AES-CBC',
-                        iv: iv
-                    },
-                    key,
-                    ciphertext
-                );
-                
-                const decoder = new TextDecoder();
-                document.getElementById('outputText').textContent = decoder.decode(decrypted);
-                
-            } catch (error) {
-                console.error("Decryption error:", error);
-                alert("Decryption failed. Check your passphrase and data.");
-            }
-        }
-
-        // Reset all fields
-        function resetAll() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('outputText').textContent = 'Results will appear here...';
-            document.getElementById('key').value = '';
-        }
+        });
     </script>
 </body>
 </html>
