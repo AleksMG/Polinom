@@ -1,561 +1,422 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolyCipher Pro - Secure Block Encryption</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Secure Cipher Pro</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --secondary: #1e40af;
-            --dark: #0f172a;
-            --darker: #020617;
-            --light: #f8fafc;
-            --danger: #dc2626;
-            --success: #10b981;
+            --primary: #6c5ce7;
+            --dark: #2d3436;
+            --light: #dfe6e9;
+            --error: #d63031;
+            --warning: #fdcb6e;
+            --success: #00b894;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
+            font-family: 'Roboto', sans-serif;
             background: var(--dark);
             color: var(--light);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
         }
-
-        header {
-            background: var(--darker);
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .header-content {
-            max-width: 1200px;
+        .container {
+            max-width: 600px;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(45, 52, 54, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .logo-icon {
+        h1 {
             color: var(--primary);
-            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
         }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--light);
+        .input-group {
+            margin-bottom: 20px;
         }
-
-        .security-badge {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .card {
-            background: rgba(15, 23, 42, 0.8);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-title {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: var(--light);
-            opacity: 0.9;
-            font-size: 0.95rem;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
-
-        input, textarea, select {
+        input, textarea {
             width: 100%;
-            padding: 0.875rem;
-            background: rgba(2, 6, 23, 0.8);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: var(--light);
-            font-size: 1rem;
-            transition: all 0.2s;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
         }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
+        input:focus, textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+            outline: none;
         }
-
-        .btn {
-            padding: 0.875rem 1.75rem;
-            border-radius: 8px;
+        .length-counter {
+            font-size: 0.9rem;
+            text-align: right;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+        .strength-meter {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 10px;
             border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .btn-primary {
             background: var(--primary);
             color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-
-        .btn-primary:hover {
-            background: var(--secondary);
-            transform: translateY(-1px);
+        button:hover {
+            background: #5649c0;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
+        button:disabled {
+            background: #636e72;
+            cursor: not-allowed;
         }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .result-container {
-            margin-top: 2rem;
-        }
-
-        .result-text {
-            background: rgba(2, 6, 23, 0.8);
-            padding: 1.5rem;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 1rem;
-            min-height: 120px;
-            overflow-x: auto;
-            border: 1px dashed var(--primary);
-            white-space: pre-wrap;
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            min-height: 100px;
             word-break: break-all;
+            font-family: 'Consolas', monospace;
+            border: 2px dashed var(--primary);
+            animation: pulse 2s infinite;
         }
-
-        .error-message {
-            color: var(--danger);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .loading {
-            display: none;
-            color: var(--success);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-
         @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+            0% { border-color: var(--primary); }
+            50% { border-color: #a29bfe; }
+            100% { border-color: var(--primary); }
         }
-
-        @media (max-width: 768px) {
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        .error {
+            color: var(--error);
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        .valid {
+            color: var(--success);
+        }
+        .invalid {
+            color: var(--error);
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon"><i class="fas fa-lock"></i></div>
-                <div class="logo-text">PolyCipher Pro</div>
-            </div>
-            <div class="security-badge">
-                <i class="fas fa-shield-alt"></i> BLOCK CIPHER MODE
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-cog"></i> Cipher Configuration</h2>
-            
-            <div class="form-group">
-                <label for="alphabet"><i class="fas fa-font"></i> Alphabet</label>
-                <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="256">
-                <div id="alphabet-error" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="symbols"><i class="fas fa-symbols"></i> Symbol Mapping (must match alphabet length)</label>
-                <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈ" maxlength="256">
-                <div id="symbols-error" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="key"><i class="fas fa-key"></i> Encryption Key</label>
-                <input type="password" id="key" value="SecureKey123!" placeholder="Enter a strong encryption key">
-                <div id="key-error" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="blockSize"><i class="fas fa-cube"></i> Block Size (characters)</label>
-                <select id="blockSize">
-                    <option value="8">8 (Fast)</option>
-                    <option value="16" selected>16 (Recommended)</option>
-                    <option value="32">32 (Maximum)</option>
-                </select>
+    <div class="container">
+        <h1>🔐 Secure Cipher Pro</h1>
+        
+        <div class="input-group">
+            <label for="alphabet">Алфавит (ровно 26 букв):</label>
+            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="26">
+            <div class="status">
+                <span id="alphabet-status">Введите 26 уникальных букв</span>
+                <span class="length-counter"><span id="alphabet-length">0</span>/26</span>
             </div>
         </div>
-
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-edit"></i> Text Input</h2>
-            <div class="form-group">
-                <label for="inputText"><i class="fas fa-keyboard"></i> Input Text</label>
-                <textarea id="inputText" rows="5">HELLO WORLD</textarea>
-            </div>
-            
-            <div class="btn-group">
-                <button class="btn btn-primary" id="encryptBtn">
-                    <i class="fas fa-lock"></i> Encrypt
-                </button>
-                <button class="btn btn-success" id="decryptBtn">
-                    <i class="fas fa-lock-open"></i> Decrypt
-                </button>
-                <button class="btn btn-primary" id="resetBtn">
-                    <i class="fas fa-redo"></i> Reset
-                </button>
-            </div>
-            <div id="loading" class="loading">
-                <i class="fas fa-spinner fa-spin"></i> Processing...
+        
+        <div class="input-group">
+            <label for="symbols">Символы шифра (ровно 26 знаков):</label>
+            <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈ" maxlength="26">
+            <div class="status">
+                <span id="symbols-status">Введите 26 уникальных символов</span>
+                <span class="length-counter"><span id="symbols-length">0</span>/26</span>
             </div>
         </div>
-
-        <div class="card result-container">
-            <h2 class="card-title"><i class="fas fa-terminal"></i> Result</h2>
-            <div class="result-text" id="outputText">
-                Encrypted/decrypted text will appear here...
+        
+        <div class="input-group">
+            <label for="key">Ключ:</label>
+            <input type="text" id="key" placeholder="Введите ключ (минимум 8 символов)">
+            <div class="strength-meter">
+                <div class="strength-fill" id="strength-fill"></div>
+            </div>
+            <div class="status">
+                <span id="key-status">Надежность ключа</span>
+                <span id="key-length" class="length-counter">0</span>
             </div>
         </div>
-    </main>
-
-    <footer>
-        <div>PolyCipher Pro v3.1 | Secure Block Cipher System</div>
-    </footer>
+        
+        <div class="input-group">
+            <label for="inputText">Текст:</label>
+            <textarea id="inputText" rows="5" placeholder="Введите текст..."></textarea>
+            <div class="length-counter">
+                Длина: <span id="text-length">0</span> симв.
+                | Шифротекст: <span id="cipher-length">0</span> симв.
+            </div>
+        </div>
+        
+        <button id="encryptBtn" disabled>Шифровать</button>
+        <button id="decryptBtn" disabled>Дешифровать</button>
+        
+        <div class="result" id="outputText">Здесь появится результат...</div>
+        <div class="error" id="errorText"></div>
+    </div>
 
     <script>
-        class PolyCipher {
-            constructor() {
-                this.encoder = new TextEncoder();
-                this.decoder = new TextDecoder();
+        // DOM элементы
+        const alphabetInput = document.getElementById('alphabet');
+        const symbolsInput = document.getElementById('symbols');
+        const keyInput = document.getElementById('key');
+        const inputText = document.getElementById('inputText');
+        const encryptBtn = document.getElementById('encryptBtn');
+        const decryptBtn = document.getElementById('decryptBtn');
+        const outputText = document.getElementById('outputText');
+        const errorText = document.getElementById('errorText');
+        
+        // Элементы статуса
+        const alphabetStatus = document.getElementById('alphabet-status');
+        const symbolsStatus = document.getElementById('symbols-status');
+        const keyStatus = document.getElementById('key-status');
+        const strengthFill = document.getElementById('strength-fill');
+        
+        // Счетчики длины
+        const alphabetLength = document.getElementById('alphabet-length');
+        const symbolsLength = document.getElementById('symbols-length');
+        const keyLength = document.getElementById('key-length');
+        const textLength = document.getElementById('text-length');
+        const cipherLength = document.getElementById('cipher-length');
+
+        // Состояние
+        let lastResult = null;
+        let isAlphabetValid = false;
+        let isSymbolsValid = false;
+        let isKeyValid = false;
+
+        // Проверка алфавита (26 уникальных букв)
+        function validateAlphabet() {
+            const value = alphabetInput.value.toUpperCase();
+            const unique = new Set(value).size;
+            
+            isAlphabetValid = value.length === 26 && unique === 26 && /^[A-Z]+$/.test(value);
+            
+            alphabetStatus.textContent = isAlphabetValid 
+                ? "✅ Алфавит корректен" 
+                : "❌ Нужно 26 уникальных букв A-Z";
+            alphabetStatus.className = isAlphabetValid ? "valid" : "invalid";
+            alphabetLength.textContent = value.length;
+            
+            updateButtonStates();
+            return isAlphabetValid;
+        }
+
+        // Проверка символов (26 уникальных знаков)
+        function validateSymbols() {
+            const value = symbolsInput.value;
+            const unique = new Set(value).size;
+            
+            isSymbolsValid = value.length === 26 && unique === 26;
+            
+            symbolsStatus.textContent = isSymbolsValid 
+                ? "✅ Символы корректны" 
+                : "❌ Нужно 26 уникальных символов";
+            symbolsStatus.className = isSymbolsValid ? "valid" : "invalid";
+            symbolsLength.textContent = value.length;
+            
+            updateButtonStates();
+            return isSymbolsValid;
+        }
+
+        // Проверка ключа (надежность)
+        function validateKey() {
+            const value = keyInput.value;
+            let strength = 0;
+            
+            // Оценка надежности
+            if (value.length >= 8) strength += 1;
+            if (value.length >= 12) strength += 1;
+            if (/[A-Z]/.test(value)) strength += 1;
+            if (/[a-z]/.test(value)) strength += 1;
+            if (/[0-9]/.test(value)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(value)) strength += 1;
+            
+            // Визуализация
+            const percent = Math.min(100, strength * 20);
+            strengthFill.style.width = percent + '%';
+            
+            if (strength <= 2) {
+                strengthFill.style.background = var(--error);
+                keyStatus.textContent = "❌ Слабый ключ";
+            } else if (strength <= 4) {
+                strengthFill.style.background = var(--warning);
+                keyStatus.textContent = "⚠️ Средний ключ";
+            } else {
+                strengthFill.style.background = var(--success);
+                keyStatus.textContent = "✅ Сильный ключ";
             }
+            
+            isKeyValid = value.length >= 8;
+            keyLength.textContent = value.length + " симв.";
+            
+            updateButtonStates();
+            return isKeyValid;
+        }
 
-            async deriveKeys(password, salt, iterations = 100000) {
-                try {
-                    const keyMaterial = await crypto.subtle.importKey(
-                        'raw',
-                        this.encoder.encode(password),
-                        { name: 'PBKDF2' },
-                        false,
-                        ['deriveBits']
-                    );
-                    
-                    const derivedBits = await crypto.subtle.deriveBits(
-                        {
-                            name: 'PBKDF2',
-                            salt: this.encoder.encode(salt),
-                            iterations,
-                            hash: 'SHA-256'
-                        },
-                        keyMaterial,
-                        256
-                    );
-                    
-                    return arrayToHex(new Uint8Array(derivedBits));
-                } catch (error) {
-                    console.error("Key derivation failed:", error);
-                    throw new Error("Key derivation failed");
-                }
+        // Обновление состояния кнопок
+        function updateButtonStates() {
+            encryptBtn.disabled = !(isAlphabetValid && isSymbolsValid && isKeyValid);
+            decryptBtn.disabled = !(isAlphabetValid && isSymbolsValid && isKeyValid && lastResult);
+        }
+
+        // Обновление счетчика длины текста
+        function updateTextLength() {
+            const length = inputText.value.length;
+            textLength.textContent = length;
+            
+            if (lastResult && lastResult.ciphertext) {
+                cipherLength.textContent = lastResult.ciphertext.length;
+            } else {
+                cipherLength.textContent = length;
             }
+        }
 
-            async encrypt(plaintext, alphabet, symbols, password, blockSize = 16) {
-                if (!this.validateInputs(alphabet, symbols, password)) {
-                    throw new Error("Invalid inputs");
-                }
-
-                // Generate random salt for this encryption
-                const salt = this.generateRandomString(32);
-                const derivedKey = await this.deriveKeys(password, salt);
+        // Шифрование
+        async function encrypt() {
+            try {
+                const alphabet = alphabetInput.value.toUpperCase();
+                const symbols = symbolsInput.value;
+                const key = keyInput.value;
+                const text = inputText.value;
                 
-                // Process in blocks
-                let ciphertext = '';
-                const blocks = this.splitIntoBlocks(plaintext, blockSize);
+                // Генерация ключевого потока
+                const keystream = await generateKeystream(text.length, key);
+                let result = "";
                 
-                for (let i = 0; i < blocks.length; i++) {
-                    const block = blocks[i];
-                    const encryptedBlock = await this.processBlock(
-                        block, 
-                        alphabet, 
-                        symbols, 
-                        derivedKey + i.toString()
-                    );
-                    ciphertext += encryptedBlock;
-                }
-                
-                return { ciphertext, salt };
-            }
-
-            async decrypt(ciphertext, alphabet, symbols, password, salt, blockSize = 16) {
-                if (!this.validateInputs(alphabet, symbols, password)) {
-                    throw new Error("Invalid inputs");
-                }
-
-                const derivedKey = await this.deriveKeys(password, salt);
-                let plaintext = '';
-                const blocks = this.splitIntoBlocks(ciphertext, blockSize);
-                
-                for (let i = 0; i < blocks.length; i++) {
-                    const block = blocks[i];
-                    const decryptedBlock = await this.processBlock(
-                        block, 
-                        symbols, 
-                        alphabet, 
-                        derivedKey + i.toString(),
-                        true
-                    );
-                    plaintext += decryptedBlock;
-                }
-                
-                return plaintext;
-            }
-
-            async processBlock(block, sourceAlphabet, targetAlphabet, key, isDecrypt = false) {
-                // Generate polynomial coefficients from key
-                const coeffs = await this.generateCoefficients(key, 3);
-                
-                let result = '';
-                for (let i = 0; i < block.length; i++) {
-                    const char = block[i];
-                    const index = sourceAlphabet.indexOf(char);
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i].toUpperCase();
+                    const index = alphabet.indexOf(char);
                     
                     if (index === -1) {
+                        result += char; // Символы вне алфавита не изменяются
+                        continue;
+                    }
+                    
+                    // Шифрование
+                    const symbolIndex = (index + keystream[i]) % 26;
+                    result += symbols[symbolIndex];
+                }
+                
+                lastResult = { ciphertext: result, alphabet, symbols, key };
+                outputText.textContent = result;
+                errorText.textContent = "";
+                updateTextLength();
+            } catch (e) {
+                errorText.textContent = "Ошибка: " + e.message;
+            }
+        }
+
+        // Дешифрование
+        async function decrypt() {
+            try {
+                if (!lastResult) throw new Error("Сначала зашифруйте текст");
+                
+                const { ciphertext, alphabet, symbols, key } = lastResult;
+                const keystream = await generateKeystream(ciphertext.length, key);
+                let result = "";
+                
+                for (let i = 0; i < ciphertext.length; i++) {
+                    const char = ciphertext[i];
+                    const symbolIndex = symbols.indexOf(char);
+                    
+                    if (symbolIndex === -1) {
                         result += char;
                         continue;
                     }
                     
-                    // Non-linear transformation with position-dependent factor
-                    const positionFactor = (i % 7) + 1;
-                    const x = (index * positionFactor) % sourceAlphabet.length;
-                    
-                    const transformedIndex = this.polynomialTransform(
-                        x, 
-                        coeffs, 
-                        sourceAlphabet.length
-                    ) % targetAlphabet.length;
-                    
-                    result += targetAlphabet[transformedIndex];
+                    // Дешифрование
+                    const originalIndex = (symbolIndex - keystream[i] + 26) % 26;
+                    result += alphabet[originalIndex];
                 }
                 
-                return result;
-            }
-
-            async generateCoefficients(key, degree) {
-                const hash = await crypto.subtle.digest(
-                    'SHA-256', 
-                    this.encoder.encode(key)
-                );
-                
-                const view = new DataView(hash);
-                const coeffs = [];
-                
-                for (let i = 0; i <= degree; i++) {
-                    coeffs.push(view.getUint32(i * 4) % 65537);
-                }
-                
-                return coeffs;
-            }
-
-            polynomialTransform(x, coeffs, mod) {
-                let result = 0;
-                for (let i = 0; i < coeffs.length; i++) {
-                    const exponent = coeffs.length - 1 - i;
-                    const term = this.modPow(x, exponent, mod);
-                    result = (result + coeffs[i] * term) % mod;
-                }
-                return result;
-            }
-
-            modPow(base, exponent, modulus) {
-                if (modulus === 1) return 0;
-                let result = 1;
-                base = base % modulus;
-                
-                while (exponent > 0) {
-                    if (exponent % 2 === 1) {
-                        result = (result * base) % modulus;
-                    }
-                    exponent = exponent >> 1;
-                    base = (base * base) % modulus;
-                }
-                return result;
-            }
-
-            splitIntoBlocks(text, blockSize) {
-                const blocks = [];
-                for (let i = 0; i < text.length; i += blockSize) {
-                    blocks.push(text.substr(i, blockSize));
-                }
-                return blocks;
-            }
-
-            generateRandomString(length) {
-                const array = new Uint8Array(length);
-                crypto.getRandomValues(array);
-                return Array.from(array, byte => 
-                    byte.toString(16).padStart(2, '0')).join('');
-            }
-
-            validateInputs(alphabet, symbols, password) {
-                if (alphabet.length !== symbols.length) {
-                    alert("Alphabet and symbols must be the same length");
-                    return false;
-                }
-                if (password.length < 8) {
-                    alert("Password must be at least 8 characters");
-                    return false;
-                }
-                return true;
+                outputText.textContent = result;
+                errorText.textContent = "";
+            } catch (e) {
+                errorText.textContent = "Ошибка: " + e.message;
             }
         }
 
-        // Helper function
-        function arrayToHex(buffer) {
-            return Array.from(new Uint8Array(buffer))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
+        // Генерация ключевого потока
+        async function generateKeystream(length, password) {
+            const salt = "fixed_salt_secure";
+            const iterations = 100000;
+            
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw",
+                new TextEncoder().encode(password),
+                { name: "PBKDF2" },
+                false,
+                ["deriveBits"]
+            );
+            
+            const bits = await crypto.subtle.deriveBits(
+                {
+                    name: "PBKDF2",
+                    salt: new TextEncoder().encode(salt),
+                    iterations,
+                    hash: "SHA-256"
+                },
+                keyMaterial,
+                length * 32
+            );
+            
+            const view = new DataView(bits);
+            const keystream = [];
+            
+            for (let i = 0; i < length; i++) {
+                keystream.push(view.getUint32(i * 4) % 26);
+            }
+            
+            return keystream;
         }
 
-        // UI Handling
-        document.addEventListener('DOMContentLoaded', function() {
-            const cipher = new PolyCipher();
-            let currentSalt = '';
-            
-            // Event listeners
-            document.getElementById('encryptBtn').addEventListener('click', async () => {
-                try {
-                    showLoading(true);
-                    const alphabet = document.getElementById('alphabet').value;
-                    const symbols = document.getElementById('symbols').value;
-                    const key = document.getElementById('key').value;
-                    const text = document.getElementById('inputText').value;
-                    const blockSize = parseInt(document.getElementById('blockSize').value);
-                    
-                    const { ciphertext, salt } = await cipher.encrypt(
-                        text, 
-                        alphabet, 
-                        symbols, 
-                        key, 
-                        blockSize
-                    );
-                    
-                    currentSalt = salt;
-                    document.getElementById('outputText').textContent = ciphertext;
-                } catch (error) {
-                    console.error("Encryption failed:", error);
-                    document.getElementById('outputText').textContent = `Error: ${error.message}`;
-                } finally {
-                    showLoading(false);
-                }
-            });
-            
-            document.getElementById('decryptBtn').addEventListener('click', async () => {
-                try {
-                    showLoading(true);
-                    const alphabet = document.getElementById('alphabet').value;
-                    const symbols = document.getElementById('symbols').value;
-                    const key = document.getElementById('key').value;
-                    const text = document.getElementById('inputText').value;
-                    const blockSize = parseInt(document.getElementById('blockSize').value);
-                    
-                    if (!currentSalt) {
-                        throw new Error("No salt found - encrypt first or reset");
-                    }
-                    
-                    const plaintext = await cipher.decrypt(
-                        text, 
-                        alphabet, 
-                        symbols, 
-                        key, 
-                        currentSalt, 
-                        blockSize
-                    );
-                    
-                    document.getElementById('outputText').textContent = plaintext;
-                } catch (error) {
-                    console.error("Decryption failed:", error);
-                    document.getElementById('outputText').textContent = `Error: ${error.message}`;
-                } finally {
-                    showLoading(false);
-                }
-            });
-            
-            document.getElementById('resetBtn').addEventListener('click', () => {
-                document.getElementById('inputText').value = "HELLO WORLD";
-                document.getElementById('outputText').textContent = "Encrypted/decrypted text will appear here...";
-                currentSalt = '';
-            });
-            
-            function showLoading(show) {
-                document.getElementById('loading').style.display = show ? 'block' : 'none';
-            }
-        });
+        // Слушатели событий
+        alphabetInput.addEventListener('input', validateAlphabet);
+        symbolsInput.addEventListener('input', validateSymbols);
+        keyInput.addEventListener('input', validateKey);
+        inputText.addEventListener('input', updateTextLength);
+        encryptBtn.addEventListener('click', encrypt);
+        decryptBtn.addEventListener('click', decrypt);
+
+        // Инициализация
+        validateAlphabet();
+        validateSymbols();
+        validateKey();
+        updateTextLength();
     </script>
 </body>
 </html>
