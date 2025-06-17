@@ -3,122 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoCipher - Полиномиальный шифр с SHA-256</title>
+    <title>SecurePolyCipher - Military-Grade Encryption</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
     <style>
         :root {
-            --primary: #00ffaa;
-            --secondary: #7700ff;
-            --dark: #0a0a12;
-            --darker: #050508;
-            --light: #e0e0ff;
-            --danger: #ff3a5e;
-            --warning: #ffcc00;
+            --primary: #3b82f6;
+            --secondary: #1d4ed8;
+            --dark: #111827;
+            --darker: #030712;
+            --light: #f9fafb;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Fira Code', monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background: var(--dark);
             color: var(--light);
             min-height: 100vh;
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Sidebar */
-        .sidebar {
+        /* Header styles */
+        header {
             background: var(--darker);
-            padding: 2rem;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            height: 100vh;
-            position: sticky;
-            top: 0;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 3rem;
         }
 
         .logo-icon {
             color: var(--primary);
-            font-size: 2.5rem;
+            font-size: 1.8rem;
         }
 
         .logo-text {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            color: var(--light);
+        }
+
+        .security-badge {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .nav-item:hover {
-            background: rgba(255,255,255,0.05);
-        }
-
-        .nav-item.active {
-            background: rgba(0, 255, 170, 0.1);
-            border-left: 3px solid var(--primary);
-        }
-
-        /* Main Content */
-        .main {
-            padding: 3rem;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-        }
-
-        .title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* Main content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .card {
-            background: rgba(20, 20, 30, 0.8);
-            border-radius: 16px;
+            background: rgba(17, 24, 39, 0.8);
+            border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
             border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .card-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             margin-bottom: 1.5rem;
             color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .form-group {
@@ -129,46 +107,48 @@
             display: block;
             margin-bottom: 0.5rem;
             color: var(--light);
-            opacity: 0.8;
+            opacity: 0.9;
+            font-size: 0.95rem;
         }
 
         input, textarea, select {
             width: 100%;
-            padding: 1rem;
-            background: rgba(10, 10, 20, 0.8);
+            padding: 0.875rem;
+            background: rgba(3, 7, 18, 0.8);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
             color: var(--light);
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(0, 255, 170, 0.2);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
 
         .btn {
-            padding: 1rem 2rem;
+            padding: 0.875rem 1.75rem;
             border-radius: 8px;
             border: none;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.95rem;
         }
 
         .btn-primary {
             background: var(--primary);
-            color: var(--dark);
+            color: white;
         }
 
         .btn-primary:hover {
-            background: #00e699;
-            transform: translateY(-2px);
+            background: var(--secondary);
+            transform: translateY(-1px);
         }
 
         .btn-danger {
@@ -179,7 +159,8 @@
         .btn-group {
             display: flex;
             gap: 1rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .result-container {
@@ -187,364 +168,256 @@
         }
 
         .result-text {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2rem;
+            background: rgba(3, 7, 18, 0.8);
+            padding: 1.5rem;
             border-radius: 8px;
             font-family: monospace;
-            font-size: 1.2rem;
-            min-height: 150px;
+            font-size: 1rem;
+            min-height: 120px;
             overflow-x: auto;
             border: 1px dashed var(--primary);
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
-        .mapping-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .mapping {
-            background: rgba(30, 30, 50, 0.6);
-            padding: 1.5rem;
-            border-radius: 12px;
-        }
-
-        .mapping-title {
-            color: var(--warning);
-            margin-bottom: 1rem;
+        .status-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .mapping-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 1rem;
-        }
-
-        .mapping-item {
-            background: rgba(50, 50, 80, 0.8);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 1rem 0.5rem;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .mapping-item:hover {
-            transform: scale(1.1);
-            background: var(--primary);
-            color: var(--dark);
-        }
-
-        .status-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--darker);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .security-badge {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: var(--dark);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
             font-size: 0.9rem;
         }
 
-        /* Анимации */
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
         @keyframes pulse {
             0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
         /* Responsive */
-        @media (max-width: 1200px) {
-            body {
-                grid-template-columns: 1fr;
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
             }
-            .sidebar {
-                display: none;
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <div class="logo-icon"><i class="fas fa-lock"></i></div>
-            <div class="logo-text">NeoCipher</div>
-        </div>
-        <div class="nav-item active">
-            <i class="fas fa-key"></i>
-            <span>Шифрование</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-wrench"></i>
-            <span>Настройки</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-shield-alt"></i>
-            <span>Безопасность</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-info-circle"></i>
-            <span>О программе</span>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main">
-        <div class="header">
-            <h1 class="title">Полиномиальный шифр</h1>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-lock"></i></div>
+                <div class="logo-text">SecurePolyCipher</div>
+            </div>
             <div class="security-badge">
-                <i class="fas fa-shield-alt"></i> УРОВЕНЬ БЕЗОПАСНОСТИ: АРМИЯ
+                <i class="fas fa-shield-alt"></i> AES-256 + SHA-384
             </div>
         </div>
+    </header>
 
+    <main>
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-cog"></i> Конфигурация шифра</h2>
+            <h2 class="card-title"><i class="fas fa-cog"></i> Encryption Settings</h2>
             
             <div class="form-group">
-                <label for="alphabet"><i class="fas fa-font"></i> Пользовательский алфавит</label>
-                <input type="text" id="alphabet" value="KRYPTOSABCDEFGHIJLMNQUVWXZ0123456789">
+                <label for="key"><i class="fas fa-key"></i> Encryption Key</label>
+                <input type="password" id="key" placeholder="Enter a strong passphrase" autocomplete="off">
             </div>
             
             <div class="form-group">
-                <label for="symbols"><i class="fas fa-symbols"></i> Маппинг символов (должен совпадать по длине с алфавитом)</label>
-                <input type="text" id="symbols" value="ⴽΔ⊕⌖§ⵁⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ">
-            </div>
-            
-            <div class="form-group">
-                <label for="key"><i class="fas fa-key"></i> Ключ шифрования</label>
-                <input type="text" id="key" value="MySuperSecretKey2024!">
-            </div>
-            
-            <div class="form-group">
-                <label for="polyDegree"><i class="fas fa-function"></i> Степень полинома</label>
-                <select id="polyDegree">
-                    <option value="3">3 (рекомендуется)</option>
-                    <option value="5">5 (макс. безопасность)</option>
-                    <option value="7">7 (экстремально)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="primeModulus"><i class="fas fa-divide"></i> Простой модуль (P)</label>
-                <select id="primeModulus">
-                    <option value="65537">65537 (рекомендуется)</option>
-                    <option value="257">257 (быстрее)</option>
-                    <option value="7919">7919 (безопаснее)</option>
+                <label for="iterations"><i class="fas fa-redo"></i> PBKDF2 Iterations</label>
+                <select id="iterations">
+                    <option value="100000">100,000 (Standard)</option>
+                    <option value="250000">250,000 (Enhanced)</option>
+                    <option value="500000">500,000 (Paranoid)</option>
                 </select>
             </div>
         </div>
 
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-edit"></i> Ввод текста</h2>
+            <h2 class="card-title"><i class="fas fa-edit"></i> Text Processing</h2>
             <div class="form-group">
-                <label for="inputText"><i class="fas fa-keyboard"></i> Исходный текст</label>
-                <textarea id="inputText" rows="5">Совершенно секретные данные: План "Феникс" активирован 12.08.2024</textarea>
+                <label for="inputText"><i class="fas fa-keyboard"></i> Input Text</label>
+                <textarea id="inputText" rows="5" placeholder="Enter text to encrypt or decrypt"></textarea>
             </div>
             
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="encrypt()">
-                    <i class="fas fa-lock"></i> Зашифровать
+                <button class="btn btn-primary" id="encryptBtn">
+                    <i class="fas fa-lock"></i> Encrypt
                 </button>
-                <button class="btn btn-primary" onclick="decrypt()">
-                    <i class="fas fa-lock-open"></i> Расшифровать
+                <button class="btn btn-primary" id="decryptBtn">
+                    <i class="fas fa-lock-open"></i> Decrypt
                 </button>
-                <button class="btn btn-danger" onclick="resetAll()">
-                    <i class="fas fa-redo"></i> Сбросить
+                <button class="btn btn-danger" id="resetBtn">
+                    <i class="fas fa-redo"></i> Clear All
                 </button>
-            </div>
-        </div>
-
-        <div class="mapping-container">
-            <div class="mapping">
-                <h3 class="mapping-title"><i class="fas fa-font"></i> Алфавит</h3>
-                <div class="mapping-grid" id="alphabetMapping"></div>
-            </div>
-            
-            <div class="mapping">
-                <h3 class="mapping-title"><i class="fas fa-symbols"></i> Маппинг символов</h3>
-                <div class="mapping-grid" id="symbolMapping"></div>
             </div>
         </div>
 
         <div class="card result-container">
-            <h2 class="card-title"><i class="fas fa-terminal"></i> Результат</h2>
+            <h2 class="card-title"><i class="fas fa-terminal"></i> Result</h2>
             <div class="result-text" id="outputText">
-                Здесь появится зашифрованный/расшифрованный текст...
+                Results will appear here...
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Status Bar -->
-    <div class="status-bar">
-        <div><i class="fas fa-circle pulse" style="color: var(--primary);"></i> Система готова</div>
-        <div>NeoCipher v2.4 | SHA-256 | Полиномиальное шифрование</div>
-    </div>
+    <footer>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>System Ready</span>
+        </div>
+        <div>SecurePolyCipher v3.0 | Web Crypto API | PBKDF2 + AES-CBC</div>
+    </footer>
 
     <script>
-        // Инициализация при загрузке
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            initMappings();
-            
-            // Слушатели изменений
-            document.getElementById('alphabet').addEventListener('input', initMappings);
-            document.getElementById('symbols').addEventListener('input', initMappings);
+            setupEventListeners();
         });
 
-        // Инициализация отображения маппинга
-        function initMappings() {
-            const alphabet = document.getElementById('alphabet').value;
-            const symbols = document.getElementById('symbols').value;
-            
-            // Очищаем предыдущие маппинги
-            document.getElementById('alphabetMapping').innerHTML = '';
-            document.getElementById('symbolMapping').innerHTML = '';
-            
-            // Заполняем алфавит
-            for (let char of alphabet) {
-                const div = document.createElement('div');
-                div.className = 'mapping-item';
-                div.textContent = char;
-                document.getElementById('alphabetMapping').appendChild(div);
-            }
-            
-            // Заполняем символы
-            for (let symbol of symbols) {
-                const div = document.createElement('div');
-                div.className = 'mapping-item';
-                div.textContent = symbol;
-                document.getElementById('symbolMapping').appendChild(div);
-            }
+        // Set up all event listeners
+        function setupEventListeners() {
+            document.getElementById('encryptBtn').addEventListener('click', handleEncrypt);
+            document.getElementById('decryptBtn').addEventListener('click', handleDecrypt);
+            document.getElementById('resetBtn').addEventListener('click', resetAll);
         }
 
-        // Генерация коэффициентов полинома из ключа с использованием SHA-256
-        function getPolynomialCoefficients(key, degree = 3, prime = 65537) {
-            // Хешируем ключ
-            const hash = sha256(key);
-            const coeffs = [];
+        // Generate derived key from passphrase using PBKDF2
+        async function deriveKey(passphrase, salt, iterations) {
+            const encoder = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                encoder.encode(passphrase),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
             
-            // Преобразуем хеш в коэффициенты
-            for (let i = 0; i <= degree; i++) {
-                const segment = hash.substring(i*8, (i+1)*8);
-                const num = parseInt(segment, 16) % prime;
-                coeffs.push(num);
-            }
-            
-            return coeffs;
+            return await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: iterations,
+                    hash: 'SHA-384'
+                },
+                keyMaterial,
+                { name: 'AES-CBC', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
         }
 
-        // Полиномиальное преобразование
-        function polynomialTransform(x, coeffs, prime) {
-            let result = 0;
-            for (let i = 0; i < coeffs.length; i++) {
-                result += coeffs[i] * Math.pow(x, coeffs.length-1-i);
-            }
-            return Math.abs(result) % prime;
+        // Generate random salt
+        function generateSalt() {
+            return window.crypto.getRandomValues(new Uint8Array(16));
         }
 
-        // Шифрование
-        function encrypt() {
-            const alphabet = document.getElementById('alphabet').value;
-            const symbols = document.getElementById('symbols').value;
-            const key = document.getElementById('key').value;
-            const inputText = document.getElementById('inputText').value;
-            const degree = parseInt(document.getElementById('polyDegree').value);
-            const prime = parseInt(document.getElementById('primeModulus').value);
-            
-            // Валидация
-            if (alphabet.length !== symbols.length) {
-                alert("Ошибка: Длина алфавита и маппинга символов должна совпадать!");
-                return;
-            }
-            
-            if (alphabet.length === 0) {
-                alert("Ошибка: Алфавит не может быть пустым!");
-                return;
-            }
-            
-            // Получаем коэффициенты полинома
-            const coeffs = getPolynomialCoefficients(key, degree, prime);
-            
-            let output = '';
-            for (let i = 0; i < inputText.length; i++) {
-                const char = inputText[i];
-                const charIndex = alphabet.indexOf(char);
+        // Encrypt handler
+        async function handleEncrypt() {
+            try {
+                const inputText = document.getElementById('inputText').value;
+                const passphrase = document.getElementById('key').value;
+                const iterations = parseInt(document.getElementById('iterations').value);
                 
-                // Если символа нет в алфавите, оставляем как есть
-                if (charIndex === -1) {
-                    output += char;
-                    continue;
+                if (!inputText || !passphrase) {
+                    alert("Please enter both text and passphrase");
+                    return;
                 }
                 
-                // Применяем полиномиальное преобразование
-                const transformedIndex = polynomialTransform(charIndex, coeffs, prime) % symbols.length;
-                output += symbols[transformedIndex];
+                const salt = generateSalt();
+                const iv = window.crypto.getRandomValues(new Uint8Array(16));
+                const key = await deriveKey(passphrase, salt, iterations);
+                
+                const encoder = new TextEncoder();
+                const data = encoder.encode(inputText);
+                
+                const encrypted = await window.crypto.subtle.encrypt(
+                    {
+                        name: 'AES-CBC',
+                        iv: iv
+                    },
+                    key,
+                    data
+                );
+                
+                // Combine salt + iv + ciphertext
+                const result = new Uint8Array(salt.byteLength + iv.byteLength + encrypted.byteLength);
+                result.set(salt, 0);
+                result.set(iv, salt.byteLength);
+                result.set(new Uint8Array(encrypted), salt.byteLength + iv.byteLength);
+                
+                // Convert to Base64 for display/storage
+                const base64 = btoa(String.fromCharCode.apply(null, result));
+                document.getElementById('outputText').textContent = base64;
+                
+            } catch (error) {
+                console.error("Encryption error:", error);
+                alert("Encryption failed: " + error.message);
             }
-            
-            document.getElementById('outputText').textContent = output;
         }
 
-        // Дешифрование
-        function decrypt() {
-            const alphabet = document.getElementById('alphabet').value;
-            const symbols = document.getElementById('symbols').value;
-            const key = document.getElementById('key').value;
-            const inputText = document.getElementById('inputText').value;
-            const degree = parseInt(document.getElementById('polyDegree').value);
-            const prime = parseInt(document.getElementById('primeModulus').value);
-            
-            // Валидация
-            if (alphabet.length !== symbols.length) {
-                alert("Ошибка: Длина алфавита и маппинга символов должна совпадать!");
-                return;
+        // Decrypt handler
+        async function handleDecrypt() {
+            try {
+                const inputText = document.getElementById('inputText').value.trim();
+                const passphrase = document.getElementById('key').value;
+                const iterations = parseInt(document.getElementById('iterations').value);
+                
+                if (!inputText || !passphrase) {
+                    alert("Please enter both encrypted data and passphrase");
+                    return;
+                }
+                
+                // Convert from Base64
+                const binaryString = atob(inputText);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Extract salt (first 16 bytes), iv (next 16 bytes), ciphertext (rest)
+                const salt = bytes.slice(0, 16);
+                const iv = bytes.slice(16, 32);
+                const ciphertext = bytes.slice(32);
+                
+                const key = await deriveKey(passphrase, salt, iterations);
+                
+                const decrypted = await window.crypto.subtle.decrypt(
+                    {
+                        name: 'AES-CBC',
+                        iv: iv
+                    },
+                    key,
+                    ciphertext
+                );
+                
+                const decoder = new TextDecoder();
+                document.getElementById('outputText').textContent = decoder.decode(decrypted);
+                
+            } catch (error) {
+                console.error("Decryption error:", error);
+                alert("Decryption failed. Check your passphrase and data.");
             }
-            
-            // Получаем коэффициенты полинома
-            const coeffs = getPolynomialCoefficients(key, degree, prime);
-            
-            // Создаем обратный маппинг
-            const inverseMap = {};
-            for (let i = 0; i < alphabet.length; i++) {
-                const transformedIndex = polynomialTransform(i, coeffs, prime) % symbols.length;
-                inverseMap[symbols[transformedIndex]] = alphabet[i];
-            }
-            
-            let output = '';
-            for (let i = 0; i < inputText.length; i++) {
-                const symbol = inputText[i];
-                output += inverseMap[symbol] || symbol; // Если нет в маппинге, оставляем как есть
-            }
-            
-            document.getElementById('outputText').textContent = output;
         }
 
-        // Сброс
+        // Reset all fields
         function resetAll() {
-            document.getElementById('alphabet').value = "KRYPTOSABCDEFGHIJLMNQUVWXZ0123456789";
-            document.getElementById('symbols').value = "ⴽΔ⊕⌖§ⵁⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ";
-            document.getElementById('key').value = "MySuperSecretKey2024!";
-            document.getElementById('inputText').value = "Совершенно секретные данные: План \"Феникс\" активирован 12.08.2024";
-            document.getElementById('outputText').textContent = "Здесь появится зашифрованный/расшифрованный текст...";
-            initMappings();
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').textContent = 'Results will appear here...';
+            document.getElementById('key').value = '';
         }
     </script>
 </body>
