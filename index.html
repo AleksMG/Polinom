@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoCipher - Полиномиальный шифр с SHA-256</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+    <style>
+        :root {
+            --primary: #00ffaa;
+            --secondary: #7700ff;
+            --dark: #0a0a12;
+            --darker: #050508;
+            --light: #e0e0ff;
+            --danger: #ff3a5e;
+            --warning: #ffcc00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fira Code', monospace;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--darker);
+            padding: 2rem;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 2.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 255, 170, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: rgba(20, 20, 30, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+            opacity: 0.8;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 255, 170, 0.2);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover {
+            background: #00e699;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+        }
+
+        .result-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            min-height: 150px;
+            overflow-x: auto;
+            border: 1px dashed var(--primary);
+        }
+
+        .mapping-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .mapping {
+            background: rgba(30, 30, 50, 0.6);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .mapping-title {
+            color: var(--warning);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 1rem;
+        }
+
+        .mapping-item {
+            background: rgba(50, 50, 80, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .mapping-item:hover {
+            transform: scale(1.1);
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--darker);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .security-badge {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Анимации */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-lock"></i></div>
+            <div class="logo-text">NeoCipher</div>
+        </div>
+        <div class="nav-item active">
+            <i class="fas fa-key"></i>
+            <span>Шифрование</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-wrench"></i>
+            <span>Настройки</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Безопасность</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-info-circle"></i>
+            <span>О программе</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <div class="header">
+            <h1 class="title">Полиномиальный шифр</h1>
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i> УРОВЕНЬ БЕЗОПАСНОСТИ: АРМИЯ
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-cog"></i> Конфигурация шифра</h2>
+            
+            <div class="form-group">
+                <label for="alphabet"><i class="fas fa-font"></i> Пользовательский алфавит</label>
+                <input type="text" id="alphabet" value="KRYPTOSABCDEFGHIJLMNQUVWXZ0123456789">
+            </div>
+            
+            <div class="form-group">
+                <label for="symbols"><i class="fas fa-symbols"></i> Маппинг символов (должен совпадать по длине с алфавитом)</label>
+                <input type="text" id="symbols" value="ⴽΔ⊕⌖§ⵁⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ">
+            </div>
+            
+            <div class="form-group">
+                <label for="key"><i class="fas fa-key"></i> Ключ шифрования</label>
+                <input type="text" id="key" value="MySuperSecretKey2024!">
+            </div>
+            
+            <div class="form-group">
+                <label for="polyDegree"><i class="fas fa-function"></i> Степень полинома</label>
+                <select id="polyDegree">
+                    <option value="3">3 (рекомендуется)</option>
+                    <option value="5">5 (макс. безопасность)</option>
+                    <option value="7">7 (экстремально)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="primeModulus"><i class="fas fa-divide"></i> Простой модуль (P)</label>
+                <select id="primeModulus">
+                    <option value="65537">65537 (рекомендуется)</option>
+                    <option value="257">257 (быстрее)</option>
+                    <option value="7919">7919 (безопаснее)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-edit"></i> Ввод текста</h2>
+            <div class="form-group">
+                <label for="inputText"><i class="fas fa-keyboard"></i> Исходный текст</label>
+                <textarea id="inputText" rows="5">Совершенно секретные данные: План "Феникс" активирован 12.08.2024</textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="encrypt()">
+                    <i class="fas fa-lock"></i> Зашифровать
+                </button>
+                <button class="btn btn-primary" onclick="decrypt()">
+                    <i class="fas fa-lock-open"></i> Расшифровать
+                </button>
+                <button class="btn btn-danger" onclick="resetAll()">
+                    <i class="fas fa-redo"></i> Сбросить
+                </button>
+            </div>
+        </div>
+
+        <div class="mapping-container">
+            <div class="mapping">
+                <h3 class="mapping-title"><i class="fas fa-font"></i> Алфавит</h3>
+                <div class="mapping-grid" id="alphabetMapping"></div>
+            </div>
+            
+            <div class="mapping">
+                <h3 class="mapping-title"><i class="fas fa-symbols"></i> Маппинг символов</h3>
+                <div class="mapping-grid" id="symbolMapping"></div>
+            </div>
+        </div>
+
+        <div class="card result-container">
+            <h2 class="card-title"><i class="fas fa-terminal"></i> Результат</h2>
+            <div class="result-text" id="outputText">
+                Здесь появится зашифрованный/расшифрованный текст...
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div><i class="fas fa-circle pulse" style="color: var(--primary);"></i> Система готова</div>
+        <div>NeoCipher v2.4 | SHA-256 | Полиномиальное шифрование</div>
+    </div>
+
+    <script>
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initMappings();
+            
+            // Слушатели изменений
+            document.getElementById('alphabet').addEventListener('input', initMappings);
+            document.getElementById('symbols').addEventListener('input', initMappings);
+        });
+
+        // Инициализация отображения маппинга
+        function initMappings() {
+            const alphabet = document.getElementById('alphabet').value;
+            const symbols = document.getElementById('symbols').value;
+            
+            // Очищаем предыдущие маппинги
+            document.getElementById('alphabetMapping').innerHTML = '';
+            document.getElementById('symbolMapping').innerHTML = '';
+            
+            // Заполняем алфавит
+            for (let char of alphabet) {
+                const div = document.createElement('div');
+                div.className = 'mapping-item';
+                div.textContent = char;
+                document.getElementById('alphabetMapping').appendChild(div);
+            }
+            
+            // Заполняем символы
+            for (let symbol of symbols) {
+                const div = document.createElement('div');
+                div.className = 'mapping-item';
+                div.textContent = symbol;
+                document.getElementById('symbolMapping').appendChild(div);
+            }
+        }
+
+        // Генерация коэффициентов полинома из ключа с использованием SHA-256
+        function getPolynomialCoefficients(key, degree = 3, prime = 65537) {
+            // Хешируем ключ
+            const hash = sha256(key);
+            const coeffs = [];
+            
+            // Преобразуем хеш в коэффициенты
+            for (let i = 0; i <= degree; i++) {
+                const segment = hash.substring(i*8, (i+1)*8);
+                const num = parseInt(segment, 16) % prime;
+                coeffs.push(num);
+            }
+            
+            return coeffs;
+        }
+
+        // Полиномиальное преобразование
+        function polynomialTransform(x, coeffs, prime) {
+            let result = 0;
+            for (let i = 0; i < coeffs.length; i++) {
+                result += coeffs[i] * Math.pow(x, coeffs.length-1-i);
+            }
+            return Math.abs(result) % prime;
+        }
+
+        // Шифрование
+        function encrypt() {
+            const alphabet = document.getElementById('alphabet').value;
+            const symbols = document.getElementById('symbols').value;
+            const key = document.getElementById('key').value;
+            const inputText = document.getElementById('inputText').value;
+            const degree = parseInt(document.getElementById('polyDegree').value);
+            const prime = parseInt(document.getElementById('primeModulus').value);
+            
+            // Валидация
+            if (alphabet.length !== symbols.length) {
+                alert("Ошибка: Длина алфавита и маппинга символов должна совпадать!");
+                return;
+            }
+            
+            if (alphabet.length === 0) {
+                alert("Ошибка: Алфавит не может быть пустым!");
+                return;
+            }
+            
+            // Получаем коэффициенты полинома
+            const coeffs = getPolynomialCoefficients(key, degree, prime);
+            
+            let output = '';
+            for (let i = 0; i < inputText.length; i++) {
+                const char = inputText[i];
+                const charIndex = alphabet.indexOf(char);
+                
+                // Если символа нет в алфавите, оставляем как есть
+                if (charIndex === -1) {
+                    output += char;
+                    continue;
+                }
+                
+                // Применяем полиномиальное преобразование
+                const transformedIndex = polynomialTransform(charIndex, coeffs, prime) % symbols.length;
+                output += symbols[transformedIndex];
+            }
+            
+            document.getElementById('outputText').textContent = output;
+        }
+
+        // Дешифрование
+        function decrypt() {
+            const alphabet = document.getElementById('alphabet').value;
+            const symbols = document.getElementById('symbols').value;
+            const key = document.getElementById('key').value;
+            const inputText = document.getElementById('inputText').value;
+            const degree = parseInt(document.getElementById('polyDegree').value);
+            const prime = parseInt(document.getElementById('primeModulus').value);
+            
+            // Валидация
+            if (alphabet.length !== symbols.length) {
+                alert("Ошибка: Длина алфавита и маппинга символов должна совпадать!");
+                return;
+            }
+            
+            // Получаем коэффициенты полинома
+            const coeffs = getPolynomialCoefficients(key, degree, prime);
+            
+            // Создаем обратный маппинг
+            const inverseMap = {};
+            for (let i = 0; i < alphabet.length; i++) {
+                const transformedIndex = polynomialTransform(i, coeffs, prime) % symbols.length;
+                inverseMap[symbols[transformedIndex]] = alphabet[i];
+            }
+            
+            let output = '';
+            for (let i = 0; i < inputText.length; i++) {
+                const symbol = inputText[i];
+                output += inverseMap[symbol] || symbol; // Если нет в маппинге, оставляем как есть
+            }
+            
+            document.getElementById('outputText').textContent = output;
+        }
+
+        // Сброс
+        function resetAll() {
+            document.getElementById('alphabet').value = "KRYPTOSABCDEFGHIJLMNQUVWXZ0123456789";
+            document.getElementById('symbols').value = "ⴽΔ⊕⌖§ⵁⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ";
+            document.getElementById('key').value = "MySuperSecretKey2024!";
+            document.getElementById('inputText').value = "Совершенно секретные данные: План \"Феникс\" активирован 12.08.2024";
+            document.getElementById('outputText').textContent = "Здесь появится зашифрованный/расшифрованный текст...";
+            initMappings();
+        }
+    </script>
+</body>
+</html>
