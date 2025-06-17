@@ -1,260 +1,525 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Cipher Pro</title>
+    <title>ADFGVX Cipher Terminal | Linux 2030 Edition</title>
     <style>
         :root {
-            --primary: #6c5ce7;
-            --dark: #2d3436;
-            --light: #dfe6e9;
-            --error: #d63031;
-            --warning: #fdcb6e;
-            --success: #00b894;
+            --bg-dark: #0a0a12;
+            --bg-light: #12121a;
+            --primary: #00ffaa;
+            --secondary: #ff00aa;
+            --text: #e0e0ff;
+            --terminal-font: 'Courier New', monospace;
+            --glow: 0 0 10px rgba(0, 255, 170, 0.5);
         }
+        
         body {
-            font-family: 'Roboto', sans-serif;
-            background: var(--dark);
-            color: var(--light);
+            background-color: var(--bg-dark);
+            color: var(--text);
+            font-family: var(--terminal-font);
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(45, 52, 54, 0.9);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        
+        .terminal {
+            width: 800px;
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            box-shadow: var(--glow);
+            overflow: hidden;
+            border: 1px solid var(--primary);
         }
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 25px;
+        
+        .terminal-header {
+            background: linear-gradient(90deg, #ff0088, #00ffaa);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
+        
+        .terminal-title {
             font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
         }
-        input, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 16px;
+        
+        .terminal-controls span {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+            background: rgba(255, 255, 255, 0.3);
         }
-        .strength-meter {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin-top: 10px;
-        }
-        .strength-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .result {
-            margin-top: 25px;
+        
+        .terminal-body {
             padding: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 10px;
-            min-height: 100px;
-            font-family: monospace;
-            border: 2px dashed var(--primary);
         }
-        .error {
-            color: var(--error);
-            margin-top: 10px;
+        
+        .panel {
+            margin-bottom: 20px;
+            border: 1px solid #333344;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            background-color: #1a1a2a;
+            padding: 8px 15px;
+            border-bottom: 1px solid #333344;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .panel-title {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .panel-content {
+            padding: 15px;
+            background-color: #161622;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .grid-header {
+            color: var(--secondary);
+            text-align: center;
+            padding: 5px;
+            font-weight: bold;
+        }
+        
+        .grid-cell {
+            background-color: #1e1e2e;
+            border: 1px solid #333344;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .grid-cell:hover {
+            background-color: #252538;
+            box-shadow: 0 0 5px var(--primary);
+        }
+        
+        .grid-cell input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            text-align: center;
+            font-family: var(--terminal-font);
+            outline: none;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: var(--bg-dark);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--terminal-font);
+            font-weight: bold;
+            transition: all 0.2s;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+            color: white;
+            box-shadow: var(--glow);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            background-color: #1e1e2e;
+            border: 1px solid #333344;
+            color: var(--text);
+            padding: 10px;
+            font-family: var(--terminal-font);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+        
+        .result {
+            background-color: #1a1a2a;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 3px solid var(--primary);
+            margin-top: 20px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            color: #8888aa;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .terminal {
+                width: 95%;
+            }
+            
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔒 Secure Cipher Pro</h1>
-        
-        <div class="input-group">
-            <label>Алфавит (ровно 26 символов):</label>
-            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="26">
-        </div>
-        
-        <div class="input-group">
-            <label>Символы шифра (ровно 26 знаков):</label>
-            <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ" maxlength="26">
-        </div>
-        
-        <div class="input-group">
-            <label>Ключ (минимум 8 символов):</label>
-            <input type="text" id="key" placeholder="Введите ключ">
-            <div class="strength-meter">
-                <div class="strength-fill" id="strength-fill"></div>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-title">ADFGVX Cipher Terminal v2.0.30</div>
+            <div class="terminal-controls">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
         
-        <div class="input-group">
-            <label>Текст:</label>
-            <textarea id="inputText" rows="5">HELLO</textarea>
+        <div class="terminal-body">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Cipher Configuration</div>
+                </div>
+                <div class="panel-content">
+                    <div class="grid">
+                        <div class="grid-header">A</div>
+                        <div class="grid-header">D</div>
+                        <div class="grid-header">F</div>
+                        <div class="grid-header">G</div>
+                        <div class="grid-header">V</div>
+                        <div class="grid-header">X</div>
+                        
+                        <div class="grid-header">A</div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="A" id="AA"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="B" id="AD"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="C" id="AF"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="D" id="AG"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="E" id="AV"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="F" id="AX"></div>
+                        
+                        <div class="grid-header">D</div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="G" id="DA"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="H" id="DD"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="I" id="DF"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="J" id="DG"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="K" id="DV"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="L" id="DX"></div>
+                        
+                        <div class="grid-header">F</div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="M" id="FA"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="N" id="FD"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="O" id="FF"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="P" id="FG"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="Q" id="FV"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="R" id="FX"></div>
+                        
+                        <div class="grid-header">G</div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="S" id="GA"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="T" id="GD"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="U" id="GF"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="V" id="GG"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="W" id="GV"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="X" id="GX"></div>
+                        
+                        <div class="grid-header">V</div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="Y" id="VA"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="Z" id="VD"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="0" id="VF"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="1" id="VG"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="2" id="VV"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="3" id="VX"></div>
+                        
+                        <div class="grid-header">X</div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="4" id="XA"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="5" id="XD"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="6" id="XF"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="7" id="XG"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="8" id="XV"></div>
+                        <div class="grid-cell"><input type="text" maxlength="1" value="9" id="XX"></div>
+                    </div>
+                    
+                    <div>
+                        <label for="transposition-key">Transposition Key:</label>
+                        <input type="text" id="transposition-key" value="GERMANY" style="width: 200px; margin-left: 10px;">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Message Processing</div>
+                </div>
+                <div class="panel-content">
+                    <textarea id="input-text" placeholder="Enter plaintext or ciphertext here..."></textarea>
+                    
+                    <div>
+                        <button id="encrypt-btn">Encrypt</button>
+                        <button id="decrypt-btn">Decrypt</button>
+                        <button id="randomize-btn">Randomize Alphabet</button>
+                        <button id="reset-btn">Reset to Default</button>
+                    </div>
+                    
+                    <div class="result" id="result">
+                        <strong>Result:</strong><br>
+                        <span id="output-text">No operation performed yet</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div>System: ADFGVX Cipher Terminal</div>
+                <div id="status">Status: Ready</div>
+            </div>
         </div>
-        
-        <button id="encryptBtn">Шифровать</button>
-        <button id="decryptBtn">Дешифровать</button>
-        
-        <div class="result" id="outputText"></div>
-        <div class="error" id="errorText"></div>
     </div>
 
     <script>
-        // Элементы
-        const alphabetInput = document.getElementById('alphabet');
-        const symbolsInput = document.getElementById('symbols');
-        const keyInput = document.getElementById('key');
-        const inputText = document.getElementById('inputText');
-        const encryptBtn = document.getElementById('encryptBtn');
-        const decryptBtn = document.getElementById('decryptBtn');
-        const outputText = document.getElementById('outputText');
-        const errorText = document.getElementById('errorText');
-        const strengthFill = document.getElementById('strength-fill');
-
-        // Состояние
-        let lastResult = null;
-
-        // Проверка ключа
-        function updateKeyStrength() {
-            const key = keyInput.value;
-            let strength = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const encryptBtn = document.getElementById('encrypt-btn');
+            const decryptBtn = document.getElementById('decrypt-btn');
+            const randomizeBtn = document.getElementById('randomize-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+            const statusElement = document.getElementById('status');
+            const transpositionKey = document.getElementById('transposition-key');
             
-            if (key.length >= 8) strength += 1;
-            if (key.length >= 12) strength += 1;
-            if (/[A-Z]/.test(key)) strength += 1;
-            if (/[a-z]/.test(key)) strength += 1;
-            if (/[0-9]/.test(key)) strength += 1;
-            if (/[^A-Za-z0-9]/.test(key)) strength += 1;
+            // Default substitution grid (6x6)
+            const defaultGrid = {
+                AA: 'A', AD: 'B', AF: 'C', AG: 'D', AV: 'E', AX: 'F',
+                DA: 'G', DD: 'H', DF: 'I', DG: 'J', DV: 'K', DX: 'L',
+                FA: 'M', FD: 'N', FF: 'O', FG: 'P', FV: 'Q', FX: 'R',
+                GA: 'S', GD: 'T', GF: 'U', GG: 'V', GV: 'W', GX: 'X',
+                VA: 'Y', VD: 'Z', VF: '0', VG: '1', VV: '2', VX: '3',
+                XA: '4', XD: '5', XF: '6', XG: '7', XV: '8', XX: '9'
+            };
             
-            const percent = Math.min(100, strength * 20);
-            strengthFill.style.width = `${percent}%`;
-            
-            if (strength <= 2) {
-                strengthFill.style.background = 'var(--error)';
-            } else if (strength <= 4) {
-                strengthFill.style.background = 'var(--warning)';
-            } else {
-                strengthFill.style.background = 'var(--success)';
+            // Initialize grid
+            function initializeGrid() {
+                for (const [id, value] of Object.entries(defaultGrid)) {
+                    document.getElementById(id).value = value;
+                }
             }
-        }
-
-        // Генерация ключевого потока
-        async function generateKeystream(length, password) {
-            const salt = crypto.getRandomValues(new Uint8Array(16));
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                new TextEncoder().encode(password),
-                { name: 'PBKDF2' },
-                false,
-                ['deriveBits']
-            );
-            const bits = await crypto.subtle.deriveBits(
-                {
-                    name: 'PBKDF2',
-                    salt,
-                    iterations: 100000,
-                    hash: 'SHA-256'
-                },
-                keyMaterial,
-                length * 8
-            );
-            return Array.from(new Uint8Array(bits), byte => byte % 26);
-        }
-
-        // Шифрование
-        async function encrypt() {
-            try {
-                const alphabet = alphabetInput.value;
-                const symbols = symbolsInput.value;
-                const key = keyInput.value;
-                const text = inputText.value.toUpperCase();
-                
-                if (alphabet.length !== 26 || symbols.length !== 26) {
-                    throw new Error('Алфавит и символы должны содержать ровно 26 знаков!');
+            
+            // Get current grid values
+            function getCurrentGrid() {
+                const grid = {};
+                for (const key of Object.keys(defaultGrid)) {
+                    grid[key] = document.getElementById(key).value.toUpperCase();
                 }
-                if (key.length < 8) {
-                    throw new Error('Ключ должен быть не короче 8 символов!');
+                return grid;
+            }
+            
+            // Create reverse mapping (character to ADFGVX code)
+            function createReverseGrid(grid) {
+                const reverseGrid = {};
+                for (const [code, char] of Object.entries(grid)) {
+                    reverseGrid[char] = code;
+                }
+                return reverseGrid;
+            }
+            
+            // Encrypt function
+            function encrypt() {
+                const grid = getCurrentGrid();
+                const reverseGrid = createReverseGrid(grid);
+                const key = transpositionKey.value.toUpperCase().replace(/[^A-Z]/g, '');
+                
+                if (key.length === 0) {
+                    statusElement.textContent = 'Status: Error - Transposition key cannot be empty';
+                    return;
                 }
                 
-                const keystream = await generateKeystream(text.length, key);
-                let result = '';
+                const plaintext = inputText.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (plaintext.length === 0) {
+                    statusElement.textContent = 'Status: Error - No input text to encrypt';
+                    return;
+                }
                 
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    const index = alphabet.indexOf(char);
-                    
-                    if (index === -1) {
-                        result += char;
-                        continue;
+                // Step 1: Substitution
+                let substituted = '';
+                for (const char of plaintext) {
+                    if (reverseGrid[char]) {
+                        substituted += reverseGrid[char];
+                    } else {
+                        statusElement.textContent = `Status: Warning - Character '${char}' not in substitution grid`;
                     }
-                    
-                    const symbolIndex = (index + keystream[i]) % 26;
-                    result += symbols[symbolIndex];
                 }
                 
-                lastResult = { ciphertext: result, alphabet, symbols, key };
-                outputText.textContent = result;
-                errorText.textContent = '';
-            } catch (e) {
-                errorText.textContent = e.message;
-            }
-        }
-
-        // Дешифрование
-        async function decrypt() {
-            try {
-                if (!lastResult) throw new Error('Сначала зашифруйте текст!');
+                // Step 2: Transposition
+                // Create a matrix with the key length as number of columns
+                const numCols = key.length;
+                const numRows = Math.ceil(substituted.length / numCols);
                 
-                const { ciphertext, alphabet, symbols, key } = lastResult;
-                const keystream = await generateKeystream(ciphertext.length, key);
-                let result = '';
+                // Fill the matrix row-wise
+                const matrix = [];
+                for (let i = 0; i < numRows; i++) {
+                    const start = i * numCols;
+                    const end = start + numCols;
+                    matrix.push(substituted.slice(start, end).split(''));
+                }
                 
-                for (let i = 0; i < ciphertext.length; i++) {
-                    const char = ciphertext[i];
-                    const symbolIndex = symbols.indexOf(char);
-                    
-                    if (symbolIndex === -1) {
-                        result += char;
-                        continue;
+                // Determine the column order based on the key
+                const keyChars = key.split('');
+                const keyOrder = keyChars
+                    .map((char, index) => ({ char, index }))
+                    .sort((a, b) => a.char.localeCompare(b.char))
+                    .map(item => item.index);
+                
+                // Read the ciphertext column-wise in the new order
+                let ciphertext = '';
+                for (const col of keyOrder) {
+                    for (let row = 0; row < numRows; row++) {
+                        if (col < matrix[row].length) {
+                            ciphertext += matrix[row][col];
+                        }
                     }
-                    
-                    const originalIndex = (symbolIndex - keystream[i] + 26) % 26;
-                    result += alphabet[originalIndex];
                 }
                 
-                outputText.textContent = result;
-                errorText.textContent = '';
-            } catch (e) {
-                errorText.textContent = e.message;
+                outputText.textContent = ciphertext;
+                statusElement.textContent = 'Status: Encryption complete';
             }
-        }
-
-        // События
-        keyInput.addEventListener('input', updateKeyStrength);
-        encryptBtn.addEventListener('click', encrypt);
-        decryptBtn.addEventListener('click', decrypt);
+            
+            // Decrypt function
+            function decrypt() {
+                const grid = getCurrentGrid();
+                const key = transpositionKey.value.toUpperCase().replace(/[^A-Z]/g, '');
+                
+                if (key.length === 0) {
+                    statusElement.textContent = 'Status: Error - Transposition key cannot be empty';
+                    return;
+                }
+                
+                const ciphertext = inputText.value.toUpperCase().replace(/[^ADFGVX]/g, '');
+                if (ciphertext.length === 0) {
+                    statusElement.textContent = 'Status: Error - No input text to decrypt';
+                    return;
+                }
+                
+                // Step 1: Reverse transposition
+                const numCols = key.length;
+                const numRows = Math.ceil(ciphertext.length / numCols);
+                const totalChars = numRows * numCols;
+                const padding = totalChars - ciphertext.length;
+                
+                // Determine the column order based on the key
+                const keyChars = key.split('');
+                const keyOrder = keyChars
+                    .map((char, index) => ({ char, index }))
+                    .sort((a, b) => a.char.localeCompare(b.char))
+                    .map(item => item.index);
+                
+                // Create a map from original column to sorted column
+                const colMap = {};
+                keyOrder.forEach((originalCol, sortedCol) => {
+                    colMap[sortedCol] = originalCol;
+                });
+                
+                // Calculate how many characters are in each column
+                const colLengths = new Array(numCols).fill(numRows);
+                for (let i = 0; i < padding; i++) {
+                    colLengths[keyOrder[numCols - 1 - i]]--;
+                }
+                
+                // Reconstruct the transposed matrix
+                const matrix = new Array(numRows);
+                for (let i = 0; i < numRows; i++) {
+                    matrix[i] = new Array(numCols);
+                }
+                
+                let index = 0;
+                for (let sortedCol = 0; sortedCol < numCols; sortedCol++) {
+                    const originalCol = colMap[sortedCol];
+                    for (let row = 0; row < colLengths[originalCol]; row++) {
+                        matrix[row][originalCol] = ciphertext[index++];
+                    }
+                }
+                
+                // Read the substituted text row-wise
+                let substituted = '';
+                for (let row = 0; row < numRows; row++) {
+                    for (let col = 0; col < numCols; col++) {
+                        if (matrix[row][col]) {
+                            substituted += matrix[row][col];
+                        }
+                    }
+                }
+                
+                // Step 2: Reverse substitution
+                let plaintext = '';
+                for (let i = 0; i < substituted.length; i += 2) {
+                    const code = substituted.substr(i, 2);
+                    if (code.length === 2) {
+                        const char = grid[code];
+                        if (char) {
+                            plaintext += char;
+                        } else {
+                            plaintext += '?';
+                            statusElement.textContent = `Status: Warning - Code '${code}' not found in grid`;
+                        }
+                    }
+                }
+                
+                outputText.textContent = plaintext;
+                statusElement.textContent = 'Status: Decryption complete';
+            }
+            
+            // Randomize the substitution grid
+            function randomizeGrid() {
+                const chars = [];
+                // A-Z
+                for (let i = 65; i <= 90; i++) {
+                    chars.push(String.fromCharCode(i));
+                }
+                // 0-9
+                for (let i = 48; i <= 57; i++) {
+                    chars.push(String.fromCharCode(i));
+                }
+                
+                // Fisher-Yates shuffle
+                for (let i = chars.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [chars[i], chars[j]] = [chars[j], chars[i]];
+                }
+                
+                // Update the grid with shuffled characters
+                let index = 0;
+                for (const key of Object.keys(defaultGrid)) {
+                    document.getElementById(key).value = chars[index++];
+                }
+                
+                statusElement.textContent = 'Status: Grid randomized';
+            }
+            
+            // Event listeners
+            encryptBtn.addEventListener('click', encrypt);
+            decryptBtn.addEventListener('click', decrypt);
+            randomizeBtn.addEventListener('click', randomizeGrid);
+            resetBtn.addEventListener('click', initializeGrid);
+            
+            // Initialize
+            initializeGrid();
+        });
     </script>
 </body>
 </html>
