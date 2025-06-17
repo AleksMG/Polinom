@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Cipher Pro</title>
+    <title>Fixed Cipher</title>
     <style>
         :root {
             --primary: #6c5ce7;
@@ -19,7 +19,6 @@
             color: var(--light);
             margin: 0;
             padding: 20px;
-            line-height: 1.6;
         }
         .container {
             max-width: 600px;
@@ -28,17 +27,11 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         h1 {
             color: var(--primary);
             text-align: center;
             margin-bottom: 25px;
-            font-size: 2rem;
         }
         .input-group {
             margin-bottom: 20px;
@@ -56,30 +49,17 @@
             background: rgba(0, 0, 0, 0.3);
             color: white;
             font-size: 16px;
-            transition: all 0.3s;
-        }
-        input:focus, textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
-            outline: none;
-        }
-        .length-counter {
-            font-size: 0.9rem;
-            text-align: right;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 5px;
         }
         .strength-meter {
             height: 6px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
             margin-top: 10px;
-            overflow: hidden;
         }
         .strength-fill {
             height: 100%;
-            width: 0%;
-            transition: width 0.3s, background 0.3s;
+            border-radius: 3px;
+            transition: width 0.3s;
         }
         button {
             width: 100%;
@@ -90,18 +70,7 @@
             background: var(--primary);
             color: white;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        button:hover {
-            background: #5649c0;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        button:disabled {
-            background: #636e72;
-            cursor: not-allowed;
         }
         .result {
             margin-top: 25px;
@@ -109,87 +78,51 @@
             background: rgba(0, 0, 0, 0.4);
             border-radius: 10px;
             min-height: 100px;
-            word-break: break-all;
-            font-family: 'Consolas', monospace;
+            font-family: monospace;
             border: 2px dashed var(--primary);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { border-color: var(--primary); }
-            50% { border-color: #a29bfe; }
-            100% { border-color: var(--primary); }
         }
         .error {
             color: var(--error);
             margin-top: 10px;
-            font-weight: bold;
-        }
-        .status {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            font-size: 0.9rem;
-        }
-        .valid {
-            color: var(--success);
-        }
-        .invalid {
-            color: var(--error);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Secure Cipher Pro</h1>
+        <h1>🔒 Fixed Cipher</h1>
         
         <div class="input-group">
-            <label for="alphabet">Алфавит (ровно 26 букв):</label>
-            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="26">
-            <div class="status">
-                <span id="alphabet-status">Введите 26 уникальных букв</span>
-                <span class="length-counter"><span id="alphabet-length">0</span>/26</span>
-            </div>
+            <label>Алфавит (минимум 26 символов):</label>
+            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
         </div>
         
         <div class="input-group">
-            <label for="symbols">Символы шифра (ровно 26 знаков):</label>
-            <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈ" maxlength="26">
-            <div class="status">
-                <span id="symbols-status">Введите 26 уникальных символов</span>
-                <span class="length-counter"><span id="symbols-length">0</span>/26</span>
-            </div>
+            <label>Символы шифра (минимум 26 символов):</label>
+            <input type="text" id="symbols" value="ⴰⴱⴲⴳⴴⴵⴶⴷⴸⴹⴺⴻⴼⴽⴾⴿⵀⵁⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏ">
         </div>
         
         <div class="input-group">
-            <label for="key">Ключ:</label>
+            <label>Ключ:</label>
             <input type="text" id="key" placeholder="Введите ключ (минимум 8 символов)">
             <div class="strength-meter">
                 <div class="strength-fill" id="strength-fill"></div>
             </div>
-            <div class="status">
-                <span id="key-status">Надежность ключа</span>
-                <span id="key-length" class="length-counter">0</span>
-            </div>
         </div>
         
         <div class="input-group">
-            <label for="inputText">Текст:</label>
-            <textarea id="inputText" rows="5" placeholder="Введите текст..."></textarea>
-            <div class="length-counter">
-                Длина: <span id="text-length">0</span> симв.
-                | Шифротекст: <span id="cipher-length">0</span> симв.
-            </div>
+            <label>Текст:</label>
+            <textarea id="inputText" rows="5">HELLO</textarea>
         </div>
         
-        <button id="encryptBtn" disabled>Шифровать</button>
-        <button id="decryptBtn" disabled>Дешифровать</button>
+        <button id="encryptBtn">Шифровать</button>
+        <button id="decryptBtn">Дешифровать</button>
         
-        <div class="result" id="outputText">Здесь появится результат...</div>
+        <div class="result" id="outputText"></div>
         <div class="error" id="errorText"></div>
     </div>
 
     <script>
-        // DOM элементы
+        // Элементы
         const alphabetInput = document.getElementById('alphabet');
         const symbolsInput = document.getElementById('symbols');
         const keyInput = document.getElementById('key');
@@ -198,156 +131,105 @@
         const decryptBtn = document.getElementById('decryptBtn');
         const outputText = document.getElementById('outputText');
         const errorText = document.getElementById('errorText');
-        
-        // Элементы статуса
-        const alphabetStatus = document.getElementById('alphabet-status');
-        const symbolsStatus = document.getElementById('symbols-status');
-        const keyStatus = document.getElementById('key-status');
         const strengthFill = document.getElementById('strength-fill');
-        
-        // Счетчики длины
-        const alphabetLength = document.getElementById('alphabet-length');
-        const symbolsLength = document.getElementById('symbols-length');
-        const keyLength = document.getElementById('key-length');
-        const textLength = document.getElementById('text-length');
-        const cipherLength = document.getElementById('cipher-length');
 
         // Состояние
         let lastResult = null;
-        let isAlphabetValid = false;
-        let isSymbolsValid = false;
-        let isKeyValid = false;
 
-        // Проверка алфавита (26 уникальных букв)
-        function validateAlphabet() {
-            const value = alphabetInput.value.toUpperCase();
-            const unique = new Set(value).size;
-            
-            isAlphabetValid = value.length === 26 && unique === 26 && /^[A-Z]+$/.test(value);
-            
-            alphabetStatus.textContent = isAlphabetValid 
-                ? "✅ Алфавит корректен" 
-                : "❌ Нужно 26 уникальных букв A-Z";
-            alphabetStatus.className = isAlphabetValid ? "valid" : "invalid";
-            alphabetLength.textContent = value.length;
-            
-            updateButtonStates();
-            return isAlphabetValid;
-        }
-
-        // Проверка символов (26 уникальных знаков)
-        function validateSymbols() {
-            const value = symbolsInput.value;
-            const unique = new Set(value).size;
-            
-            isSymbolsValid = value.length === 26 && unique === 26;
-            
-            symbolsStatus.textContent = isSymbolsValid 
-                ? "✅ Символы корректны" 
-                : "❌ Нужно 26 уникальных символов";
-            symbolsStatus.className = isSymbolsValid ? "valid" : "invalid";
-            symbolsLength.textContent = value.length;
-            
-            updateButtonStates();
-            return isSymbolsValid;
-        }
-
-        // Проверка ключа (надежность)
-        function validateKey() {
-            const value = keyInput.value;
+        // Проверка ключа
+        function updateKeyStrength() {
+            const key = keyInput.value;
             let strength = 0;
             
-            // Оценка надежности
-            if (value.length >= 8) strength += 1;
-            if (value.length >= 12) strength += 1;
-            if (/[A-Z]/.test(value)) strength += 1;
-            if (/[a-z]/.test(value)) strength += 1;
-            if (/[0-9]/.test(value)) strength += 1;
-            if (/[^A-Za-z0-9]/.test(value)) strength += 1;
+            if (key.length >= 8) strength += 1;
+            if (key.length >= 12) strength += 1;
+            if (/[A-Z]/.test(key)) strength += 1;
+            if (/[a-z]/.test(key)) strength += 1;
+            if (/[0-9]/.test(key)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(key)) strength += 1;
             
-            // Визуализация
             const percent = Math.min(100, strength * 20);
-            strengthFill.style.width = percent + '%';
+            strengthFill.style.width = `${percent}%`;
             
             if (strength <= 2) {
-                strengthFill.style.background = var(--error);
-                keyStatus.textContent = "❌ Слабый ключ";
+                strengthFill.style.background = 'var(--error)';
             } else if (strength <= 4) {
-                strengthFill.style.background = var(--warning);
-                keyStatus.textContent = "⚠️ Средний ключ";
+                strengthFill.style.background = 'var(--warning)';
             } else {
-                strengthFill.style.background = var(--success);
-                keyStatus.textContent = "✅ Сильный ключ";
+                strengthFill.style.background = 'var(--success)';
             }
-            
-            isKeyValid = value.length >= 8;
-            keyLength.textContent = value.length + " симв.";
-            
-            updateButtonStates();
-            return isKeyValid;
         }
 
-        // Обновление состояния кнопок
-        function updateButtonStates() {
-            encryptBtn.disabled = !(isAlphabetValid && isSymbolsValid && isKeyValid);
-            decryptBtn.disabled = !(isAlphabetValid && isSymbolsValid && isKeyValid && lastResult);
-        }
-
-        // Обновление счетчика длины текста
-        function updateTextLength() {
-            const length = inputText.value.length;
-            textLength.textContent = length;
-            
-            if (lastResult && lastResult.ciphertext) {
-                cipherLength.textContent = lastResult.ciphertext.length;
-            } else {
-                cipherLength.textContent = length;
-            }
+        // Генерация ключевого потока
+        async function generateKeystream(length, password) {
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits']
+            );
+            const bits = await crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                length * 8
+            );
+            return Array.from(new Uint8Array(bits), byte => byte % 26);
         }
 
         // Шифрование
         async function encrypt() {
             try {
-                const alphabet = alphabetInput.value.toUpperCase();
+                const alphabet = alphabetInput.value;
                 const symbols = symbolsInput.value;
                 const key = keyInput.value;
                 const text = inputText.value;
                 
-                // Генерация ключевого потока
+                if (alphabet.length < 26 || symbols.length < 26) {
+                    throw new Error('Алфавит и символы должны содержать минимум 26 знаков!');
+                }
+                if (key.length < 8) {
+                    throw new Error('Ключ должен быть не короче 8 символов!');
+                }
+                
                 const keystream = await generateKeystream(text.length, key);
-                let result = "";
+                let result = '';
                 
                 for (let i = 0; i < text.length; i++) {
-                    const char = text[i].toUpperCase();
+                    const char = text[i];
                     const index = alphabet.indexOf(char);
                     
                     if (index === -1) {
-                        result += char; // Символы вне алфавита не изменяются
+                        result += char;
                         continue;
                     }
                     
-                    // Шифрование
-                    const symbolIndex = (index + keystream[i]) % 26;
+                    const symbolIndex = (index + keystream[i]) % symbols.length;
                     result += symbols[symbolIndex];
                 }
                 
                 lastResult = { ciphertext: result, alphabet, symbols, key };
                 outputText.textContent = result;
-                errorText.textContent = "";
-                updateTextLength();
+                errorText.textContent = '';
             } catch (e) {
-                errorText.textContent = "Ошибка: " + e.message;
+                errorText.textContent = e.message;
             }
         }
 
         // Дешифрование
         async function decrypt() {
             try {
-                if (!lastResult) throw new Error("Сначала зашифруйте текст");
+                if (!lastResult) throw new Error('Сначала зашифруйте текст!');
                 
                 const { ciphertext, alphabet, symbols, key } = lastResult;
                 const keystream = await generateKeystream(ciphertext.length, key);
-                let result = "";
+                let result = '';
                 
                 for (let i = 0; i < ciphertext.length; i++) {
                     const char = ciphertext[i];
@@ -358,65 +240,21 @@
                         continue;
                     }
                     
-                    // Дешифрование
-                    const originalIndex = (symbolIndex - keystream[i] + 26) % 26;
+                    const originalIndex = (symbolIndex - keystream[i] + symbols.length) % symbols.length;
                     result += alphabet[originalIndex];
                 }
                 
                 outputText.textContent = result;
-                errorText.textContent = "";
+                errorText.textContent = '';
             } catch (e) {
-                errorText.textContent = "Ошибка: " + e.message;
+                errorText.textContent = e.message;
             }
         }
 
-        // Генерация ключевого потока
-        async function generateKeystream(length, password) {
-            const salt = "fixed_salt_secure";
-            const iterations = 100000;
-            
-            const keyMaterial = await crypto.subtle.importKey(
-                "raw",
-                new TextEncoder().encode(password),
-                { name: "PBKDF2" },
-                false,
-                ["deriveBits"]
-            );
-            
-            const bits = await crypto.subtle.deriveBits(
-                {
-                    name: "PBKDF2",
-                    salt: new TextEncoder().encode(salt),
-                    iterations,
-                    hash: "SHA-256"
-                },
-                keyMaterial,
-                length * 32
-            );
-            
-            const view = new DataView(bits);
-            const keystream = [];
-            
-            for (let i = 0; i < length; i++) {
-                keystream.push(view.getUint32(i * 4) % 26);
-            }
-            
-            return keystream;
-        }
-
-        // Слушатели событий
-        alphabetInput.addEventListener('input', validateAlphabet);
-        symbolsInput.addEventListener('input', validateSymbols);
-        keyInput.addEventListener('input', validateKey);
-        inputText.addEventListener('input', updateTextLength);
+        // События
+        keyInput.addEventListener('input', updateKeyStrength);
         encryptBtn.addEventListener('click', encrypt);
         decryptBtn.addEventListener('click', decrypt);
-
-        // Инициализация
-        validateAlphabet();
-        validateSymbols();
-        validateKey();
-        updateTextLength();
     </script>
 </body>
 </html>
