@@ -202,28 +202,13 @@
             background: var(--primary);
             transform: scale(1.1);
         }
-        .coordinates {
-            font-family: monospace;
-            background: #252525;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        .speed-control {
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .speed-control label {
-            margin-bottom: 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>TRIFID CIPHER PRO</h1>
-            <p class="subtitle">Fixed Implementation with Round Visualization</p>
+            <p class="subtitle">Fixed Implementation</p>
         </header>
 
         <div class="grid">
@@ -236,7 +221,7 @@
                 </div>
                 <div class="form-group">
                     <label for="key">Encryption Key</label>
-                    <input type="text" id="key" placeholder="Enter secret key (min 3 chars)">
+                    <input type="text" id="key" placeholder="Enter secret key (min 3 chars)" value="SECRET">
                     <div id="key-error" class="error"></div>
                 </div>
                 <div class="form-group">
@@ -250,9 +235,9 @@
                 </div>
                 <div class="form-group">
                     <label for="message">Message</label>
-                    <textarea id="message" placeholder="Enter message to encrypt/decrypt"></textarea>
+                    <textarea id="message" placeholder="Enter message to encrypt/decrypt">HELLO</textarea>
                 </div>
-                <div class="speed-control">
+                <div class="form-group">
                     <label for="speed">Animation Speed:</label>
                     <select id="speed">
                         <option value="500">Slow</option>
@@ -634,6 +619,37 @@
             }
         }
 
+        // Global functions for visualization
+        function updateVisualization(round) {
+            const state = cipher.getRoundState(round);
+            if (!state) return;
+            
+            visualizer.updateCube(state.cube);
+            visualizer.updateTransform(state.angles.θx, state.angles.θy, state.angles.θz);
+            
+            // Update active round indicator
+            document.querySelectorAll('.round-indicator').forEach(el => {
+                el.classList.toggle('active', parseInt(el.dataset.round) === round);
+            });
+        }
+
+        function highlightCharCoords(char, cube) {
+            for (let z = 0; z < 3; z++) {
+                for (let y = 0; y < 3; y++) {
+                    for (let x = 0; x < 3; x++) {
+                        if (cube[z][y][x] === char) {
+                            visualizer.highlightCell(x, y, z);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function highlightCoords(x, y, z) {
+            visualizer.highlightCell(x, y, z);
+        }
+
         // Initialize application
         document.addEventListener('DOMContentLoaded', async () => {
             const cipher = new TrifidCipher();
@@ -664,39 +680,6 @@
                     });
                     roundControls.appendChild(indicator);
                 }
-            }
-
-            // Update visualization for specific round
-            function updateVisualization(round) {
-                const state = cipher.getRoundState(round);
-                if (!state) return;
-                
-                visualizer.updateCube(state.cube);
-                visualizer.updateTransform(state.angles.θx, state.angles.θy, state.angles.θz);
-                
-                // Update active round indicator
-                document.querySelectorAll('.round-indicator').forEach(el => {
-                    el.classList.toggle('active', parseInt(el.dataset.round) === round);
-                });
-            }
-
-            // Highlight character coordinates
-            function highlightCharCoords(char, cube) {
-                for (let z = 0; z < 3; z++) {
-                    for (let y = 0; y < 3; y++) {
-                        for (let x = 0; x < 3; x++) {
-                            if (cube[z][y][x] === char) {
-                                visualizer.highlightCell(x, y, z);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Highlight specific coordinates
-            function highlightCoords(x, y, z) {
-                visualizer.highlightCell(x, y, z);
             }
 
             // Show status message
@@ -740,7 +723,7 @@
 
             // Encryption handler
             encryptBtn.addEventListener('click', async () => {
-                if (!initializeCipher()) return;
+                if (!await initializeCipher()) return;
                 
                 try {
                     encryptBtn.disabled = true;
@@ -765,7 +748,7 @@
 
             // Decryption handler
             decryptBtn.addEventListener('click', async () => {
-                if (!initializeCipher()) return;
+                if (!await initializeCipher()) return;
                 
                 try {
                     encryptBtn.disabled = true;
