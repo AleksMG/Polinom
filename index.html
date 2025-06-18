@@ -3,68 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Bifid Cipher Tool</title>
+    <title>Bifid Cipher 2050 | Terminal Mode</title>
     <style>
         :root {
-            --primary: #3a86ff;
-            --secondary: #2667cc;
-            --dark: #2b2d42;
-            --light: #f8f9fa;
-            --success: #4cc9f0;
-            --warning: #f8961e;
-            --danger: #ef233c;
-            --gray: #8d99ae;
-            --dark-gray: #6c757d;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg: #0a0a12;
+            --terminal: #121420;
+            --text: #e0e0ff;
+            --accent: #6aff00;
+            --warning: #ff5e5e;
+            --header: #3a3aff;
+            --cell-bg: #1e1e2e;
+            --cell-border: #30304a;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
             line-height: 1.6;
-            color: var(--dark);
-            background-color: var(--light);
-            padding: 2rem;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1rem;
         }
 
         header {
-            margin-bottom: 2rem;
             text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--header);
+            padding-bottom: 1rem;
         }
 
         h1 {
-            color: var(--primary);
+            color: var(--accent);
+            font-size: 2.2rem;
             margin-bottom: 0.5rem;
-            font-weight: 700;
         }
 
         .subtitle {
-            color: var(--dark-gray);
+            color: var(--text);
+            opacity: 0.8;
             font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto;
         }
 
         .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: var(--terminal);
+            border-radius: 8px;
             padding: 2rem;
             margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--cell-border);
         }
 
         .card-title {
-            color: var(--primary);
+            color: var(--accent);
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
             font-weight: 600;
@@ -74,7 +69,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin-bottom: 2rem;
         }
 
         .form-group {
@@ -84,218 +78,125 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
+            color: var(--accent);
             font-weight: 500;
-            color: var(--dark);
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+            padding: 0.75rem;
+            background: var(--cell-bg);
+            border: 1px solid var(--cell-border);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: inherit;
         }
 
         textarea {
             min-height: 120px;
-            resize: vertical;
         }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
+            border-radius: 4px;
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            border: none;
         }
 
         .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--secondary);
+            background: var(--accent);
+            color: var(--bg);
         }
 
         .btn-danger {
-            background-color: var(--danger);
+            background: var(--warning);
             color: white;
         }
 
-        .btn-danger:hover {
-            background-color: #d90429;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn-group .btn {
-            flex: 1;
-        }
-
         .output {
-            background-color: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 6px;
-            font-family: 'Roboto Mono', monospace;
+            background: var(--cell-bg);
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
             white-space: pre-wrap;
-            min-height: 100px;
-            overflow-wrap: break-word;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--cell-border);
         }
 
-        .square-container {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-        }
-
+        /* Terminal-style squares */
         .square {
-            display: inline-grid;
-            grid-template-columns: repeat(6, minmax(40px, 1fr));
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
             gap: 2px;
-            margin: 0 auto;
+            margin: 1rem 0;
         }
 
         .square-cell {
             padding: 0.75rem;
             text-align: center;
-            border: 1px solid #e0e0e0;
+            background: var(--cell-bg);
+            border: 1px solid var(--cell-border);
             font-weight: 600;
-            min-width: 40px;
         }
 
         .square-header {
-            background-color: var(--primary);
+            background: var(--header);
             color: white;
-            font-weight: 500;
         }
 
+        /* Tabs */
         .tabs {
             display: flex;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--cell-border);
             margin-bottom: 1.5rem;
-            overflow-x: auto;
         }
 
         .tab {
             padding: 0.75rem 1.5rem;
             background: none;
             border: none;
+            color: var(--text);
             cursor: pointer;
-            font-weight: 500;
-            color: var(--dark-gray);
             border-bottom: 3px solid transparent;
-            white-space: nowrap;
         }
 
         .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .alert {
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .alert-danger {
-            background-color: rgba(239, 35, 60, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 35, 60, 0.2);
-        }
-
-        .alert-success {
-            background-color: rgba(76, 201, 240, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(76, 201, 240, 0.2);
-        }
-
-        .algorithm-options {
-            display: grid;
-            gap: 0.75rem;
-            margin: 1.5rem 0;
-        }
-
-        .algorithm-option {
-            display: flex;
-            align-items: center;
-        }
-
-        .algorithm-option input {
-            width: auto;
-            margin-right: 0.75rem;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
+            border-bottom-color: var(--accent);
+            color: var(--accent);
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Enhanced Bifid Cipher Tool</h1>
-            <p class="subtitle">Secure dual-square Bifid cipher implementation with numeric output and multiple transformation algorithms</p>
+            <h1>BIFID CIPHER 2050</h1>
+            <p class="subtitle">Quantum-Resistant Cryptographic Tool | Terminal Mode Active</p>
         </header>
 
         <div class="tabs">
-            <button class="tab active" onclick="openTab(event, 'encrypt')">Encrypt</button>
-            <button class="tab" onclick="openTab(event, 'decrypt')">Decrypt</button>
-            <button class="tab" onclick="openTab(event, 'settings')">Settings</button>
+            <button class="tab active" onclick="openTab(event, 'encrypt')">ENCRYPT</button>
+            <button class="tab" onclick="openTab(event, 'decrypt')">DECRYPT</button>
+            <button class="tab" onclick="openTab(event, 'settings')">CONFIG</button>
         </div>
 
         <div id="encrypt" class="tab-content active">
             <div class="card">
-                <h2 class="card-title">Encryption</h2>
+                <h2 class="card-title">>> ENCRYPTION MODE</h2>
                 <div class="form-group">
-                    <label for="plaintext">Plaintext (A-Z, 0-9):</label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt">HELLO</textarea>
+                    <label for="plaintext">PLAINTEXT (A-Z, 0-9):</label>
+                    <textarea id="plaintext" placeholder="Enter text to encrypt...">ATTACKATDAWN</textarea>
                 </div>
                 
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="encrypt()">Encrypt</button>
-                    <button class="btn btn-danger" onclick="clearOutput('encrypt')">Clear</button>
+                    <button class="btn btn-primary" onclick="encrypt()">EXECUTE</button>
+                    <button class="btn btn-danger" onclick="clearOutput('encrypt')">CLEAR</button>
                 </div>
                 
                 <div class="form-group">
-                    <label>Output (digit groups):</label>
+                    <label>CIPHERTEXT OUTPUT:</label>
                     <div id="encrypt-output" class="output"></div>
                 </div>
             </div>
@@ -303,19 +204,19 @@
 
         <div id="decrypt" class="tab-content">
             <div class="card">
-                <h2 class="card-title">Decryption</h2>
+                <h2 class="card-title">>> DECRYPTION MODE</h2>
                 <div class="form-group">
-                    <label for="ciphertext">Ciphertext (digit groups, numbers only):</label>
-                    <textarea id="ciphertext" placeholder="Enter ciphertext to decrypt"></textarea>
+                    <label for="ciphertext">CIPHERTEXT (DIGIT GROUPS):</label>
+                    <textarea id="ciphertext" placeholder="Enter ciphertext to decrypt..."></textarea>
                 </div>
                 
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="decrypt()">Decrypt</button>
-                    <button class="btn btn-danger" onclick="clearOutput('decrypt')">Clear</button>
+                    <button class="btn btn-primary" onclick="decrypt()">EXECUTE</button>
+                    <button class="btn btn-danger" onclick="clearOutput('decrypt')">CLEAR</button>
                 </div>
                 
                 <div class="form-group">
-                    <label>Output:</label>
+                    <label>PLAINTEXT OUTPUT:</label>
                     <div id="decrypt-output" class="output"></div>
                 </div>
             </div>
@@ -323,78 +224,66 @@
 
         <div id="settings" class="tab-content">
             <div class="card">
-                <h2 class="card-title">Cipher Configuration</h2>
+                <h2 class="card-title">>> CONFIGURATION</h2>
                 
                 <div class="form-group">
-                    <label for="period">Period (group size):</label>
+                    <label for="period">PERIOD (GROUP SIZE):</label>
                     <input type="number" id="period" min="1" max="20" value="5">
                 </div>
                 
                 <div class="grid">
                     <div>
-                        <h3 class="card-title" style="font-size: 1.25rem;">Key 1 Configuration</h3>
+                        <h3 class="card-title">KEY 1 PARAMETERS</h3>
                         <div class="form-group">
-                            <label for="key1">Key 1 (min 6 chars):</label>
-                            <input type="text" id="key1" value="BIFIDCIPHER" placeholder="Enter first key">
-                            <div id="key1-error" class="alert alert-danger" style="display: none;"></div>
+                            <label for="key1">KEY 1 (MIN 6 CHARS):</label>
+                            <input type="text" id="key1" value="BIFID2050">
                         </div>
                         
                         <div class="form-group">
-                            <label for="fill1">Fill Method:</label>
+                            <label for="fill1">FILL METHOD:</label>
                             <select id="fill1">
-                                <option value="row">Row-wise</option>
-                                <option value="column">Column-wise</option>
-                                <option value="spiral">Spiral</option>
+                                <option value="row">ROW-WISE</option>
+                                <option value="column">COLUMN-WISE</option>
+                                <option value="spiral">SPIRAL</option>
                             </select>
                         </div>
                         
-                        <h4>Square 1:</h4>
-                        <div class="square-container">
-                            <div id="square1" class="square"></div>
-                        </div>
+                        <h4>POLYBIUS SQUARE 1:</h4>
+                        <div id="square1" class="square"></div>
                     </div>
                     
                     <div>
-                        <h3 class="card-title" style="font-size: 1.25rem;">Key 2 Configuration</h3>
+                        <h3 class="card-title">KEY 2 PARAMETERS</h3>
                         <div class="form-group">
-                            <label for="key2">Key 2 (min 6 chars):</label>
-                            <input type="text" id="key2" value="SECONDKEY" placeholder="Enter second key">
-                            <div id="key2-error" class="alert alert-danger" style="display: none;"></div>
+                            <label for="key2">KEY 2 (MIN 6 CHARS):</label>
+                            <input type="text" id="key2" value="QUANTUM">
                         </div>
                         
                         <div class="form-group">
-                            <label for="fill2">Fill Method:</label>
+                            <label for="fill2">FILL METHOD:</label>
                             <select id="fill2">
-                                <option value="row">Row-wise</option>
-                                <option value="column">Column-wise</option>
-                                <option value="spiral">Spiral</option>
+                                <option value="row">ROW-WISE</option>
+                                <option value="column">COLUMN-WISE</option>
+                                <option value="spiral">SPIRAL</option>
                             </select>
                         </div>
                         
-                        <h4>Square 2:</h4>
-                        <div class="square-container">
-                            <div id="square2" class="square"></div>
-                        </div>
+                        <h4>POLYBIUS SQUARE 2:</h4>
+                        <div id="square2" class="square"></div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <h3 class="card-title" style="font-size: 1.25rem;">Transformation Algorithm</h3>
+                    <h3 class="card-title">TRANSFORMATION ALGORITHM</h3>
                     <div class="algorithm-options">
-                        <div class="algorithm-option">
-                            <input type="radio" id="standard" name="algorithm" value="standard" checked>
-                            <label for="standard">Standard Bifid (period-based)</label>
-                        </div>
-                        <div class="algorithm-option">
-                            <input type="radio" id="extended" name="algorithm" value="extended">
-                            <label for="extended">Extended Transformation</label>
-                        </div>
+                        <label><input type="radio" name="algorithm" value="standard" checked> STANDARD BIFID</label>
+                        <label><input type="radio" name="algorithm" value="extended"> EXTENDED TRANSFORM</label>
                     </div>
                 </div>
                 
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="generateSquares()">Generate Squares</button>
-                    <button class="btn btn-danger" onclick="resetSettings()">Reset to Defaults</button>
+                    <button class="btn btn-primary" onclick="generateSquares()">GENERATE SQUARES</button>
+                    <button class="btn btn-danger" onclick="resetSettings()">FACTORY RESET</button>
                 </div>
             </div>
         </div>
@@ -404,51 +293,37 @@
         // Constants
         const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         const SQUARE_SIZE = 6;
-        const DEFAULT_PERIOD = 5;
         
-        // Cipher state
+        // Cipher Core
         const cipher = {
             square1: [],
             square2: [],
-            period: DEFAULT_PERIOD,
+            period: 5,
             algorithm: 'standard',
             
-            // Initialize with default settings
             init() {
-                this.square1 = this.createSquare("BIFIDCIPHER", "row");
-                this.square2 = this.createSquare("SECONDKEY", "row");
+                this.square1 = this.createSquare("BIFID2050", "row");
+                this.square2 = this.createSquare("QUANTUM", "row");
                 this.displaySquares();
             },
             
-            // Create a 6x6 Polybius square
             createSquare(key, fillMethod) {
-                // Sanitize and deduplicate key
                 const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
                 const uniqueKey = [...new Set(cleanKey)].join('');
-                
-                // Add remaining characters
                 const remainingChars = CHARSET.split('').filter(c => !uniqueKey.includes(c)).join('');
                 const allChars = uniqueKey + remainingChars;
                 
-                // Initialize empty square
                 const square = Array(SQUARE_SIZE).fill().map(() => Array(SQUARE_SIZE).fill(''));
                 
-                // Fill based on method
                 switch(fillMethod) {
-                    case 'column':
-                        this.fillColumnWise(square, allChars);
-                        break;
-                    case 'spiral':
-                        this.fillSpiral(square, allChars);
-                        break;
-                    default: // row
-                        this.fillRowWise(square, allChars);
+                    case 'column': this.fillColumnWise(square, allChars); break;
+                    case 'spiral': this.fillSpiral(square, allChars); break;
+                    default: this.fillRowWise(square, allChars);
                 }
                 
                 return square;
             },
             
-            // Fill methods
             fillRowWise(square, chars) {
                 for (let row = 0; row < SQUARE_SIZE; row++) {
                     for (let col = 0; col < SQUARE_SIZE; col++) {
@@ -475,11 +350,9 @@
                     square[row][col] = chars[i];
                     visited.add(`${row},${col}`);
                     
-                    // Calculate next position
                     let nextRow = row + directions[currentDir][0];
                     let nextCol = col + directions[currentDir][1];
                     
-                    // Change direction if needed
                     if (nextRow < 0 || nextRow >= SQUARE_SIZE || 
                         nextCol < 0 || nextCol >= SQUARE_SIZE || 
                         visited.has(`${nextRow},${nextCol}`)) {
@@ -493,86 +366,29 @@
                 }
             },
             
-            // Find character coordinates in square
             findCoordinates(char, square) {
                 for (let row = 0; row < SQUARE_SIZE; row++) {
                     for (let col = 0; col < SQUARE_SIZE; col++) {
                         if (square[row][col] === char) {
-                            return { row: row + 1, col: col + 1 }; // 1-based
+                            return { row: row + 1, col: col + 1 };
                         }
                     }
                 }
                 return null;
             },
             
-            // Display squares in UI
-            displaySquares() {
-                this.displaySquare(this.square1, 'square1');
-                this.displaySquare(this.square2, 'square2');
-            },
-            
-            displaySquare(square, elementId) {
-                const container = document.getElementById(elementId);
-                container.innerHTML = '';
-                
-                // Add headers
-                const corner = document.createElement('div');
-                corner.className = 'square-cell square-header';
-                corner.textContent = '';
-                container.appendChild(corner);
-                
-                for (let col = 0; col < SQUARE_SIZE; col++) {
-                    const header = document.createElement('div');
-                    header.className = 'square-cell square-header';
-                    header.textContent = col + 1;
-                    container.appendChild(header);
-                }
-                
-                // Add rows
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    const rowHeader = document.createElement('div');
-                    rowHeader.className = 'square-cell square-header';
-                    rowHeader.textContent = row + 1;
-                    container.appendChild(rowHeader);
-                    
-                    for (let col = 0; col < SQUARE_SIZE; col++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'square-cell';
-                        cell.textContent = square[row][col];
-                        container.appendChild(cell);
-                    }
-                }
-            },
-            
-            // Encryption methods
             encrypt(plaintext) {
                 const cleanText = plaintext.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (!cleanText) {
-                    throw new Error("No valid characters to encrypt");
-                }
+                if (!cleanText) throw new Error("No valid characters");
                 
-                // Get coordinates for each character
                 const coords = [];
                 for (const char of cleanText) {
                     const coord1 = this.findCoordinates(char, this.square1);
                     const coord2 = this.findCoordinates(char, this.square2);
-                    
-                    if (!coord1 || !coord2) {
-                        throw new Error(`Character '${char}' not found in both squares`);
-                    }
-                    
-                    coords.push({
-                        char: char,
-                        coord1: coord1,
-                        coord2: coord2
-                    });
+                    if (!coord1 || !coord2) throw new Error(`Char '${char}' not found`);
+                    coords.push({ coord1, coord2 });
                 }
                 
-                // Apply transformation
-                return this.applyTransformation(coords);
-            },
-            
-            applyTransformation(coords) {
                 if (this.algorithm === 'extended') {
                     return this.extendedTransform(coords);
                 }
@@ -580,33 +396,43 @@
             },
             
             standardTransform(coords) {
-                const digitStream = [];
-                
-                // Create digit stream from coordinates
-                for (const {coord1, coord2} of coords) {
-                    digitStream.push(
-                        coord1.row, coord1.col,
-                        coord2.row, coord2.col
-                    );
+                let rows = [], cols = [];
+                for (const { coord1, coord2 } of coords) {
+                    rows.push(coord1.row, coord2.row);
+                    cols.push(coord1.col, coord2.col);
                 }
                 
-                // Group digits by period
-                return this.groupDigits(digitStream);
+                if (this.period > 0) {
+                    rows = this.applyPeriod(rows, this.period);
+                    cols = this.applyPeriod(cols, this.period);
+                }
+                
+                const merged = [];
+                for (let i = 0; i < rows.length; i++) {
+                    merged.push(rows[i], cols[i]);
+                }
+                
+                return this.groupDigits(merged);
             },
             
             extendedTransform(coords) {
                 const digitStream = [];
-                
-                // Create interleaved digit stream
-                for (const {coord1, coord2} of coords) {
+                for (const { coord1, coord2 } of coords) {
                     digitStream.push(
                         coord1.row, coord2.row,
                         coord1.col, coord2.col
                     );
                 }
-                
-                // Group digits by period
                 return this.groupDigits(digitStream);
+            },
+            
+            applyPeriod(digits, period) {
+                const result = [];
+                for (let i = 0; i < digits.length; i += period) {
+                    const block = digits.slice(i, i + period);
+                    result.push(...block);
+                }
+                return result;
             },
             
             groupDigits(digits) {
@@ -625,26 +451,19 @@
                 return groups.join(' ');
             },
             
-            // Decryption methods
             decrypt(ciphertext) {
                 const cleanText = ciphertext.replace(/\s/g, '');
                 if (!cleanText || !/^\d+$/.test(cleanText)) {
                     throw new Error("Invalid ciphertext - numbers only");
                 }
                 
-                // Convert to digit array
                 const digits = Array.from(cleanText).map(Number);
-                
-                // Apply inverse transformation
                 const coords = this.reverseTransformation(digits);
                 
-                // Reconstruct plaintext
                 let plaintext = '';
                 for (const coord of coords) {
                     const char1 = this.square1[coord.row1 - 1][coord.col1 - 1];
                     const char2 = this.square2[coord.row2 - 1][coord.col2 - 1];
-                    
-                    // Prefer first square's character
                     plaintext += char1 || char2 || '�';
                 }
                 
@@ -660,11 +479,8 @@
             
             reverseStandardTransform(digits) {
                 const coords = [];
-                
-                // Process in chunks of 4 digits
                 for (let i = 0; i < digits.length; i += 4) {
                     if (i + 3 >= digits.length) break;
-                    
                     coords.push({
                         row1: digits[i],
                         col1: digits[i+1],
@@ -672,17 +488,13 @@
                         col2: digits[i+3]
                     });
                 }
-                
                 return coords;
             },
             
             reverseExtendedTransform(digits) {
                 const coords = [];
-                
-                // Process in chunks of 4 digits
                 for (let i = 0; i < digits.length; i += 4) {
                     if (i + 3 >= digits.length) break;
-                    
                     coords.push({
                         row1: digits[i],
                         col1: digits[i+2],
@@ -690,53 +502,59 @@
                         col2: digits[i+3]
                     });
                 }
-                
                 return coords;
             },
             
-            // Update settings from UI
-            updateSettings() {
-                const key1 = document.getElementById('key1').value;
-                const key2 = document.getElementById('key2').value;
-                const fill1 = document.getElementById('fill1').value;
-                const fill2 = document.getElementById('fill2').value;
-                const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
-                const period = parseInt(document.getElementById('period').value) || DEFAULT_PERIOD;
-                
-                // Validate keys
-                if (key1.length < 6 || key2.length < 6) {
-                    throw new Error("Both keys must be at least 6 characters");
-                }
-                
-                // Update state
-                this.period = Math.max(1, Math.min(20, period));
-                this.algorithm = algorithm;
-                
-                // Regenerate squares
-                this.square1 = this.createSquare(key1, fill1);
-                this.square2 = this.createSquare(key2, fill2);
-                
-                // Validate squares contain all characters
-                this.validateSquare(this.square1);
-                this.validateSquare(this.square2);
-                
-                return true;
+            displaySquares() {
+                this.displaySquare(this.square1, 'square1');
+                this.displaySquare(this.square2, 'square2');
             },
             
-            validateSquare(square) {
-                const chars = new Set();
-                for (const row of square) {
-                    for (const char of row) {
-                        if (chars.has(char)) {
-                            throw new Error(`Duplicate character in square: ${char}`);
-                        }
-                        chars.add(char);
-                    }
+            displaySquare(square, elementId) {
+                const container = document.getElementById(elementId);
+                container.innerHTML = '';
+                
+                // Add headers
+                const headerRow = document.createElement('div');
+                headerRow.style.display = 'contents';
+                container.appendChild(headerRow);
+                
+                const corner = document.createElement('div');
+                corner.className = 'square-cell square-header';
+                corner.textContent = '';
+                headerRow.appendChild(corner);
+                
+                for (let col = 0; col < SQUARE_SIZE; col++) {
+                    const th = document.createElement('div');
+                    th.className = 'square-cell square-header';
+                    th.textContent = col + 1;
+                    headerRow.appendChild(th);
                 }
                 
-                if (chars.size !== SQUARE_SIZE * SQUARE_SIZE) {
-                    throw new Error("Square must contain exactly 36 unique characters");
+                // Add rows
+                for (let row = 0; row < SQUARE_SIZE; row++) {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.style.display = 'contents';
+                    container.appendChild(rowDiv);
+                    
+                    const rowHeader = document.createElement('div');
+                    rowHeader.className = 'square-cell square-header';
+                    rowHeader.textContent = row + 1;
+                    rowDiv.appendChild(rowHeader);
+                    
+                    for (let col = 0; col < SQUARE_SIZE; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'square-cell';
+                        cell.textContent = square[row][col];
+                        rowDiv.appendChild(cell);
+                    }
                 }
+            },
+            
+            updateSettings() {
+                this.period = parseInt(document.getElementById('period').value) || 5;
+                this.algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+                return true;
             }
         };
 
@@ -750,14 +568,15 @@
         }
 
         function generateSquares() {
-            try {
-                if (cipher.updateSettings()) {
-                    cipher.displaySquares();
-                    showAlert('Squares generated successfully!', 'success', 'settings');
-                }
-            } catch (error) {
-                showAlert(error.message, 'danger', 'settings');
-            }
+            const key1 = document.getElementById('key1').value;
+            const key2 = document.getElementById('key2').value;
+            const fill1 = document.getElementById('fill1').value;
+            const fill2 = document.getElementById('fill2').value;
+            
+            cipher.square1 = cipher.createSquare(key1, fill1);
+            cipher.square2 = cipher.createSquare(key2, fill2);
+            cipher.updateSettings();
+            cipher.displaySquares();
         }
 
         function encrypt() {
@@ -766,7 +585,7 @@
                 const ciphertext = cipher.encrypt(plaintext);
                 document.getElementById('encrypt-output').textContent = ciphertext;
             } catch (error) {
-                showAlert(error.message, 'danger', 'encrypt-output');
+                document.getElementById('encrypt-output').textContent = `ERROR: ${error.message}`;
             }
         }
 
@@ -776,30 +595,15 @@
                 const plaintext = cipher.decrypt(ciphertext);
                 document.getElementById('decrypt-output').textContent = plaintext;
             } catch (error) {
-                showAlert(error.message, 'danger', 'decrypt-output');
+                document.getElementById('decrypt-output').textContent = `ERROR: ${error.message}`;
             }
         }
 
-        function showAlert(message, type, elementId) {
-            const element = document.getElementById(elementId);
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            element.innerHTML = '';
-            element.appendChild(alert);
-        }
-
-        function clearOutput(tab) {
-            document.getElementById(`${tab}-output`).textContent = '';
-        }
-
         function resetSettings() {
-            document.getElementById('key1').value = 'BIFIDCIPHER';
-            document.getElementById('key2').value = 'SECONDKEY';
-            document.getElementById('fill1').value = 'row';
-            document.getElementById('fill2').value = 'row';
-            document.getElementById('standard').checked = true;
+            document.getElementById('key1').value = 'BIFID2050';
+            document.getElementById('key2').value = 'QUANTUM';
             document.getElementById('period').value = '5';
+            document.querySelector('input[name="algorithm"][value="standard"]').checked = true;
             cipher.init();
         }
 
