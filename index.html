@@ -22,7 +22,6 @@
             background-color: var(--light);
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
         }
         
         .container {
@@ -41,7 +40,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 20px;
-            overflow: visible;
         }
         
         .grid {
@@ -56,11 +54,17 @@
             }
         }
         
+        .square-container {
+            display: inline-block;
+            margin: 15px 0;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+        
         .square {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(7, minmax(30px, 1fr));
             gap: 2px;
-            margin: 15px 0;
         }
         
         .square div {
@@ -117,14 +121,12 @@
         
         .tab-container {
             margin-bottom: 20px;
-            overflow: visible;
         }
         
         .tab-buttons {
             display: flex;
             border-bottom: 1px solid #ddd;
             overflow-x: auto;
-            white-space: nowrap;
         }
         
         .tab-button {
@@ -133,7 +135,7 @@
             border: none;
             cursor: pointer;
             border-bottom: 3px solid transparent;
-            flex-shrink: 0;
+            white-space: nowrap;
         }
         
         .tab-button.active {
@@ -194,9 +196,9 @@
         
         <div class="tab-container">
             <div class="tab-buttons">
-                <button class="tab-button active" onclick="openTab('encrypt')">Encrypt</button>
-                <button class="tab-button" onclick="openTab('decrypt')">Decrypt</button>
-                <button class="tab-button" onclick="openTab('settings')">Settings</button>
+                <button class="tab-button active" onclick="openTab(event, 'encrypt')">Encrypt</button>
+                <button class="tab-button" onclick="openTab(event, 'decrypt')">Decrypt</button>
+                <button class="tab-button" onclick="openTab(event, 'settings')">Settings</button>
             </div>
             
             <div id="encrypt" class="tab-content active">
@@ -252,7 +254,9 @@
                             </select>
                             
                             <h4>Square 1:</h4>
-                            <div id="square1" class="square"></div>
+                            <div class="square-container">
+                                <div id="square1" class="square"></div>
+                            </div>
                         </div>
                         
                         <div>
@@ -271,7 +275,9 @@
                             </select>
                             
                             <h4>Square 2:</h4>
-                            <div id="square2" class="square"></div>
+                            <div class="square-container">
+                                <div id="square2" class="square"></div>
+                            </div>
                         </div>
                     </div>
                     
@@ -324,7 +330,7 @@
         });
         
         // Tab switching
-        function openTab(tabName) {
+        function openTab(event, tabName) {
             const tabs = document.getElementsByClassName('tab-content');
             for (let tab of tabs) {
                 tab.classList.remove('active');
