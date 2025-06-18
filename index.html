@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trifid Cipher Pro | Working Implementation</title>
+    <title>Trifid Cipher Pro | Fixed Implementation</title>
     <style>
         :root {
             --bg: #121212;
             --text: #e0e0e0;
             --primary: #1e88e5;
+            --secondary: #ff9800;
             --card-bg: #1e1e1e;
             --border: #333;
             --error: #f44336;
+            --success: #4caf50;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,6 +37,10 @@
             font-size: 2.5rem;
             margin: 0;
             color: var(--primary);
+        }
+        h2 {
+            color: var(--secondary);
+            margin-top: 0;
         }
         .subtitle {
             color: #aaa;
@@ -92,16 +98,20 @@
             transition: background 0.2s;
         }
         button:hover {
-            background: #1976d2;
+            opacity: 0.9;
         }
         button:disabled {
             background: #555;
             cursor: not-allowed;
         }
+        button.secondary {
+            background: var(--secondary);
+        }
         .controls {
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         #cube-container {
             width: 100%;
@@ -147,7 +157,7 @@
             transition: all 0.2s;
         }
         .cell.highlight {
-            background: #1e88e5;
+            background: var(--primary);
             color: white;
             transform: scale(1.05);
             box-shadow: 0 0 10px rgba(30, 136, 229, 0.7);
@@ -162,10 +172,35 @@
             padding: 10px;
             border-radius: 5px;
             background: #333;
-            display: none;
         }
-        .status.visible {
-            display: block;
+        .status.error {
+            background: var(--error);
+            color: white;
+        }
+        .status.success {
+            background: var(--success);
+            color: white;
+        }
+        .round-controls {
+            display: flex;
+            gap: 5px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        .round-indicator {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .round-indicator.active {
+            background: var(--primary);
+            transform: scale(1.1);
         }
         .coordinates {
             font-family: monospace;
@@ -173,13 +208,22 @@
             padding: 2px 5px;
             border-radius: 3px;
         }
+        .speed-control {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .speed-control label {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>TRIFID CIPHER PRO</h1>
-            <p class="subtitle">Working 3D Encryption Implementation</p>
+            <p class="subtitle">Fixed Implementation with Round Visualization</p>
         </header>
 
         <div class="grid">
@@ -192,7 +236,7 @@
                 </div>
                 <div class="form-group">
                     <label for="key">Encryption Key</label>
-                    <input type="text" id="key" placeholder="Enter secret key">
+                    <input type="text" id="key" placeholder="Enter secret key (min 3 chars)">
                     <div id="key-error" class="error"></div>
                 </div>
                 <div class="form-group">
@@ -208,16 +252,25 @@
                     <label for="message">Message</label>
                     <textarea id="message" placeholder="Enter message to encrypt/decrypt"></textarea>
                 </div>
+                <div class="speed-control">
+                    <label for="speed">Animation Speed:</label>
+                    <select id="speed">
+                        <option value="500">Slow</option>
+                        <option value="300" selected>Medium</option>
+                        <option value="100">Fast</option>
+                    </select>
+                </div>
                 <div class="controls">
                     <button id="encrypt">Encrypt</button>
                     <button id="decrypt">Decrypt</button>
-                    <button id="reset">Reset</button>
+                    <button id="reset" class="secondary">Reset</button>
                 </div>
                 <div id="status" class="status"></div>
             </div>
 
             <div class="card">
                 <h2>3D Cube Visualization</h2>
+                <div id="round-controls" class="round-controls"></div>
                 <div id="cube-container">
                     <div id="cube"></div>
                 </div>
@@ -233,31 +286,41 @@
         class TrifidCipher {
             constructor() {
                 this.cubeSize = 3;
-                this.resetState();
-            }
-
-            resetState() {
-                this.originalCube = null;
-                this.currentCube = null;
-                this.rotationHistory = [];
+                this.roundStates = [];
+                this.currentRound = 0;
                 this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.";
             }
 
-            initialize(alphabet) {
+            async initialize(alphabet, key, rounds) {
+                // Validate alphabet
                 if (alphabet.length !== 27) {
-                    throw new Error("Alphabet must contain exactly 27 unique characters");
+                    throw new Error("Alphabet must contain exactly 27 characters");
                 }
                 
-                // Check for duplicate characters
                 const uniqueChars = new Set(alphabet);
                 if (uniqueChars.size !== 27) {
                     throw new Error("Alphabet must contain unique characters only");
                 }
 
+                // Validate key
+                if (!key || key.length < 3) {
+                    throw new Error("Key must be at least 3 characters long");
+                }
+
                 this.alphabet = alphabet;
-                this.originalCube = this.createCube(alphabet);
-                this.currentCube = this.deepCopyCube(this.originalCube);
-                this.rotationHistory = [];
+                this.roundStates = [];
+                const baseCube = this.createCube(alphabet);
+
+                // Pre-calculate all round states
+                for (let round = 0; round < rounds; round++) {
+                    const angles = await this.getRotationAngles(key, round);
+                    const rotatedCube = this.rotateCube(baseCube, angles);
+                    this.roundStates.push({
+                        cube: rotatedCube,
+                        angles,
+                        round
+                    });
+                }
             }
 
             createCube(alphabet) {
@@ -279,17 +342,68 @@
                 return cube;
             }
 
-            deepCopyCube(cube) {
-                return JSON.parse(JSON.stringify(cube));
+            rotateCube(baseCube, {θx, θy, θz}) {
+                const rotatedCube = this.createEmptyCube();
+                
+                // Convert angles to radians
+                const radX = this.degreesToRadians(θx);
+                const radY = this.degreesToRadians(θy);
+                const radZ = this.degreesToRadians(θz);
+
+                // Pre-calculate trigonometric values
+                const cosX = Math.cos(radX);
+                const sinX = Math.sin(radX);
+                const cosY = Math.cos(radY);
+                const sinY = Math.sin(radY);
+                const cosZ = Math.cos(radZ);
+                const sinZ = Math.sin(radZ);
+
+                for (let z = 0; z < this.cubeSize; z++) {
+                    for (let y = 0; y < this.cubeSize; y++) {
+                        for (let x = 0; x < this.cubeSize; x++) {
+                            // Convert to centered coordinates (-1, 0, 1)
+                            let cx = x - 1;
+                            let cy = y - 1;
+                            let cz = z - 1;
+
+                            // Apply rotations
+                            // X rotation
+                            const y1 = cy * cosX - cz * sinX;
+                            const z1 = cy * sinX + cz * cosX;
+
+                            // Y rotation
+                            const x2 = cx * cosY + z1 * sinY;
+                            const z2 = -cx * sinY + z1 * cosY;
+
+                            // Z rotation
+                            const x3 = x2 * cosZ - y1 * sinZ;
+                            const y3 = x2 * sinZ + y1 * cosZ;
+
+                            // Convert back to cube indices (0-2) with rounding
+                            const newX = Math.round(x3 + 1);
+                            const newY = Math.round(y3 + 1);
+                            const newZ = Math.round(z2 + 1);
+
+                            // Ensure coordinates stay within bounds
+                            const finalX = Math.max(0, Math.min(2, newX));
+                            const finalY = Math.max(0, Math.min(2, newY));
+                            const finalZ = Math.max(0, Math.min(2, newZ));
+
+                            rotatedCube[finalZ][finalY][finalX] = baseCube[z][y][x];
+                        }
+                    }
+                }
+                
+                return rotatedCube;
             }
 
             async getRotationAngles(key, round) {
                 const hash = await this.sha256(key + round.toString());
-                return [
-                    parseInt(hash.substring(0, 2), 16) % 360,
-                    parseInt(hash.substring(2, 4), 16) % 360,
-                    parseInt(hash.substring(4, 6), 16) % 360
-                ];
+                return {
+                    θx: parseInt(hash.substring(0, 2), 16) % 360,
+                    θy: parseInt(hash.substring(2, 4), 16) % 360,
+                    θz: parseInt(hash.substring(4, 6), 16) % 360
+                };
             }
 
             async sha256(message) {
@@ -300,69 +414,6 @@
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             }
 
-            async rotateCube(θx, θy, θz) {
-                const rotatedCube = this.createEmptyCube();
-                
-                for (let z = 0; z < this.cubeSize; z++) {
-                    for (let y = 0; y < this.cubeSize; y++) {
-                        for (let x = 0; x < this.cubeSize; x++) {
-                            const [newX, newY, newZ] = this.calculateRotatedPosition(x, y, z, θx, θy, θz);
-                            rotatedCube[newZ][newY][newX] = this.currentCube[z][y][x];
-                        }
-                    }
-                }
-                
-                this.currentCube = rotatedCube;
-                this.rotationHistory.push({ θx, θy, θz });
-                return this.currentCube;
-            }
-
-            calculateRotatedPosition(x, y, z, θx, θy, θz) {
-                // Convert to centered coordinates (-1, 0, 1)
-                let cx = x - 1;
-                let cy = y - 1;
-                let cz = z - 1;
-
-                // Convert angles to radians
-                const radX = this.degreesToRadians(θx);
-                const radY = this.degreesToRadians(θy);
-                const radZ = this.degreesToRadians(θz);
-
-                // Rotation around X axis
-                const cosX = Math.cos(radX);
-                const sinX = Math.sin(radX);
-                const y1 = cy * cosX - cz * sinX;
-                const z1 = cy * sinX + cz * cosX;
-
-                // Rotation around Y axis
-                const cosY = Math.cos(radY);
-                const sinY = Math.sin(radY);
-                const x2 = cx * cosY + z1 * sinY;
-                const z2 = -cx * sinY + z1 * cosY;
-
-                // Rotation around Z axis
-                const cosZ = Math.cos(radZ);
-                const sinZ = Math.sin(radZ);
-                const x3 = x2 * cosZ - y1 * sinZ;
-                const y3 = x2 * sinZ + y1 * cosZ;
-
-                // Convert back to cube indices (0-2) with proper rounding
-                const newX = Math.round(x3 + 1);
-                const newY = Math.round(y3 + 1);
-                const newZ = Math.round(z2 + 1);
-
-                // Ensure coordinates stay within bounds
-                return [
-                    Math.max(0, Math.min(2, newX)),
-                    Math.max(0, Math.min(2, newY)),
-                    Math.max(0, Math.min(2, newZ))
-                ];
-            }
-
-            degreesToRadians(degrees) {
-                return degrees * Math.PI / 180;
-            }
-
             createEmptyCube() {
                 return Array(this.cubeSize).fill().map(
                     () => Array(this.cubeSize).fill().map(
@@ -371,96 +422,99 @@
                 );
             }
 
-            async encrypt(message, key, rounds = 3) {
-                if (!key || key.length < 3) {
-                    throw new Error("Encryption key must be at least 3 characters long");
-                }
+            degreesToRadians(degrees) {
+                return degrees * Math.PI / 180;
+            }
 
-                this.initialize(document.getElementById('alphabet').value);
+            async encrypt(message, key, rounds = 3) {
+                await this.initialize(document.getElementById('alphabet').value, key, rounds);
+                this.currentRound = 0;
+                
                 let result = "";
+                const animationSpeed = parseInt(document.getElementById('speed').value);
                 
-                // Apply all rotations
-                for (let round = 0; round < rounds; round++) {
-                    const [θx, θy, θz] = await this.getRotationAngles(key, round);
-                    await this.rotateCube(θx, θy, θz);
-                }
-                
-                // Encrypt each character
                 for (const char of message.toUpperCase()) {
                     if (char === ' ') {
                         result += ' ';
                         continue;
                     }
                     
-                    let found = false;
-                    for (let z = 0; z < this.cubeSize && !found; z++) {
-                        for (let y = 0; y < this.cubeSize && !found; y++) {
-                            for (let x = 0; x < this.cubeSize && !found; x++) {
-                                if (this.currentCube[z][y][x] === char) {
-                                    result += `${x}${y}${z}`;
-                                    found = true;
-                                }
-                            }
-                        }
-                    }
+                    const round = this.currentRound % rounds;
+                    const cubeState = this.roundStates[round];
+                    const coords = this.findInCube(char, cubeState.cube);
                     
-                    if (!found) result += '?';
+                    result += coords || '000';
+                    this.currentRound++;
+                    
+                    // Update visualization
+                    updateVisualization(round);
+                    highlightCharCoords(char, cubeState.cube);
+                    await new Promise(resolve => setTimeout(resolve, animationSpeed));
                 }
                 
                 return result;
             }
 
             async decrypt(ciphertext, key, rounds = 3) {
-                if (!key || key.length < 3) {
-                    throw new Error("Decryption key must be at least 3 characters long");
-                }
-
-                this.initialize(document.getElementById('alphabet').value);
+                await this.initialize(document.getElementById('alphabet').value, key, rounds);
+                this.currentRound = 0;
                 
-                // Calculate all rotations first
-                const rotations = [];
-                for (let round = 0; round < rounds; round++) {
-                    rotations.push(await this.getRotationAngles(key, round));
-                }
-                
-                // Apply all rotations to get to the encryption state
-                for (const rotation of rotations) {
-                    const { θx, θy, θz } = rotation;
-                    await this.rotateCube(θx, θy, θz);
-                }
-                
-                // Decrypt the message
                 let result = "";
-                const coordRegex = /(\d)(\d)(\d)|(\s)|(\?)/g;
+                const coordRegex = /(\d)(\d)(\d)|(\s)/g;
                 let match;
+                const animationSpeed = parseInt(document.getElementById('speed').value);
                 
                 while ((match = coordRegex.exec(ciphertext)) !== null) {
                     if (match[4]) { // Space
                         result += ' ';
-                    } else if (match[5]) { // Unknown character
-                        result += '?';
-                    } else {
-                        const x = parseInt(match[1]);
-                        const y = parseInt(match[2]);
-                        const z = parseInt(match[3]);
-                        
-                        if (x < this.cubeSize && y < this.cubeSize && z < this.cubeSize) {
-                            result += this.currentCube[z][y][x];
-                        } else {
-                            result += '?';
-                        }
+                        continue;
                     }
+                    
+                    const round = this.currentRound % rounds;
+                    const cubeState = this.roundStates[round];
+                    
+                    const x = parseInt(match[1]);
+                    const y = parseInt(match[2]);
+                    const z = parseInt(match[3]);
+                    
+                    if (x < this.cubeSize && y < this.cubeSize && z < this.cubeSize) {
+                        const char = cubeState.cube[z][y][x];
+                        result += char;
+                        
+                        // Update visualization
+                        updateVisualization(round);
+                        highlightCoords(x, y, z);
+                        await new Promise(resolve => setTimeout(resolve, animationSpeed));
+                    } else {
+                        result += '?';
+                    }
+                    
+                    this.currentRound++;
                 }
                 
                 return result;
             }
 
-            getCurrentCube() {
-                return this.currentCube;
+            findInCube(char, cube) {
+                for (let z = 0; z < this.cubeSize; z++) {
+                    for (let y = 0; y < this.cubeSize; y++) {
+                        for (let x = 0; x < this.cubeSize; x++) {
+                            if (cube[z][y][x] === char) {
+                                return `${x}${y}${z}`;
+                            }
+                        }
+                    }
+                }
+                return null;
             }
 
-            getOriginalCube() {
-                return this.originalCube;
+            getRoundState(round) {
+                return this.roundStates[round];
+            }
+
+            reset() {
+                this.roundStates = [];
+                this.currentRound = 0;
             }
         }
 
@@ -504,49 +558,49 @@
 
             updateCube(cubeData) {
                 // Front face (z=0)
-                this.updateFace(0, cubeData[0]);
+                this.updateFace(0, cubeData[0], 'z', 0);
                 // Back face (z=2)
-                this.updateFace(1, cubeData[2]);
+                this.updateFace(1, cubeData[2], 'z', 2);
                 // Right face (x=2)
-                this.updateFace(2, cubeData.map(layer => layer.map(row => row[2])));
+                this.updateFace(2, cubeData.map(layer => layer.map(row => row[2])), 'x', 2);
                 // Left face (x=0)
-                this.updateFace(3, cubeData.map(layer => layer.map(row => row[0])));
+                this.updateFace(3, cubeData.map(layer => layer.map(row => row[0])), 'x', 0);
                 // Top face (y=0)
-                this.updateFace(4, cubeData.map(layer => layer[0]));
+                this.updateFace(4, cubeData.map(layer => layer[0]), 'y', 0);
                 // Bottom face (y=2)
-                this.updateFace(5, cubeData.map(layer => layer[2]));
+                this.updateFace(5, cubeData.map(layer => layer[2]), 'y', 2);
             }
 
-            updateFace(faceIndex, faceData) {
+            updateFace(faceIndex, faceData, axis, axisValue) {
                 const cells = this.faces[faceIndex].querySelectorAll('.cell');
                 
-                if (faceIndex === 0 || faceIndex === 1) {
-                    // Front or back face (z-axis)
+                if (axis === 'z') {
+                    // Front or back face
                     let index = 0;
                     for (let y = 0; y < 3; y++) {
                         for (let x = 0; x < 3; x++) {
                             cells[index].textContent = faceData[y][x];
-                            cells[index].dataset.coords = `${x},${y},${faceIndex === 0 ? 0 : 2}`;
+                            cells[index].dataset.coords = `${x},${y},${axisValue}`;
                             index++;
                         }
                     }
-                } else if (faceIndex === 2 || faceIndex === 3) {
-                    // Right or left face (x-axis)
+                } else if (axis === 'x') {
+                    // Right or left face
                     let index = 0;
                     for (let y = 0; y < 3; y++) {
                         for (let z = 0; z < 3; z++) {
                             cells[index].textContent = faceData[z][y];
-                            cells[index].dataset.coords = `${faceIndex === 2 ? 2 : 0},${y},${z}`;
+                            cells[index].dataset.coords = `${axisValue},${y},${z}`;
                             index++;
                         }
                     }
                 } else {
-                    // Top or bottom face (y-axis)
+                    // Top or bottom face
                     let index = 0;
                     for (let z = 0; z < 3; z++) {
                         for (let x = 0; x < 3; x++) {
                             cells[index].textContent = faceData[z][x];
-                            cells[index].dataset.coords = `${x},${faceIndex === 4 ? 0 : 2},${z}`;
+                            cells[index].dataset.coords = `${x},${axisValue},${z}`;
                             index++;
                         }
                     }
@@ -569,7 +623,7 @@
                 if (cell) {
                     cell.classList.add('highlight');
                     
-                    // Auto-remove highlight after 2 seconds
+                    // Auto-remove highlight after delay
                     if (this.highlightTimeout) {
                         clearTimeout(this.highlightTimeout);
                     }
@@ -595,51 +649,104 @@
             const statusDiv = document.getElementById('status');
             const alphabetError = document.getElementById('alphabet-error');
             const keyError = document.getElementById('key-error');
+            const roundControls = document.getElementById('round-controls');
 
-            // Initialize with default alphabet
-            function initializeCipher() {
+            // Create round indicators
+            function createRoundControls(rounds) {
+                roundControls.innerHTML = '';
+                for (let i = 0; i < rounds; i++) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'round-indicator';
+                    indicator.textContent = i + 1;
+                    indicator.dataset.round = i;
+                    indicator.addEventListener('click', () => {
+                        updateVisualization(i);
+                    });
+                    roundControls.appendChild(indicator);
+                }
+            }
+
+            // Update visualization for specific round
+            function updateVisualization(round) {
+                const state = cipher.getRoundState(round);
+                if (!state) return;
+                
+                visualizer.updateCube(state.cube);
+                visualizer.updateTransform(state.angles.θx, state.angles.θy, state.angles.θz);
+                
+                // Update active round indicator
+                document.querySelectorAll('.round-indicator').forEach(el => {
+                    el.classList.toggle('active', parseInt(el.dataset.round) === round);
+                });
+            }
+
+            // Highlight character coordinates
+            function highlightCharCoords(char, cube) {
+                for (let z = 0; z < 3; z++) {
+                    for (let y = 0; y < 3; y++) {
+                        for (let x = 0; x < 3; x++) {
+                            if (cube[z][y][x] === char) {
+                                visualizer.highlightCell(x, y, z);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Highlight specific coordinates
+            function highlightCoords(x, y, z) {
+                visualizer.highlightCell(x, y, z);
+            }
+
+            // Show status message
+            function showStatus(message, type = '') {
+                statusDiv.textContent = message;
+                statusDiv.className = 'status ' + type;
+            }
+
+            // Clear errors
+            function clearErrors() {
+                alphabetError.textContent = '';
+                keyError.textContent = '';
+                showStatus('');
+            }
+
+            // Initialize cipher with current settings
+            async function initializeCipher() {
                 try {
-                    cipher.initialize(alphabetInput.value);
-                    visualizer.updateCube(cipher.getCurrentCube());
+                    const rounds = parseInt(roundsSelect.value);
+                    createRoundControls(rounds);
+                    
+                    await cipher.initialize(
+                        alphabetInput.value,
+                        keyInput.value,
+                        rounds
+                    );
+                    
                     clearErrors();
                     return true;
                 } catch (e) {
-                    alphabetError.textContent = e.message;
+                    if (e.message.includes('Alphabet')) {
+                        alphabetError.textContent = e.message;
+                    } else if (e.message.includes('Key')) {
+                        keyError.textContent = e.message;
+                    } else {
+                        showStatus(e.message, 'error');
+                    }
                     return false;
                 }
             }
 
-            function clearErrors() {
-                alphabetError.textContent = '';
-                keyError.textContent = '';
-                statusDiv.className = 'status';
-                statusDiv.textContent = '';
-            }
-
-            function showStatus(message, isError = false) {
-                statusDiv.textContent = message;
-                statusDiv.className = isError ? 'status error' : 'status visible';
-            }
-
-            // Update cube when alphabet changes
-            alphabetInput.addEventListener('input', () => {
-                initializeCipher();
-            });
-
             // Encryption handler
             encryptBtn.addEventListener('click', async () => {
-                if (!keyInput.value) {
-                    keyError.textContent = "Please enter an encryption key";
-                    return;
-                }
-
                 if (!initializeCipher()) return;
-
+                
                 try {
                     encryptBtn.disabled = true;
                     decryptBtn.disabled = true;
                     showStatus("Encrypting...");
-
+                    
                     const result = await cipher.encrypt(
                         messageInput.value,
                         keyInput.value,
@@ -647,10 +754,9 @@
                     );
                     
                     resultOutput.value = result;
-                    visualizer.updateCube(cipher.getCurrentCube());
-                    showStatus("Encryption completed successfully");
+                    showStatus("Encryption completed successfully", "success");
                 } catch (e) {
-                    showStatus("Error: " + e.message, true);
+                    showStatus("Error: " + e.message, "error");
                 } finally {
                     encryptBtn.disabled = false;
                     decryptBtn.disabled = false;
@@ -659,18 +765,13 @@
 
             // Decryption handler
             decryptBtn.addEventListener('click', async () => {
-                if (!keyInput.value) {
-                    keyError.textContent = "Please enter a decryption key";
-                    return;
-                }
-
                 if (!initializeCipher()) return;
-
+                
                 try {
                     encryptBtn.disabled = true;
                     decryptBtn.disabled = true;
                     showStatus("Decrypting...");
-
+                    
                     const result = await cipher.decrypt(
                         messageInput.value,
                         keyInput.value,
@@ -678,10 +779,9 @@
                     );
                     
                     resultOutput.value = result;
-                    visualizer.updateCube(cipher.getCurrentCube());
-                    showStatus("Decryption completed successfully");
+                    showStatus("Decryption completed successfully", "success");
                 } catch (e) {
-                    showStatus("Error: " + e.message, true);
+                    showStatus("Error: " + e.message, "error");
                 } finally {
                     encryptBtn.disabled = false;
                     decryptBtn.disabled = false;
@@ -690,16 +790,21 @@
 
             // Reset handler
             resetBtn.addEventListener('click', () => {
-                cipher.resetState();
-                initializeCipher();
+                cipher.reset();
                 messageInput.value = '';
                 resultOutput.value = '';
                 keyInput.value = '';
                 clearErrors();
+                showStatus("System reset", "success");
             });
 
-            // Initialize on load
-            initializeCipher();
+            // Initialize round controls
+            createRoundControls(parseInt(roundsSelect.value));
+            
+            // Update rounds when selection changes
+            roundsSelect.addEventListener('change', () => {
+                createRoundControls(parseInt(roundsSelect.value));
+            });
         });
     </script>
 </body>
