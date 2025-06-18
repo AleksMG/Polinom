@@ -3,247 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Bifid Cipher (Fixed)</title>
+    <title>Professional Bifid Cipher Tool</title>
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --dark: #212529;
+            --primary: #3a86ff;
+            --secondary: #2667cc;
+            --dark: #2b2d42;
             --light: #f8f9fa;
             --success: #4cc9f0;
             --warning: #f8961e;
-            --danger: #f94144;
+            --danger: #ef233c;
+            --gray: #8d99ae;
+            --dark-gray: #6c757d;
         }
-        
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             color: var(--dark);
             background-color: var(--light);
-            margin: 0;
-            padding: 20px;
+            padding: 2rem;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 1rem;
         }
-        
-        h1, h2, h3 {
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
             color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
         }
-        
+
+        .subtitle {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
         .card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
-        
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
         .grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
-        
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
-        
-        .square-container {
-            display: inline-block;
-            margin: 15px 0;
-            overflow-x: auto;
-            max-width: 100%;
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
         }
-        
-        .square {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(30px, 1fr));
-            gap: 2px;
-        }
-        
-        .square div {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-            font-weight: bold;
-            min-width: 30px;
-        }
-        
-        .square .header {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        textarea, input, select, button {
+
+        input, select, textarea {
             width: 100%;
-            padding: 10px;
-            margin: 5px 0 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
         }
-        
-        button {
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
             background-color: var(--primary);
             color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
-        
-        button:hover {
+
+        .btn-primary:hover {
             background-color: var(--secondary);
         }
-        
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d90429;
+        }
+
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
-        
-        .btn-group button {
+
+        .btn-group .btn {
             flex: 1;
         }
-        
-        .process-btn {
-            background-color: var(--success);
-        }
-        
-        .reset-btn {
-            background-color: var(--danger);
-        }
-        
-        .tab-container {
-            margin-bottom: 20px;
-        }
-        
-        .tab-buttons {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            overflow-x: auto;
-        }
-        
-        .tab-button {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
-        }
-        
-        .tab-button.active {
-            border-bottom: 3px solid var(--primary);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 20px 0;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
+
         .output {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            font-family: 'Roboto Mono', monospace;
             white-space: pre-wrap;
             min-height: 100px;
             overflow-wrap: break-word;
+            border: 1px solid #e0e0e0;
         }
-        
-        .validation-error {
+
+        .square-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .square {
+            display: inline-grid;
+            grid-template-columns: repeat(7, minmax(40px, 1fr));
+            gap: 2px;
+            margin: 0 auto;
+        }
+
+        .square-cell {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            font-weight: 600;
+            min-width: 40px;
+        }
+
+        .square-header {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--dark-gray);
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 35, 60, 0.1);
             color: var(--danger);
-            font-size: 14px;
-            margin-top: -10px;
-            margin-bottom: 15px;
+            border: 1px solid rgba(239, 35, 60, 0.2);
         }
-        
-        .algorithm-selector {
-            margin-bottom: 20px;
+
+        .algorithm-options {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
         }
-        
+
         .algorithm-option {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
         }
-        
+
         .algorithm-option input {
             width: auto;
-            margin-right: 10px;
+            margin-right: 0.75rem;
         }
-        
-        .algorithm-option label {
-            cursor: pointer;
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Advanced Bifid Cipher (Fixed)</h1>
-        <p>A corrected implementation of the Bifid cipher with dual 6×6 Polybius squares and multiple transformation algorithms.</p>
-        
-        <div class="tab-container">
-            <div class="tab-buttons">
-                <button class="tab-button active" onclick="openTab(event, 'encrypt')">Encrypt</button>
-                <button class="tab-button" onclick="openTab(event, 'decrypt')">Decrypt</button>
-                <button class="tab-button" onclick="openTab(event, 'settings')">Settings</button>
-            </div>
-            
-            <div id="encrypt" class="tab-content active">
-                <div class="card">
-                    <h2>Encryption</h2>
+        <header>
+            <h1>Professional Bifid Cipher Tool</h1>
+            <p class="subtitle">A secure implementation of the Bifid cipher with dual 6×6 Polybius squares and multiple transformation algorithms.</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="openTab(event, 'encrypt')">Encrypt</button>
+            <button class="tab" onclick="openTab(event, 'decrypt')">Decrypt</button>
+            <button class="tab" onclick="openTab(event, 'settings')">Settings</button>
+        </div>
+
+        <div id="encrypt" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">Encryption</h2>
+                <div class="form-group">
                     <label for="plaintext">Plaintext (A-Z, 0-9):</label>
-                    <textarea id="plaintext" rows="4" placeholder="Enter text to encrypt">HELLO</textarea>
-                    
-                    <div class="btn-group">
-                        <button class="process-btn" onclick="encrypt()">Encrypt</button>
-                        <button class="reset-btn" onclick="clearOutput('encrypt')">Clear</button>
-                    </div>
-                    
-                    <h3>Output (4-digit groups):</h3>
+                    <textarea id="plaintext" placeholder="Enter text to encrypt">HELLO</textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="encrypt()">Encrypt</button>
+                    <button class="btn btn-danger" onclick="clearOutput('encrypt')">Clear</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Output (4-digit groups):</label>
                     <div id="encrypt-output" class="output"></div>
                 </div>
             </div>
-            
-            <div id="decrypt" class="tab-content">
-                <div class="card">
-                    <h2>Decryption</h2>
+        </div>
+
+        <div id="decrypt" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Decryption</h2>
+                <div class="form-group">
                     <label for="ciphertext">Ciphertext (4-digit groups, numbers only):</label>
-                    <textarea id="ciphertext" rows="4" placeholder="Enter ciphertext to decrypt"></textarea>
-                    
-                    <div class="btn-group">
-                        <button class="process-btn" onclick="decrypt()">Decrypt</button>
-                        <button class="reset-btn" onclick="clearOutput('decrypt')">Clear</button>
-                    </div>
-                    
-                    <h3>Output:</h3>
+                    <textarea id="ciphertext" placeholder="Enter ciphertext to decrypt"></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="decrypt()">Decrypt</button>
+                    <button class="btn btn-danger" onclick="clearOutput('decrypt')">Clear</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Output:</label>
                     <div id="decrypt-output" class="output"></div>
                 </div>
             </div>
-            
-            <div id="settings" class="tab-content">
-                <div class="card">
-                    <h2>Cipher Configuration</h2>
-                    
-                    <div class="grid">
-                        <div>
-                            <h3>Key 1 Configuration</h3>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Cipher Configuration</h2>
+                
+                <div class="grid">
+                    <div>
+                        <h3 class="card-title" style="font-size: 1.25rem;">Key 1 Configuration</h3>
+                        <div class="form-group">
                             <label for="key1">Key 1:</label>
                             <input type="text" id="key1" value="SECRETKEY1" placeholder="Enter first key">
-                            <p id="key1-error" class="validation-error"></p>
-                            
+                            <div id="key1-error" class="alert alert-danger" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="fill1">Fill Method:</label>
                             <select id="fill1">
                                 <option value="row">Row-wise</option>
@@ -252,19 +337,23 @@
                                 <option value="spiral">Spiral</option>
                                 <option value="chess">Chess Pattern</option>
                             </select>
-                            
-                            <h4>Square 1:</h4>
-                            <div class="square-container">
-                                <div id="square1" class="square"></div>
-                            </div>
                         </div>
                         
-                        <div>
-                            <h3>Key 2 Configuration</h3>
+                        <h4>Square 1:</h4>
+                        <div class="square-container">
+                            <div id="square1" class="square"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="card-title" style="font-size: 1.25rem;">Key 2 Configuration</h3>
+                        <div class="form-group">
                             <label for="key2">Key 2:</label>
                             <input type="text" id="key2" value="SECRETKEY2" placeholder="Enter second key">
-                            <p id="key2-error" class="validation-error"></p>
-                            
+                            <div id="key2-error" class="alert alert-danger" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="fill2">Fill Method:</label>
                             <select id="fill2">
                                 <option value="row">Row-wise</option>
@@ -273,16 +362,18 @@
                                 <option value="spiral">Spiral</option>
                                 <option value="chess">Chess Pattern</option>
                             </select>
-                            
-                            <h4>Square 2:</h4>
-                            <div class="square-container">
-                                <div id="square2" class="square"></div>
-                            </div>
+                        </div>
+                        
+                        <h4>Square 2:</h4>
+                        <div class="square-container">
+                            <div id="square2" class="square"></div>
                         </div>
                     </div>
-                    
-                    <div class="algorithm-selector">
-                        <h3>Transformation Algorithm</h3>
+                </div>
+                
+                <div class="form-group">
+                    <h3 class="card-title" style="font-size: 1.25rem;">Transformation Algorithm</h3>
+                    <div class="algorithm-options">
                         <div class="algorithm-option">
                             <input type="radio" id="standard" name="algorithm" value="standard" checked>
                             <label for="standard">Standard Bifid (period-based)</label>
@@ -296,11 +387,11 @@
                             <label for="chess">Chess Knight Transformation</label>
                         </div>
                     </div>
-                    
-                    <div class="btn-group">
-                        <button onclick="generateSquares()">Generate Squares</button>
-                        <button class="reset-btn" onclick="resetSettings()">Reset to Defaults</button>
-                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generateSquares()">Generate Squares</button>
+                    <button class="btn btn-danger" onclick="resetSettings()">Reset to Defaults</button>
                 </div>
             </div>
         </div>
@@ -308,274 +399,281 @@
 
     <script>
         // Character set for 6x6 squares (A-Z, 0-9)
-        const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const SQUARE_SIZE = 6;
         
-        // Initialize squares with default keys
-        let square1 = [];
-        let square2 = [];
-        
-        // Current settings
-        let settings = {
-            key1: "SECRETKEY1",
-            key2: "SECRETKEY2",
-            fill1: "row",
-            fill2: "row",
-            algorithm: "standard",
-            period: 5
+        // Current settings state
+        const state = {
+            square1: [],
+            square2: [],
+            settings: {
+                key1: "SECRETKEY1",
+                key2: "SECRETKEY2",
+                fill1: "row",
+                fill2: "row",
+                algorithm: "standard",
+                period: 5
+            }
         };
-        
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             generateSquares();
         });
-        
+
         // Tab switching
         function openTab(event, tabName) {
-            const tabs = document.getElementsByClassName('tab-content');
-            for (let tab of tabs) {
-                tab.classList.remove('active');
-            }
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
             
-            const buttons = document.getElementsByClassName('tab-button');
-            for (let button of buttons) {
-                button.classList.remove('active');
-            }
+            const buttons = document.querySelectorAll('.tab');
+            buttons.forEach(button => button.classList.remove('active'));
             
             document.getElementById(tabName).classList.add('active');
             event.currentTarget.classList.add('active');
         }
-        
-        // Generate Polybius squares based on keys and fill methods
+
+        // Generate Polybius squares based on current settings
         function generateSquares() {
-            // Get current settings
-            settings.key1 = document.getElementById('key1').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            settings.key2 = document.getElementById('key2').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            settings.fill1 = document.getElementById('fill1').value;
-            settings.fill2 = document.getElementById('fill2').value;
-            settings.algorithm = document.querySelector('input[name="algorithm"]:checked').value;
-            
+            // Update settings from UI
+            state.settings.key1 = document.getElementById('key1').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            state.settings.key2 = document.getElementById('key2').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            state.settings.fill1 = document.getElementById('fill1').value;
+            state.settings.fill2 = document.getElementById('fill2').value;
+            state.settings.algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+
             // Validate keys
-            const key1Error = document.getElementById('key1-error');
-            const key2Error = document.getElementById('key2-error');
-            
-            key1Error.textContent = '';
-            key2Error.textContent = '';
-            
-            if (settings.key1.length < 6) {
-                key1Error.textContent = 'Key should be at least 6 characters for better security';
-            }
-            
-            if (settings.key2.length < 6) {
-                key2Error.textContent = 'Key should be at least 6 characters for better security';
-            }
-            
+            validateKey('key1', state.settings.key1);
+            validateKey('key2', state.settings.key2);
+
             // Generate squares
-            square1 = createSquare(settings.key1, settings.fill1);
-            square2 = createSquare(settings.key2, settings.fill2);
-            
+            state.square1 = createSquare(state.settings.key1, state.settings.fill1);
+            state.square2 = createSquare(state.settings.key2, state.settings.fill2);
+
             // Display squares
-            displaySquare(square1, 'square1');
-            displaySquare(square2, 'square2');
+            displaySquare(state.square1, 'square1');
+            displaySquare(state.square2, 'square2');
         }
-        
+
+        // Validate key and show error if needed
+        function validateKey(keyId, keyValue) {
+            const errorElement = document.getElementById(`${keyId}-error`);
+            
+            if (keyValue.length < 6) {
+                errorElement.textContent = 'Key should be at least 6 characters for better security';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        }
+
         // Create a 6x6 Polybius square
         function createSquare(key, fillMethod) {
             // Remove duplicate characters from key
-            let uniqueKey = [];
-            for (let char of key) {
-                if (!uniqueKey.includes(char) && charset.includes(char)) {
-                    uniqueKey.push(char);
-                }
-            }
+            const uniqueKey = Array.from(new Set(key.split('').filter(c => CHARSET.includes(c))).join('');
             
             // Add remaining characters from charset
-            let remainingChars = [];
-            for (let char of charset) {
-                if (!uniqueKey.includes(char)) {
-                    remainingChars.push(char);
-                }
-            }
+            const remainingChars = CHARSET.split('').filter(c => !uniqueKey.includes(c)).join('');
+            const allChars = uniqueKey + remainingChars;
             
-            // Combine key and remaining characters
-            let allChars = [...uniqueKey, ...remainingChars];
-            
-            // Create square based on fill method
-            let square = Array(6).fill().map(() => Array(6).fill(''));
-            
+            // Initialize empty square
+            const square = Array(SQUARE_SIZE).fill().map(() => Array(SQUARE_SIZE).fill(''));
+
+            // Fill square based on selected method
             switch (fillMethod) {
                 case 'row':
-                    // Simple row-wise fill
-                    for (let i = 0; i < 6; i++) {
-                        for (let j = 0; j < 6; j++) {
-                            square[i][j] = allChars[i * 6 + j];
-                        }
-                    }
+                    fillRowWise(square, allChars);
                     break;
-                    
                 case 'column':
-                    // Column-wise fill
-                    for (let i = 0; i < 6; i++) {
-                        for (let j = 0; j < 6; j++) {
-                            square[j][i] = allChars[i * 6 + j];
-                        }
-                    }
+                    fillColumnWise(square, allChars);
                     break;
-                    
                 case 'diagonal':
-                    // Diagonal fill (zigzag)
-                    let index = 0;
-                    for (let d = 0; d < 11; d++) {
-                        for (let i = 0; i < 6; i++) {
-                            let j = d - i;
-                            if (j >= 0 && j < 6 && i < 6) {
-                                square[i][j] = allChars[index++];
-                            }
-                        }
-                    }
+                    fillDiagonal(square, allChars);
                     break;
-                    
                 case 'spiral':
-                    // Spiral fill from center
-                    let directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-                    let currentDir = 0;
-                    let steps = 1;
-                    let stepCount = 0;
-                    let pos = [2, 2]; // Start near center
-                    let visited = new Set();
-                    
-                    for (let i = 0; i < 36; i++) {
-                        // Place character
-                        square[pos[0]][pos[1]] = allChars[i];
-                        visited.add(`${pos[0]},${pos[1]}`);
-                        
-                        // Move to next position
-                        let nextPos = [pos[0] + directions[currentDir][0], pos[1] + directions[currentDir][1]];
-                        
-                        // Check if need to change direction
-                        if (visited.has(`${nextPos[0]},${nextPos[1]}`) || 
-                            nextPos[0] < 0 || nextPos[0] >= 6 || 
-                            nextPos[1] < 0 || nextPos[1] >= 6) {
-                            currentDir = (currentDir + 1) % 4;
-                            nextPos = [pos[0] + directions[currentDir][0], pos[1] + directions[currentDir][1]];
-                        }
-                        
-                        pos = nextPos;
-                    }
+                    fillSpiral(square, allChars);
                     break;
-                    
                 case 'chess':
-                    // Chess pattern fill (knight's tour inspired)
-                    let knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
-                    let chessPos = [0, 0];
-                    let chessVisited = new Set();
-                    chessVisited.add("0,0");
-                    square[0][0] = allChars[0];
-                    
-                    for (let i = 1; i < 36; i++) {
-                        let found = false;
-                        
-                        // Try all possible knight moves
-                        for (let move of knightMoves) {
-                            let newRow = chessPos[0] + move[0];
-                            let newCol = chessPos[1] + move[1];
-                            
-                            if (newRow >= 0 && newRow < 6 && newCol >= 0 && newCol < 6 && 
-                                !chessVisited.has(`${newRow},${newCol}`)) {
-                                chessPos = [newRow, newCol];
-                                chessVisited.add(`${newRow},${newCol}`);
-                                square[newRow][newCol] = allChars[i];
-                                found = true;
-                                break;
-                            }
-                        }
-                        
-                        // If no valid move found, pick first available spot
-                        if (!found) {
-                            for (let r = 0; r < 6; r++) {
-                                for (let c = 0; c < 6; c++) {
-                                    if (!chessVisited.has(`${r},${c}`)) {
-                                        chessPos = [r, c];
-                                        chessVisited.add(`${r},${c}`);
-                                        square[r][c] = allChars[i];
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                                if (found) break;
-                            }
-                        }
-                    }
+                    fillChessPattern(square, allChars);
                     break;
+                default:
+                    fillRowWise(square, allChars);
             }
-            
+
             return square;
         }
-        
+
+        // Fill square row-wise
+        function fillRowWise(square, chars) {
+            for (let row = 0; row < SQUARE_SIZE; row++) {
+                for (let col = 0; col < SQUARE_SIZE; col++) {
+                    square[row][col] = chars[row * SQUARE_SIZE + col];
+                }
+            }
+        }
+
+        // Fill square column-wise
+        function fillColumnWise(square, chars) {
+            for (let col = 0; col < SQUARE_SIZE; col++) {
+                for (let row = 0; row < SQUARE_SIZE; row++) {
+                    square[row][col] = chars[col * SQUARE_SIZE + row];
+                }
+            }
+        }
+
+        // Fill square diagonally
+        function fillDiagonal(square, chars) {
+            let index = 0;
+            for (let d = 0; d < 2 * SQUARE_SIZE - 1; d++) {
+                for (let row = 0; row < SQUARE_SIZE; row++) {
+                    const col = d - row;
+                    if (col >= 0 && col < SQUARE_SIZE && index < chars.length) {
+                        square[row][col] = chars[index++];
+                    }
+                }
+            }
+        }
+
+        // Fill square in spiral pattern
+        function fillSpiral(square, chars) {
+            const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+            let currentDir = 0;
+            let row = 2, col = 2; // Start near center
+            const visited = new Set();
+            
+            for (let i = 0; i < SQUARE_SIZE * SQUARE_SIZE; i++) {
+                square[row][col] = chars[i];
+                visited.add(`${row},${col}`);
+                
+                // Calculate next position
+                let nextRow = row + directions[currentDir][0];
+                let nextCol = col + directions[currentDir][1];
+                
+                // Change direction if next position is invalid
+                if (visited.has(`${nextRow},${nextCol}`) || 
+                    nextRow < 0 || nextRow >= SQUARE_SIZE || 
+                    nextCol < 0 || nextCol >= SQUARE_SIZE) {
+                    currentDir = (currentDir + 1) % 4;
+                    nextRow = row + directions[currentDir][0];
+                    nextCol = col + directions[currentDir][1];
+                }
+                
+                row = nextRow;
+                col = nextCol;
+            }
+        }
+
+        // Fill square in chess knight's tour pattern
+        function fillChessPattern(square, chars) {
+            const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
+            let pos = [0, 0];
+            const visited = new Set();
+            visited.add(`${pos[0]},${pos[1]}`);
+            square[0][0] = chars[0];
+            
+            for (let i = 1; i < SQUARE_SIZE * SQUARE_SIZE; i++) {
+                let found = false;
+                
+                // Try all possible knight moves
+                for (const [dr, dc] of knightMoves) {
+                    const newRow = pos[0] + dr;
+                    const newCol = pos[1] + dc;
+                    
+                    if (newRow >= 0 && newRow < SQUARE_SIZE && 
+                        newCol >= 0 && newCol < SQUARE_SIZE && 
+                        !visited.has(`${newRow},${newCol}`)) {
+                        pos = [newRow, newCol];
+                        visited.add(`${newRow},${newCol}`);
+                        square[newRow][newCol] = chars[i];
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // If no valid move, find first available spot
+                if (!found) {
+                    outer: for (let r = 0; r < SQUARE_SIZE; r++) {
+                        for (let c = 0; c < SQUARE_SIZE; c++) {
+                            if (!visited.has(`${r},${c}`)) {
+                                pos = [r, c];
+                                visited.add(`${r},${c}`);
+                                square[r][c] = chars[i];
+                                found = true;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Display a square in the UI
         function displaySquare(square, elementId) {
             const container = document.getElementById(elementId);
             container.innerHTML = '';
             
-            // Add header row
-            let header = document.createElement('div');
-            header.className = 'header';
-            header.textContent = '';
-            container.appendChild(header);
+            // Add empty header corner
+            const corner = document.createElement('div');
+            corner.className = 'square-cell square-header';
+            corner.textContent = '';
+            container.appendChild(corner);
             
-            for (let i = 0; i < 6; i++) {
-                let headerCol = document.createElement('div');
-                headerCol.className = 'header';
-                headerCol.textContent = i + 1;
-                container.appendChild(headerCol);
+            // Add column headers
+            for (let col = 0; col < SQUARE_SIZE; col++) {
+                const header = document.createElement('div');
+                header.className = 'square-cell square-header';
+                header.textContent = col + 1;
+                container.appendChild(header);
             }
             
             // Add rows with data
-            for (let i = 0; i < 6; i++) {
-                let rowHeader = document.createElement('div');
-                rowHeader.className = 'header';
-                rowHeader.textContent = i + 1;
+            for (let row = 0; row < SQUARE_SIZE; row++) {
+                // Row header
+                const rowHeader = document.createElement('div');
+                rowHeader.className = 'square-cell square-header';
+                rowHeader.textContent = row + 1;
                 container.appendChild(rowHeader);
                 
-                for (let j = 0; j < 6; j++) {
-                    let cell = document.createElement('div');
-                    cell.textContent = square[i][j];
+                // Row cells
+                for (let col = 0; col < SQUARE_SIZE; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'square-cell';
+                    cell.textContent = square[row][col];
                     container.appendChild(cell);
                 }
             }
         }
-        
+
         // Encrypt plaintext
         function encrypt() {
             const plaintext = document.getElementById('plaintext').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             
             if (!plaintext) {
-                alert('Please enter text to encrypt');
+                showAlert('Please enter text to encrypt', 'encrypt-output');
                 return;
             }
             
             // Get coordinates for each character from both squares
-            let coords = [];
-            for (let char of plaintext) {
-                let coord1 = findCoordinate(char, square1);
-                let coord2 = findCoordinate(char, square2);
+            const coords = [];
+            for (const char of plaintext) {
+                const coord1 = findCoordinate(char, state.square1);
+                const coord2 = findCoordinate(char, state.square2);
                 
-                if (coord1 && coord2) {
-                    coords.push({
-                        char: char,
-                        coord1: coord1,
-                        coord2: coord2,
-                        combined: coord1.row.toString() + coord1.col.toString() + 
-                                 coord2.row.toString() + coord2.col.toString()
-                    });
-                } else {
-                    alert(`Character '${char}' not found in squares`);
+                if (!coord1 || !coord2) {
+                    showAlert(`Character '${char}' not found in squares`, 'encrypt-output');
                     return;
                 }
+                
+                coords.push({
+                    char: char,
+                    coord1: coord1,
+                    coord2: coord2
+                });
             }
             
             // Apply selected transformation algorithm
             let ciphertext;
-            switch (settings.algorithm) {
+            switch (state.settings.algorithm) {
                 case 'standard':
                     ciphertext = standardBifidTransform(coords);
                     break;
@@ -592,150 +690,93 @@
             // Display result
             document.getElementById('encrypt-output').textContent = formatCiphertext(ciphertext);
         }
-        
-        // Standard Bifid transformation (fixed)
+
+        // Standard Bifid transformation
         function standardBifidTransform(coords) {
-            let rowStream = [];
-            let colStream = [];
+            const rowStream = [];
+            const colStream = [];
             
             // Split coordinates into row and column streams
-            for (let item of coords) {
-                rowStream.push(item.coord1.row);
-                rowStream.push(item.coord2.row);
-                colStream.push(item.coord1.col);
-                colStream.push(item.coord2.col);
+            for (const {coord1, coord2} of coords) {
+                rowStream.push(coord1.row, coord2.row);
+                colStream.push(coord1.col, coord2.col);
             }
             
             // Combine streams
-            let combined = [...rowStream, ...colStream];
+            const combined = [...rowStream, ...colStream];
             
             // Create consistent 4-digit groups
-            let ciphertext = [];
-            let temp = '';
-            for (let num of combined) {
-                temp += num.toString();
-                if (temp.length === 4) {
-                    ciphertext.push(temp);
-                    temp = '';
-                }
-            }
-            
-            // Add remaining digits if any
-            if (temp.length > 0) {
-                // Pad with zeros to make 4 digits
-                while (temp.length < 4) {
-                    temp += '0';
-                }
-                ciphertext.push(temp);
-            }
-            
-            return ciphertext.join(' ');
+            return createDigitGroups(combined);
         }
-        
-        // Diagonal transformation (fixed)
+
+        // Diagonal transformation
         function diagonalTransform(coords) {
-            let numbers = [];
+            const numbers = [];
             
             // Extract all numbers from coordinates
-            for (let item of coords) {
-                numbers.push(
-                    item.coord1.row,
-                    item.coord1.col,
-                    item.coord2.row,
-                    item.coord2.col
-                );
+            for (const {coord1, coord2} of coords) {
+                numbers.push(coord1.row, coord1.col, coord2.row, coord2.col);
             }
             
             // Create a square matrix (pad if necessary)
-            let size = Math.ceil(Math.sqrt(numbers.length));
-            let paddedLength = size * size;
-            while (numbers.length < paddedLength) {
-                numbers.push(1); // Pad with 1s (neutral element)
-            }
-            
-            let matrix = Array(size).fill().map(() => Array(size).fill(null));
+            const size = Math.ceil(Math.sqrt(numbers.length));
+            const padded = [...numbers, ...Array(size * size - numbers.length).fill(1)];
+            const matrix = Array(size).fill().map(() => Array(size).fill(null));
             
             // Fill matrix diagonally
             let index = 0;
             for (let d = 0; d < 2 * size - 1; d++) {
-                for (let i = 0; i < size; i++) {
-                    let j = d - i;
-                    if (j >= 0 && j < size && index < numbers.length) {
-                        matrix[i][j] = numbers[index++];
+                for (let row = 0; row < size; row++) {
+                    const col = d - row;
+                    if (col >= 0 && col < size && index < padded.length) {
+                        matrix[row][col] = padded[index++];
                     }
                 }
             }
             
             // Read numbers back in row-major order
-            let result = [];
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    if (matrix[i][j] !== null) {
-                        result.push(matrix[i][j]);
+            const result = [];
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    if (matrix[row][col] !== null) {
+                        result.push(matrix[row][col]);
                     }
                 }
             }
             
-            // Create consistent 4-digit groups
-            let ciphertext = [];
-            let temp = '';
-            for (let num of result) {
-                temp += num.toString();
-                if (temp.length === 4) {
-                    ciphertext.push(temp);
-                    temp = '';
-                }
-            }
-            
-            // Add remaining digits if any
-            if (temp.length > 0) {
-                while (temp.length < 4) {
-                    temp += '0';
-                }
-                ciphertext.push(temp);
-            }
-            
-            return ciphertext.join(' ');
+            return createDigitGroups(result);
         }
-        
-        // Chess (knight's move) transformation (fixed)
+
+        // Chess (knight's move) transformation
         function chessTransform(coords) {
-            let numbers = [];
+            const numbers = [];
             
             // Extract all numbers from coordinates
-            for (let item of coords) {
-                numbers.push(
-                    item.coord1.row,
-                    item.coord1.col,
-                    item.coord2.row,
-                    item.coord2.col
-                );
+            for (const {coord1, coord2} of coords) {
+                numbers.push(coord1.row, coord1.col, coord2.row, coord2.col);
             }
             
             // Create a square matrix (pad if necessary)
-            let size = Math.ceil(Math.sqrt(numbers.length));
-            let paddedLength = size * size;
-            while (numbers.length < paddedLength) {
-                numbers.push(1); // Pad with 1s
-            }
-            
-            let matrix = Array(size).fill().map(() => Array(size).fill(null));
-            let visited = new Set();
+            const size = Math.ceil(Math.sqrt(numbers.length));
+            const padded = [...numbers, ...Array(size * size - numbers.length).fill(1)];
+            const matrix = Array(size).fill().map(() => Array(size).fill(null));
+            const visited = new Set();
             let pos = [0, 0];
-            let knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
+            const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
             
             // Fill matrix with knight's moves
-            for (let i = 0; i < numbers.length; i++) {
-                matrix[pos[0]][pos[1]] = numbers[i];
+            for (let i = 0; i < size * size; i++) {
+                matrix[pos[0]][pos[1]] = padded[i];
                 visited.add(`${pos[0]},${pos[1]}`);
                 
                 // Find next position with knight's move
                 let found = false;
-                for (let move of knightMoves) {
-                    let newRow = pos[0] + move[0];
-                    let newCol = pos[1] + move[1];
+                for (const [dr, dc] of knightMoves) {
+                    const newRow = pos[0] + dr;
+                    const newCol = pos[1] + dc;
                     
-                    if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size && 
+                    if (newRow >= 0 && newRow < size && 
+                        newCol >= 0 && newCol < size && 
                         !visited.has(`${newRow},${newCol}`)) {
                         pos = [newRow, newCol];
                         found = true;
@@ -757,17 +798,22 @@
             }
             
             // Read numbers back in row-major order
-            let result = [];
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    result.push(matrix[i][j]);
+            const result = [];
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    result.push(matrix[row][col]);
                 }
             }
             
-            // Create consistent 4-digit groups
-            let ciphertext = [];
+            return createDigitGroups(result);
+        }
+
+        // Create digit groups from numbers array
+        function createDigitGroups(numbers) {
+            const ciphertext = [];
             let temp = '';
-            for (let num of result) {
+            
+            for (const num of numbers) {
                 temp += num.toString();
                 if (temp.length === 4) {
                     ciphertext.push(temp);
@@ -777,33 +823,27 @@
             
             // Add remaining digits if any
             if (temp.length > 0) {
-                while (temp.length < 4) {
-                    temp += '0';
-                }
-                ciphertext.push(temp);
+                ciphertext.push(temp.padEnd(4, '0'));
             }
             
             return ciphertext.join(' ');
         }
-        
-        // Decrypt ciphertext (fixed)
+
+        // Decrypt ciphertext
         function decrypt() {
             const ciphertext = document.getElementById('ciphertext').value.replace(/\s/g, '');
             
             if (!ciphertext || ciphertext.length % 4 !== 0 || !/^\d+$/.test(ciphertext)) {
-                alert('Ciphertext must consist of 4-digit number groups');
+                showAlert('Ciphertext must consist of 4-digit number groups', 'decrypt-output');
                 return;
             }
             
             // Split into individual digits
-            let digits = [];
-            for (let char of ciphertext) {
-                digits.push(parseInt(char));
-            }
+            const digits = Array.from(ciphertext).map(Number);
             
             // Apply inverse transformation
             let numbers;
-            switch (settings.algorithm) {
+            switch (state.settings.algorithm) {
                 case 'standard':
                     numbers = inverseStandardBifidTransform(digits);
                     break;
@@ -818,7 +858,7 @@
             }
             
             // Reconstruct coordinates
-            let coords = [];
+            const coords = [];
             for (let i = 0; i < numbers.length; i += 4) {
                 if (i + 3 < numbers.length) {
                     coords.push({
@@ -832,42 +872,38 @@
             
             // Reconstruct plaintext
             let plaintext = '';
-            for (let coord of coords) {
+            for (const {row1, col1, row2, col2} of coords) {
                 // Validate coordinates
-                if (coord.row1 < 1 || coord.row1 > 6 || coord.col1 < 1 || coord.col1 > 6 ||
-                    coord.row2 < 1 || coord.row2 > 6 || coord.col2 < 1 || coord.col2 > 6) {
+                if (!isValidCoord(row1, col1) || !isValidCoord(row2, col2)) {
                     plaintext += '?';
                     continue;
                 }
                 
-                let char1 = square1[coord.row1 - 1][coord.col1 - 1];
-                let char2 = square2[coord.row2 - 1][coord.col2 - 1];
+                const char1 = state.square1[row1 - 1][col1 - 1];
+                const char2 = state.square2[row2 - 1][col2 - 1];
                 
-                if (char1 === char2) {
-                    plaintext += char1;
-                } else {
-                    plaintext += '?'; // Indicate mismatch
-                }
+                plaintext += (char1 === char2) ? char1 : '?';
             }
             
             document.getElementById('decrypt-output').textContent = plaintext;
         }
-        
-        // Inverse of standard Bifid transformation (fixed)
+
+        // Check if coordinate is valid
+        function isValidCoord(row, col) {
+            return row >= 1 && row <= SQUARE_SIZE && col >= 1 && col <= SQUARE_SIZE;
+        }
+
+        // Inverse of standard Bifid transformation
         function inverseStandardBifidTransform(digits) {
-            let half = Math.ceil(digits.length / 2);
-            let rowDigits = digits.slice(0, half);
-            let colDigits = digits.slice(half);
+            const half = Math.ceil(digits.length / 2);
+            const rowDigits = digits.slice(0, half);
+            const colDigits = digits.slice(half);
             
             // Pad if necessary
-            while (rowDigits.length < colDigits.length) {
-                rowDigits.push(1);
-            }
-            while (colDigits.length < rowDigits.length) {
-                colDigits.push(1);
-            }
+            while (rowDigits.length < colDigits.length) rowDigits.push(1);
+            while (colDigits.length < rowDigits.length) colDigits.push(1);
             
-            let coords = [];
+            const coords = [];
             for (let i = 0; i < rowDigits.length; i += 2) {
                 if (i + 1 < rowDigits.length) {
                     coords.push(
@@ -879,34 +915,30 @@
                 }
             }
             
-            return coords;
+            return coords.flat();
         }
-        
-        // Inverse of diagonal transformation (fixed)
+
+        // Inverse of diagonal transformation
         function inverseDiagonalTransform(digits) {
             // Create a square matrix
-            let size = Math.ceil(Math.sqrt(digits.length));
-            let matrix = Array(size).fill().map(() => Array(size).fill(null));
+            const size = Math.ceil(Math.sqrt(digits.length));
+            const matrix = Array(size).fill().map(() => Array(size).fill(null));
             
             // Fill matrix in row-major order
             let index = 0;
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    if (index < digits.length) {
-                        matrix[i][j] = digits[index++];
-                    } else {
-                        matrix[i][j] = 1; // Pad with 1s
-                    }
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    matrix[row][col] = index < digits.length ? digits[index++] : 1;
                 }
             }
             
             // Read numbers in diagonal order
-            let diagonalNumbers = [];
+            const diagonalNumbers = [];
             for (let d = 0; d < 2 * size - 1; d++) {
-                for (let i = 0; i < size; i++) {
-                    let j = d - i;
-                    if (j >= 0 && j < size && matrix[i][j] !== null) {
-                        diagonalNumbers.push(matrix[i][j]);
+                for (let row = 0; row < size; row++) {
+                    const col = d - row;
+                    if (col >= 0 && col < size && matrix[row][col] !== null) {
+                        diagonalNumbers.push(matrix[row][col]);
                     }
                 }
             }
@@ -914,30 +946,26 @@
             // Now apply standard Bifid inverse
             return inverseStandardBifidTransform(diagonalNumbers);
         }
-        
-        // Inverse of chess transformation (fixed)
+
+        // Inverse of chess transformation
         function inverseChessTransform(digits) {
             // Create a square matrix
-            let size = Math.ceil(Math.sqrt(digits.length));
-            let matrix = Array(size).fill().map(() => Array(size).fill(null));
+            const size = Math.ceil(Math.sqrt(digits.length));
+            const matrix = Array(size).fill().map(() => Array(size).fill(null));
             
             // Fill matrix in row-major order
             let index = 0;
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    if (index < digits.length) {
-                        matrix[i][j] = digits[index++];
-                    } else {
-                        matrix[i][j] = 1; // Pad with 1s
-                    }
+            for (let row = 0; row < size; row++) {
+                for (let col = 0; col < size; col++) {
+                    matrix[row][col] = index < digits.length ? digits[index++] : 1;
                 }
             }
             
             // Reconstruct knight's tour path
-            let visited = new Set();
+            const visited = new Set();
             let pos = [0, 0];
-            let knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
-            let chessNumbers = [];
+            const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
+            const chessNumbers = [];
             
             for (let i = 0; i < size * size; i++) {
                 chessNumbers.push(matrix[pos[0]][pos[1]]);
@@ -945,11 +973,12 @@
                 
                 // Find next position with knight's move
                 let found = false;
-                for (let move of knightMoves) {
-                    let newRow = pos[0] + move[0];
-                    let newCol = pos[1] + move[1];
+                for (const [dr, dc] of knightMoves) {
+                    const newRow = pos[0] + dr;
+                    const newCol = pos[1] + dc;
                     
-                    if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size && 
+                    if (newRow >= 0 && newRow < size && 
+                        newCol >= 0 && newCol < size && 
                         !visited.has(`${newRow},${newCol}`)) {
                         pos = [newRow, newCol];
                         found = true;
@@ -973,32 +1002,34 @@
             // Now apply standard Bifid inverse
             return inverseStandardBifidTransform(chessNumbers);
         }
-        
+
         // Find coordinates of a character in a square
         function findCoordinate(char, square) {
-            for (let i = 0; i < 6; i++) {
-                for (let j = 0; j < 6; j++) {
-                    if (square[i][j] === char) {
-                        return {
-                            row: i + 1,
-                            col: j + 1
-                        };
+            for (let row = 0; row < square.length; row++) {
+                for (let col = 0; col < square[row].length; col++) {
+                    if (square[row][col] === char) {
+                        return { row: row + 1, col: col + 1 };
                     }
                 }
             }
             return null;
         }
-        
+
         // Format ciphertext with consistent 4-digit groups
         function formatCiphertext(ciphertext) {
-            return ciphertext.match(/.{1,4}/g).join(' ');
+            return ciphertext;
         }
-        
+
+        // Show alert message in output area
+        function showAlert(message, outputId) {
+            document.getElementById(outputId).textContent = message;
+        }
+
         // Clear output
         function clearOutput(tab) {
             document.getElementById(`${tab}-output`).textContent = '';
         }
-        
+
         // Reset settings to defaults
         function resetSettings() {
             document.getElementById('key1').value = 'SECRETKEY1';
