@@ -11,12 +11,13 @@
             --text: #e0e0ff;
             --accent: #6aff00;
             --error: #ff5e5e;
+            --warning: #ffcc00;
         }
         body {
             font-family: 'Courier New', monospace;
             background: var(--bg);
             color: var(--text);
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             line-height: 1.6;
@@ -30,31 +31,50 @@
         }
         h1, h2, h3 {
             color: var(--accent);
+            margin-top: 0;
         }
         button {
             background: var(--accent);
             color: #000;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 12px 18px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            margin: 5px 0;
+            margin: 8px 0;
             transition: all 0.2s;
+            font-size: 16px;
         }
         button:hover {
             opacity: 0.9;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(106, 255, 0, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button.secondary {
+            background: #333;
+            color: var(--text);
+        }
+        button.danger {
+            background: var(--error);
+            color: white;
         }
         textarea, input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: rgba(0,0,0,0.3);
             border: 1px solid #333;
-            border-radius: 4px;
+            border-radius: 6px;
             color: var(--text);
             font-family: inherit;
-            margin: 5px 0;
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
         .grid {
             display: grid;
@@ -64,32 +84,116 @@
         .square {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 2px;
-            margin: 10px 0;
+            gap: 4px;
+            margin: 12px 0;
         }
         .square div {
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             background: rgba(0,0,0,0.2);
             border: 1px solid #333;
+            font-weight: bold;
+        }
+        .square-header {
+            background: rgba(106, 255, 0, 0.1) !important;
+            font-weight: bold;
         }
         .alert {
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+        }
+        .alert svg {
+            margin-right: 10px;
+            min-width: 20px;
         }
         .success {
             background: rgba(106, 255, 0, 0.1);
-            border-left: 3px solid var(--accent);
+            border-left: 4px solid var(--accent);
         }
         .error {
             background: rgba(255, 94, 94, 0.1);
-            border-left: 3px solid var(--error);
+            border-left: 4px solid var(--error);
         }
-        @media (max-width: 600px) {
+        .warning {
+            background: rgba(255, 204, 0, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .settings-group {
+            margin-bottom: 20px;
+        }
+        .settings-group h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .settings-group h3 svg {
+            margin-right: 8px;
+        }
+        @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
             }
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+        .copy-btn {
+            background: #333;
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .copy-btn:hover {
+            background: #444;
+        }
+        .status-bar {
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--text);
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -97,41 +201,121 @@
     <div class="card">
         <h1>Bifid-X RealApp</h1>
         <p>Усиленный криптостойкий шифратор с динамическим кодированием</p>
+        <div class="status-bar" id="status">Система готова</div>
     </div>
 
     <div class="card">
-        <h2>🔑 Ключи</h2>
-        <div class="grid">
-            <div>
-                <h3>Ключ 1</h3>
-                <input id="key1" value="SECRETKEY1" placeholder="Минимум 6 символов">
-                <div id="square1" class="square"></div>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('encrypt')">🔒 Шифрование</div>
+            <div class="tab" onclick="switchTab('decrypt')">🔓 Дешифрование</div>
+            <div class="tab" onclick="switchTab('settings')">⚙️ Настройки</div>
+            <div class="tab" onclick="switchTab('help')">❓ Помощь</div>
+        </div>
+
+        <div id="encrypt" class="tab-content active">
+            <h2>Шифрование текста</h2>
+            <textarea id="plaintext" placeholder="Введите текст для шифрования...">SECRETMESSAGE</textarea>
+            <div class="grid">
+                <button onclick="encrypt()">🔐 Зашифровать</button>
+                <button class="secondary" onclick="clearEncrypt()">🗑️ Очистить</button>
             </div>
-            <div>
-                <h3>Ключ 2</h3>
-                <input id="key2" value="SECRETKEY2" placeholder="Минимум 6 символов">
-                <div id="square2" class="square"></div>
+            <div id="encrypt-alert" class="alert" style="display:none;"></div>
+            <h3>Результат:</h3>
+            <textarea id="ciphertext" readonly></textarea>
+            <button class="copy-btn" onclick="copyToClipboard('ciphertext')">Копировать</button>
+        </div>
+
+        <div id="decrypt" class="tab-content">
+            <h2>Дешифрование текста</h2>
+            <textarea id="encryptedText" placeholder="Введите цифры для дешифровки..."></textarea>
+            <div class="grid">
+                <button onclick="decrypt()">🔓 Расшифровать</button>
+                <button class="secondary" onclick="clearDecrypt()">🗑️ Очистить</button>
+            </div>
+            <div id="decrypt-alert" class="alert" style="display:none;"></div>
+            <h3>Результат:</h3>
+            <textarea id="decryptedText" readonly></textarea>
+            <button class="copy-btn" onclick="copyToClipboard('decryptedText')">Копировать</button>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <h2>Настройки шифрования</h2>
+            
+            <div class="settings-group">
+                <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Ключи шифрования</h3>
+                <div class="grid">
+                    <div>
+                        <label for="key1">Ключ 1 (минимум 6 символов)</label>
+                        <input id="key1" value="SECRETKEY1">
+                    </div>
+                    <div>
+                        <label for="key2">Ключ 2 (минимум 6 символов)</label>
+                        <input id="key2" value="SECRETKEY2">
+                    </div>
+                </div>
+                <button onclick="generateSquares()">🔄 Сгенерировать квадраты</button>
+                <button class="secondary" onclick="randomizeKeys()">🎲 Случайные ключи</button>
+            </div>
+
+            <div class="settings-group">
+                <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>Полибиусовы квадраты</h3>
+                <div class="grid">
+                    <div>
+                        <h4>Квадрат 1</h4>
+                        <div id="square1" class="square"></div>
+                    </div>
+                    <div>
+                        <h4>Квадрат 2</h4>
+                        <div id="square2" class="square"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>Дополнительные настройки</h3>
+                <label>
+                    <input type="checkbox" id="useXor" checked> Использовать XOR преобразование
+                </label>
+                <label>
+                    <input type="checkbox" id="useDynamic" checked> Использовать динамическое кодирование
+                </label>
+            </div>
+
+            <button class="danger" onclick="resetSettings()">♻️ Сбросить настройки</button>
+        </div>
+
+        <div id="help" class="tab-content">
+            <h2>Помощь и инструкции</h2>
+            
+            <div class="settings-group">
+                <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Как пользоваться</h3>
+                <ol>
+                    <li>Введите два ключа (минимум 6 символов каждый)</li>
+                    <li>Нажмите "Сгенерировать квадраты"</li>
+                    <li>Введите текст для шифрования</li>
+                    <li>Нажмите "Зашифровать"</li>
+                    <li>Для дешифровки введите цифры и нажмите "Расшифровать"</li>
+                </ol>
+            </div>
+
+            <div class="settings-group">
+                <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path><path d="M8.5 8.5v.01"></path><path d="M16 15.5v.01"></path><path d="M12 12v.01"></path><path d="M11 17v.01"></path><path d="M7 14v.01"></path></svg>О шифре</h3>
+                <p>Bifid-X - это улучшенная версия классического шифра Bifid с:</p>
+                <ul>
+                    <li>Динамическим кодированием символов</li>
+                    <li>XOR преобразованием координат</li>
+                    <li>Криптостойким заполнением квадратов</li>
+                    <li>Защитой от частотного анализа</li>
+                </ul>
+                <p><strong>Важно:</strong> Для максимальной безопасности регулярно меняйте ключи.</p>
+            </div>
+
+            <div class="settings-group">
+                <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>Примеры</h3>
+                <button onclick="loadExample1()">📋 Пример 1: Простое сообщение</button>
+                <button onclick="loadExample2()">📋 Пример 2: Случайные ключи</button>
             </div>
         </div>
-        <button onclick="generateSquares()">🔄 Сгенерировать квадраты</button>
-    </div>
-
-    <div class="card">
-        <h2>🔒 Шифрование</h2>
-        <textarea id="plaintext" rows="4" placeholder="Введите текст...">ATTACKATDAWN</textarea>
-        <button onclick="encrypt()">🔐 Зашифровать</button>
-        <div id="encrypt-alert" class="alert" style="display:none;"></div>
-        <h3>Результат:</h3>
-        <textarea id="ciphertext" rows="4" readonly></textarea>
-    </div>
-
-    <div class="card">
-        <h2>🔓 Дешифрование</h2>
-        <textarea id="encryptedText" rows="4" placeholder="Введите цифры..."></textarea>
-        <button onclick="decrypt()">🔓 Расшифровать</button>
-        <div id="decrypt-alert" class="alert" style="display:none;"></div>
-        <h3>Результат:</h3>
-        <textarea id="decryptedText" rows="4" readonly></textarea>
     </div>
 
     <script>
@@ -140,14 +324,57 @@
         const SIZE = 6;
         let square1 = [];
         let square2 = [];
+        let currentTab = 'encrypt';
+
+        // Инициализация при загрузке
+        window.onload = function() {
+            generateSquares();
+            updateStatus('Система готова');
+        };
+
+        // Переключение вкладок
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Обновление статуса
+        function updateStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.style.color = isError ? 'var(--error)' : 'var(--accent)';
+        }
 
         // Показать уведомление
-        function showAlert(elementId, message, isError = false) {
+        function showAlert(elementId, message, isError = false, isWarning = false) {
             const alert = document.getElementById(elementId);
-            alert.textContent = message;
-            alert.className = `alert ${isError ? 'error' : 'success'}`;
-            alert.style.display = 'block';
-            setTimeout(() => alert.style.display = 'none', 3000);
+            alert.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    ${isError ? '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>' : ''}
+                    ${!isError && !isWarning ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4L12 14.01l-3-3"></path>' : ''}
+                    ${isWarning ? '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>' : ''}
+                </svg>
+                ${message}
+            `;
+            alert.className = `alert ${isError ? 'error' : isWarning ? 'warning' : 'success'}`;
+            alert.style.display = 'flex';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+
+        // Копирование в буфер обмена
+        function copyToClipboard(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            document.execCommand('copy');
+            showAlert(currentTab === 'encrypt' ? 'encrypt-alert' : 'decrypt-alert', 'Скопировано в буфер обмена');
         }
 
         // Генерация квадрата с криптостойким заполнением
@@ -186,11 +413,41 @@
             const container = document.getElementById(elementId);
             container.innerHTML = '';
             
+            // Заголовки столбцов
+            const headerRow = document.createElement('div');
+            headerRow.style.display = 'contents';
+            container.appendChild(headerRow);
+            
+            const corner = document.createElement('div');
+            corner.className = 'square-cell square-header';
+            corner.textContent = '';
+            headerRow.appendChild(corner);
+            
+            for (let col = 0; col < SIZE; col++) {
+                const th = document.createElement('div');
+                th.className = 'square-cell square-header';
+                th.textContent = col + 1;
+                headerRow.appendChild(th);
+            }
+            
+            // Строки с данными
             for (let row = 0; row < SIZE; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.style.display = 'contents';
+                container.appendChild(rowDiv);
+                
+                const rowHeader = document.createElement('div');
+                rowHeader.className = 'square-cell square-header';
+                rowHeader.textContent = row + 1;
+                rowDiv.appendChild(rowHeader);
+                
                 for (let col = 0; col < SIZE; col++) {
                     const cell = document.createElement('div');
+                    cell.className = 'square-cell';
                     cell.textContent = square[row][col];
-                    container.appendChild(cell);
+                    cell.dataset.row = row + 1;
+                    cell.dataset.col = col + 1;
+                    rowDiv.appendChild(cell);
                 }
             }
         }
@@ -198,6 +455,10 @@
         // Генерация квадратов
         function generateSquares() {
             try {
+                updateStatus('Генерация квадратов...');
+                document.getElementById('encrypt-alert').style.display = 'none';
+                document.getElementById('decrypt-alert').style.display = 'none';
+                
                 const key1 = document.getElementById('key1').value;
                 const key2 = document.getElementById('key2').value;
                 
@@ -208,8 +469,10 @@
                 displaySquare(square2, 'square2');
                 
                 showAlert('encrypt-alert', 'Квадраты успешно сгенерированы!');
+                updateStatus('Система готова');
             } catch (e) {
                 console.error(e);
+                updateStatus('Ошибка генерации', true);
             }
         }
 
@@ -219,8 +482,9 @@
                 for (let col = 0; col < SIZE; col++) {
                     if (square[row][col] === char) {
                         // Динамическое смещение на основе позиции
-                        const dynamicRow = (row + 1 + position) % SIZE;
-                        const dynamicCol = (col + 1 + position) % SIZE;
+                        const useDynamic = document.getElementById('useDynamic').checked;
+                        const dynamicRow = useDynamic ? (row + position) % SIZE : row;
+                        const dynamicCol = useDynamic ? (col + position) % SIZE : col;
                         return `${dynamicRow + 1}${dynamicCol + 1}`;
                     }
                 }
@@ -233,6 +497,7 @@
             try {
                 if (square1.length === 0 || square2.length === 0) {
                     showAlert('encrypt-alert', 'Сначала сгенерируйте квадраты!', true);
+                    updateStatus('Ошибка: квадраты не созданы', true);
                     return;
                 }
                 
@@ -240,28 +505,46 @@
                 
                 if (!plaintext) {
                     showAlert('encrypt-alert', 'Введите текст для шифрования', true);
+                    updateStatus('Ошибка: нет текста', true);
                     return;
                 }
                 
-                let cipherDigits = '';
+                updateStatus('Шифрование...');
+                document.getElementById('ciphertext').value = '';
                 
-                for (let i = 0; i < plaintext.length; i++) {
-                    const char = plaintext[i];
-                    const pos = i + 1;
-                    
-                    const digits1 = encodeChar(char, square1, pos);
-                    const digits2 = encodeChar(char, square2, pos);
-                    
-                    // XOR преобразование
-                    const xorDigit = (parseInt(digits1) ^ parseInt(digits2)).toString().padStart(2, '0');
-                    cipherDigits += xorDigit;
-                }
-                
-                // Группировка по 4 цифры для удобства
-                document.getElementById('ciphertext').value = cipherDigits.match(/.{1,4}/g).join(' ');
-                showAlert('encrypt-alert', 'Текст успешно зашифрован!');
+                // Искусственная задержка для анимации
+                setTimeout(() => {
+                    try {
+                        let cipherDigits = '';
+                        
+                        for (let i = 0; i < plaintext.length; i++) {
+                            const char = plaintext[i];
+                            const pos = i + 1;
+                            
+                            const digits1 = encodeChar(char, square1, pos);
+                            const digits2 = encodeChar(char, square2, pos);
+                            
+                            // XOR преобразование
+                            const useXor = document.getElementById('useXor').checked;
+                            const xorDigit = useXor 
+                                ? (parseInt(digits1) ^ parseInt(digits2)).toString().padStart(2, '0')
+                                : digits1 + digits2;
+                            
+                            cipherDigits += xorDigit;
+                        }
+                        
+                        // Группировка по 4 цифры для удобства
+                        document.getElementById('ciphertext').value = cipherDigits.match(/.{1,4}/g).join(' ');
+                        showAlert('encrypt-alert', 'Текст успешно зашифрован!');
+                        updateStatus('Шифрование завершено');
+                    } catch (e) {
+                        showAlert('encrypt-alert', 'Ошибка при шифровании: ' + e.message, true);
+                        updateStatus('Ошибка шифрования', true);
+                    }
+                }, 100);
             } catch (e) {
-                showAlert('encrypt-alert', 'Ошибка при шифровании: ' + e.message, true);
+                showAlert('encrypt-alert', 'Ошибка: ' + e.message, true);
+                updateStatus('Ошибка', true);
             }
         }
 
@@ -270,6 +553,7 @@
             try {
                 if (square1.length === 0 || square2.length === 0) {
                     showAlert('decrypt-alert', 'Сначала сгенерируйте квадраты!', true);
+                    updateStatus('Ошибка: квадраты не созданы', true);
                     return;
                 }
                 
@@ -277,60 +561,155 @@
                 
                 if (!ciphertext || !/^\d+$/.test(ciphertext)) {
                     showAlert('decrypt-alert', 'Введите цифры для расшифровки', true);
+                    updateStatus('Ошибка: неверный ввод', true);
                     return;
                 }
                 
-                let plaintext = '';
+                updateStatus('Дешифрование...');
+                document.getElementById('decryptedText').value = '';
                 
-                // Обработка по 2 цифры (так как каждая буква кодируется 2 цифрами)
-                for (let i = 0; i < ciphertext.length; i += 2) {
-                    const digits = ciphertext.substr(i, 2);
-                    if (digits.length < 2) break;
-                    
-                    // Обратный XOR
-                    const xorValue = parseInt(digits);
-                    const pos = (i / 2) + 1;
-                    
-                    // Находим возможные варианты
-                    let foundChar = null;
-                    
-                    for (let row1 = 0; row1 < SIZE && !foundChar; row1++) {
-                        for (let col1 = 0; col1 < SIZE && !foundChar; col1++) {
-                            const dynamicRow1 = (row1 + 1 + pos) % SIZE;
-                            const dynamicCol1 = (col1 + 1 + pos) % SIZE;
-                            const code1 = `${dynamicRow1 + 1}${dynamicCol1 + 1}`;
+                // Искусственная задержка для анимации
+                setTimeout(() => {
+                    try {
+                        let plaintext = '';
+                        const useXor = document.getElementById('useXor').checked;
+                        const useDynamic = document.getElementById('useDynamic').checked;
+                        
+                        // Обработка по 2 или 4 цифры в зависимости от режима
+                        const chunkSize = useXor ? 2 : 4;
+                        
+                        for (let i = 0; i < ciphertext.length; i += chunkSize) {
+                            const digits = ciphertext.substr(i, chunkSize);
+                            if (digits.length < chunkSize) break;
                             
-                            for (let row2 = 0; row2 < SIZE && !foundChar; row2++) {
-                                for (let col2 = 0; col2 < SIZE && !foundChar; col2++) {
-                                    const dynamicRow2 = (row2 + 1 + pos) % SIZE;
-                                    const dynamicCol2 = (col2 + 1 + pos) % SIZE;
-                                    const code2 = `${dynamicRow2 + 1}${dynamicCol2 + 1}`;
-                                    
-                                    if ((parseInt(code1) ^ parseInt(code2)) === xorValue) {
-                                        // Проверяем, что символ одинаков в обоих квадратах
-                                        if (square1[row1][col1] === square2[row2][col2]) {
-                                            foundChar = square1[row1][col1];
+                            let foundChar = null;
+                            const pos = (i / chunkSize) + 1;
+                            
+                            if (useXor) {
+                                // Режим с XOR
+                                const xorValue = parseInt(digits);
+                                
+                                for (let row1 = 0; row1 < SIZE && !foundChar; row1++) {
+                                    for (let col1 = 0; col1 < SIZE && !foundChar; col1++) {
+                                        const dynamicRow1 = useDynamic ? (row1 + pos) % SIZE : row1;
+                                        const dynamicCol1 = useDynamic ? (col1 + pos) % SIZE : col1;
+                                        const code1 = `${dynamicRow1 + 1}${dynamicCol1 + 1}`;
+                                        
+                                        for (let row2 = 0; row2 < SIZE && !foundChar; row2++) {
+                                            for (let col2 = 0; col2 < SIZE && !foundChar; col2++) {
+                                                const dynamicRow2 = useDynamic ? (row2 + pos) % SIZE : row2;
+                                                const dynamicCol2 = useDynamic ? (col2 + pos) % SIZE : col2;
+                                                const code2 = `${dynamicRow2 + 1}${dynamicCol2 + 1}`;
+                                                
+                                                if ((parseInt(code1) ^ parseInt(code2)) === xorValue) {
+                                                    if (square1[row1][col1] === square2[row2][col2]) {
+                                                        foundChar = square1[row1][col1];
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
+                            } else {
+                                // Режим без XOR (простое соединение координат)
+                                const coord1 = digits.substring(0, 2);
+                                const coord2 = digits.substring(2, 4);
+                                
+                                const row1 = parseInt(coord1[0]) - 1;
+                                const col1 = parseInt(coord1[1]) - 1;
+                                const row2 = parseInt(coord2[0]) - 1;
+                                const col2 = parseInt(coord2[1]) - 1;
+                                
+                                if (row1 >= 0 && row1 < SIZE && col1 >= 0 && col1 < SIZE &&
+                                    row2 >= 0 && row2 < SIZE && col2 >= 0 && col2 < SIZE) {
+                                    if (square1[row1][col1] === square2[row2][col2]) {
+                                        foundChar = square1[row1][col1];
+                                    }
+                                }
                             }
+                            
+                            plaintext += foundChar || '�';
                         }
+                        
+                        document.getElementById('decryptedText').value = plaintext;
+                        showAlert('decrypt-alert', 'Текст успешно расшифрован!');
+                        updateStatus('Дешифрование завершено');
+                    } catch (e) {
+                        showAlert('decrypt-alert', 'Ошибка при расшифровке: ' + e.message, true);
+                        updateStatus('Ошибка дешифрования', true);
                     }
-                    
-                    plaintext += foundChar || '�';
-                }
-                
-                document.getElementById('decryptedText').value = plaintext;
-                showAlert('decrypt-alert', 'Текст успешно расшифрован!');
+                }, 100);
             } catch (e) {
-                showAlert('decrypt-alert', 'Ошибка при расшифровке: ' + e.message, true);
+                showAlert('decrypt-alert', 'Ошибка: ' + e.message, true);
+                updateStatus('Ошибка', true);
             }
         }
 
-        // Инициализация при загрузке
-        window.onload = function() {
+        // Очистка полей
+        function clearEncrypt() {
+            document.getElementById('plaintext').value = '';
+            document.getElementById('ciphertext').value = '';
+            document.getElementById('encrypt-alert').style.display = 'none';
+            updateStatus('Система готова');
+        }
+
+        function clearDecrypt() {
+            document.getElementById('encryptedText').value = '';
+            document.getElementById('decryptedText').value = '';
+            document.getElementById('decrypt-alert').style.display = 'none';
+            updateStatus('Система готова');
+        }
+
+        // Случайные ключи
+        function randomizeKeys() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key1 = '';
+            let key2 = '';
+            
+            for (let i = 0; i < 10; i++) {
+                key1 += chars.charAt(Math.floor(Math.random() * chars.length));
+                key2 += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            document.getElementById('key1').value = key1;
+            document.getElementById('key2').value = key2;
+            showAlert('encrypt-alert', 'Сгенерированы случайные ключи', false, true);
+            updateStatus('Сгенерированы новые ключи');
+        }
+
+        // Сброс настроек
+        function resetSettings() {
+            if (confirm('Вы уверены, что хотите сбросить все настройки?')) {
+                document.getElementById('key1').value = 'SECRETKEY1';
+                document.getElementById('key2').value = 'SECRETKEY2';
+                document.getElementById('useXor').checked = true;
+                document.getElementById('useDynamic').checked = true;
+                document.getElementById('plaintext').value = 'SECRETMESSAGE';
+                document.getElementById('encryptedText').value = '';
+                
+                generateSquares();
+                showAlert('encrypt-alert', 'Настройки сброшены');
+                updateStatus('Настройки по умолчанию');
+            }
+        }
+
+        // Примеры
+        function loadExample1() {
+            document.getElementById('key1').value = 'CRYPTOKEY';
+            document.getElementById('key2').value = 'SECURITY2023';
+            document.getElementById('plaintext').value = 'HELLOWORLD';
             generateSquares();
-        };
+            switchTab('encrypt');
+            showAlert('encrypt-alert', 'Загружен пример 1', false, true);
+        }
+
+        function loadExample2() {
+            randomizeKeys();
+            document.getElementById('plaintext').value = 'TESTMESSAGE123';
+            generateSquares();
+            switchTab('encrypt');
+            showAlert('encrypt-alert', 'Загружен пример 2', false, true);
+        }
     </script>
 </body>
 </html>
