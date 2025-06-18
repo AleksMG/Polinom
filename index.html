@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Bifid Cipher Tool</title>
+    <title>Enhanced Bifid Cipher Tool</title>
     <style>
         :root {
             --primary: #3a86ff;
@@ -167,7 +167,7 @@
 
         .square {
             display: inline-grid;
-            grid-template-columns: repeat(7, minmax(40px, 1fr));
+            grid-template-columns: repeat(6, minmax(40px, 1fr));
             gap: 2px;
             margin: 0 auto;
         }
@@ -230,6 +230,12 @@
             border: 1px solid rgba(239, 35, 60, 0.2);
         }
 
+        .alert-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(76, 201, 240, 0.2);
+        }
+
         .algorithm-options {
             display: grid;
             gap: 0.75rem;
@@ -265,8 +271,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>Professional Bifid Cipher Tool</h1>
-            <p class="subtitle">A secure implementation of the Bifid cipher with dual 6×6 Polybius squares and multiple transformation algorithms.</p>
+            <h1>Enhanced Bifid Cipher Tool</h1>
+            <p class="subtitle">Secure dual-square Bifid cipher implementation with numeric output and multiple transformation algorithms</p>
         </header>
 
         <div class="tabs">
@@ -289,7 +295,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Output (4-digit groups):</label>
+                    <label>Output (digit groups):</label>
                     <div id="encrypt-output" class="output"></div>
                 </div>
             </div>
@@ -299,7 +305,7 @@
             <div class="card">
                 <h2 class="card-title">Decryption</h2>
                 <div class="form-group">
-                    <label for="ciphertext">Ciphertext (4-digit groups, numbers only):</label>
+                    <label for="ciphertext">Ciphertext (digit groups, numbers only):</label>
                     <textarea id="ciphertext" placeholder="Enter ciphertext to decrypt"></textarea>
                 </div>
                 
@@ -319,12 +325,17 @@
             <div class="card">
                 <h2 class="card-title">Cipher Configuration</h2>
                 
+                <div class="form-group">
+                    <label for="period">Period (group size):</label>
+                    <input type="number" id="period" min="1" max="20" value="5">
+                </div>
+                
                 <div class="grid">
                     <div>
                         <h3 class="card-title" style="font-size: 1.25rem;">Key 1 Configuration</h3>
                         <div class="form-group">
-                            <label for="key1">Key 1:</label>
-                            <input type="text" id="key1" value="SECRETKEY1" placeholder="Enter first key">
+                            <label for="key1">Key 1 (min 6 chars):</label>
+                            <input type="text" id="key1" value="BIFIDCIPHER" placeholder="Enter first key">
                             <div id="key1-error" class="alert alert-danger" style="display: none;"></div>
                         </div>
                         
@@ -333,9 +344,7 @@
                             <select id="fill1">
                                 <option value="row">Row-wise</option>
                                 <option value="column">Column-wise</option>
-                                <option value="diagonal">Diagonal</option>
                                 <option value="spiral">Spiral</option>
-                                <option value="chess">Chess Pattern</option>
                             </select>
                         </div>
                         
@@ -348,8 +357,8 @@
                     <div>
                         <h3 class="card-title" style="font-size: 1.25rem;">Key 2 Configuration</h3>
                         <div class="form-group">
-                            <label for="key2">Key 2:</label>
-                            <input type="text" id="key2" value="SECRETKEY2" placeholder="Enter second key">
+                            <label for="key2">Key 2 (min 6 chars):</label>
+                            <input type="text" id="key2" value="SECONDKEY" placeholder="Enter second key">
                             <div id="key2-error" class="alert alert-danger" style="display: none;"></div>
                         </div>
                         
@@ -358,9 +367,7 @@
                             <select id="fill2">
                                 <option value="row">Row-wise</option>
                                 <option value="column">Column-wise</option>
-                                <option value="diagonal">Diagonal</option>
                                 <option value="spiral">Spiral</option>
-                                <option value="chess">Chess Pattern</option>
                             </select>
                         </div>
                         
@@ -379,12 +386,8 @@
                             <label for="standard">Standard Bifid (period-based)</label>
                         </div>
                         <div class="algorithm-option">
-                            <input type="radio" id="diagonal" name="algorithm" value="diagonal">
-                            <label for="diagonal">Diagonal Transformation</label>
-                        </div>
-                        <div class="algorithm-option">
-                            <input type="radio" id="chess" name="algorithm" value="chess">
-                            <label for="chess">Chess Knight Transformation</label>
+                            <input type="radio" id="extended" name="algorithm" value="extended">
+                            <label for="extended">Extended Transformation</label>
                         </div>
                     </div>
                 </div>
@@ -398,647 +401,412 @@
     </div>
 
     <script>
-        // Character set for 6x6 squares (A-Z, 0-9)
+        // Constants
         const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         const SQUARE_SIZE = 6;
+        const DEFAULT_PERIOD = 5;
         
-        // Current settings state
-        const state = {
+        // Cipher state
+        const cipher = {
             square1: [],
             square2: [],
-            settings: {
-                key1: "SECRETKEY1",
-                key2: "SECRETKEY2",
-                fill1: "row",
-                fill2: "row",
-                algorithm: "standard",
-                period: 5
+            period: DEFAULT_PERIOD,
+            algorithm: 'standard',
+            
+            // Initialize with default settings
+            init() {
+                this.square1 = this.createSquare("BIFIDCIPHER", "row");
+                this.square2 = this.createSquare("SECONDKEY", "row");
+                this.displaySquares();
+            },
+            
+            // Create a 6x6 Polybius square
+            createSquare(key, fillMethod) {
+                // Sanitize and deduplicate key
+                const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                const uniqueKey = [...new Set(cleanKey)].join('');
+                
+                // Add remaining characters
+                const remainingChars = CHARSET.split('').filter(c => !uniqueKey.includes(c)).join('');
+                const allChars = uniqueKey + remainingChars;
+                
+                // Initialize empty square
+                const square = Array(SQUARE_SIZE).fill().map(() => Array(SQUARE_SIZE).fill(''));
+                
+                // Fill based on method
+                switch(fillMethod) {
+                    case 'column':
+                        this.fillColumnWise(square, allChars);
+                        break;
+                    case 'spiral':
+                        this.fillSpiral(square, allChars);
+                        break;
+                    default: // row
+                        this.fillRowWise(square, allChars);
+                }
+                
+                return square;
+            },
+            
+            // Fill methods
+            fillRowWise(square, chars) {
+                for (let row = 0; row < SQUARE_SIZE; row++) {
+                    for (let col = 0; col < SQUARE_SIZE; col++) {
+                        square[row][col] = chars[row * SQUARE_SIZE + col];
+                    }
+                }
+            },
+            
+            fillColumnWise(square, chars) {
+                for (let col = 0; col < SQUARE_SIZE; col++) {
+                    for (let row = 0; row < SQUARE_SIZE; row++) {
+                        square[row][col] = chars[col * SQUARE_SIZE + row];
+                    }
+                }
+            },
+            
+            fillSpiral(square, chars) {
+                let directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+                let currentDir = 0;
+                let row = 0, col = 0;
+                let visited = new Set();
+                
+                for (let i = 0; i < SQUARE_SIZE * SQUARE_SIZE; i++) {
+                    square[row][col] = chars[i];
+                    visited.add(`${row},${col}`);
+                    
+                    // Calculate next position
+                    let nextRow = row + directions[currentDir][0];
+                    let nextCol = col + directions[currentDir][1];
+                    
+                    // Change direction if needed
+                    if (nextRow < 0 || nextRow >= SQUARE_SIZE || 
+                        nextCol < 0 || nextCol >= SQUARE_SIZE || 
+                        visited.has(`${nextRow},${nextCol}`)) {
+                        currentDir = (currentDir + 1) % 4;
+                        nextRow = row + directions[currentDir][0];
+                        nextCol = col + directions[currentDir][1];
+                    }
+                    
+                    row = nextRow;
+                    col = nextCol;
+                }
+            },
+            
+            // Find character coordinates in square
+            findCoordinates(char, square) {
+                for (let row = 0; row < SQUARE_SIZE; row++) {
+                    for (let col = 0; col < SQUARE_SIZE; col++) {
+                        if (square[row][col] === char) {
+                            return { row: row + 1, col: col + 1 }; // 1-based
+                        }
+                    }
+                }
+                return null;
+            },
+            
+            // Display squares in UI
+            displaySquares() {
+                this.displaySquare(this.square1, 'square1');
+                this.displaySquare(this.square2, 'square2');
+            },
+            
+            displaySquare(square, elementId) {
+                const container = document.getElementById(elementId);
+                container.innerHTML = '';
+                
+                // Add headers
+                const corner = document.createElement('div');
+                corner.className = 'square-cell square-header';
+                corner.textContent = '';
+                container.appendChild(corner);
+                
+                for (let col = 0; col < SQUARE_SIZE; col++) {
+                    const header = document.createElement('div');
+                    header.className = 'square-cell square-header';
+                    header.textContent = col + 1;
+                    container.appendChild(header);
+                }
+                
+                // Add rows
+                for (let row = 0; row < SQUARE_SIZE; row++) {
+                    const rowHeader = document.createElement('div');
+                    rowHeader.className = 'square-cell square-header';
+                    rowHeader.textContent = row + 1;
+                    container.appendChild(rowHeader);
+                    
+                    for (let col = 0; col < SQUARE_SIZE; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'square-cell';
+                        cell.textContent = square[row][col];
+                        container.appendChild(cell);
+                    }
+                }
+            },
+            
+            // Encryption methods
+            encrypt(plaintext) {
+                const cleanText = plaintext.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (!cleanText) {
+                    throw new Error("No valid characters to encrypt");
+                }
+                
+                // Get coordinates for each character
+                const coords = [];
+                for (const char of cleanText) {
+                    const coord1 = this.findCoordinates(char, this.square1);
+                    const coord2 = this.findCoordinates(char, this.square2);
+                    
+                    if (!coord1 || !coord2) {
+                        throw new Error(`Character '${char}' not found in both squares`);
+                    }
+                    
+                    coords.push({
+                        char: char,
+                        coord1: coord1,
+                        coord2: coord2
+                    });
+                }
+                
+                // Apply transformation
+                return this.applyTransformation(coords);
+            },
+            
+            applyTransformation(coords) {
+                if (this.algorithm === 'extended') {
+                    return this.extendedTransform(coords);
+                }
+                return this.standardTransform(coords);
+            },
+            
+            standardTransform(coords) {
+                const digitStream = [];
+                
+                // Create digit stream from coordinates
+                for (const {coord1, coord2} of coords) {
+                    digitStream.push(
+                        coord1.row, coord1.col,
+                        coord2.row, coord2.col
+                    );
+                }
+                
+                // Group digits by period
+                return this.groupDigits(digitStream);
+            },
+            
+            extendedTransform(coords) {
+                const digitStream = [];
+                
+                // Create interleaved digit stream
+                for (const {coord1, coord2} of coords) {
+                    digitStream.push(
+                        coord1.row, coord2.row,
+                        coord1.col, coord2.col
+                    );
+                }
+                
+                // Group digits by period
+                return this.groupDigits(digitStream);
+            },
+            
+            groupDigits(digits) {
+                const groups = [];
+                let currentGroup = '';
+                
+                for (let i = 0; i < digits.length; i++) {
+                    currentGroup += digits[i];
+                    
+                    if (currentGroup.length === this.period || i === digits.length - 1) {
+                        groups.push(currentGroup);
+                        currentGroup = '';
+                    }
+                }
+                
+                return groups.join(' ');
+            },
+            
+            // Decryption methods
+            decrypt(ciphertext) {
+                const cleanText = ciphertext.replace(/\s/g, '');
+                if (!cleanText || !/^\d+$/.test(cleanText)) {
+                    throw new Error("Invalid ciphertext - numbers only");
+                }
+                
+                // Convert to digit array
+                const digits = Array.from(cleanText).map(Number);
+                
+                // Apply inverse transformation
+                const coords = this.reverseTransformation(digits);
+                
+                // Reconstruct plaintext
+                let plaintext = '';
+                for (const coord of coords) {
+                    const char1 = this.square1[coord.row1 - 1][coord.col1 - 1];
+                    const char2 = this.square2[coord.row2 - 1][coord.col2 - 1];
+                    
+                    // Prefer first square's character
+                    plaintext += char1 || char2 || '�';
+                }
+                
+                return plaintext;
+            },
+            
+            reverseTransformation(digits) {
+                if (this.algorithm === 'extended') {
+                    return this.reverseExtendedTransform(digits);
+                }
+                return this.reverseStandardTransform(digits);
+            },
+            
+            reverseStandardTransform(digits) {
+                const coords = [];
+                
+                // Process in chunks of 4 digits
+                for (let i = 0; i < digits.length; i += 4) {
+                    if (i + 3 >= digits.length) break;
+                    
+                    coords.push({
+                        row1: digits[i],
+                        col1: digits[i+1],
+                        row2: digits[i+2],
+                        col2: digits[i+3]
+                    });
+                }
+                
+                return coords;
+            },
+            
+            reverseExtendedTransform(digits) {
+                const coords = [];
+                
+                // Process in chunks of 4 digits
+                for (let i = 0; i < digits.length; i += 4) {
+                    if (i + 3 >= digits.length) break;
+                    
+                    coords.push({
+                        row1: digits[i],
+                        col1: digits[i+2],
+                        row2: digits[i+1],
+                        col2: digits[i+3]
+                    });
+                }
+                
+                return coords;
+            },
+            
+            // Update settings from UI
+            updateSettings() {
+                const key1 = document.getElementById('key1').value;
+                const key2 = document.getElementById('key2').value;
+                const fill1 = document.getElementById('fill1').value;
+                const fill2 = document.getElementById('fill2').value;
+                const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+                const period = parseInt(document.getElementById('period').value) || DEFAULT_PERIOD;
+                
+                // Validate keys
+                if (key1.length < 6 || key2.length < 6) {
+                    throw new Error("Both keys must be at least 6 characters");
+                }
+                
+                // Update state
+                this.period = Math.max(1, Math.min(20, period));
+                this.algorithm = algorithm;
+                
+                // Regenerate squares
+                this.square1 = this.createSquare(key1, fill1);
+                this.square2 = this.createSquare(key2, fill2);
+                
+                // Validate squares contain all characters
+                this.validateSquare(this.square1);
+                this.validateSquare(this.square2);
+                
+                return true;
+            },
+            
+            validateSquare(square) {
+                const chars = new Set();
+                for (const row of square) {
+                    for (const char of row) {
+                        if (chars.has(char)) {
+                            throw new Error(`Duplicate character in square: ${char}`);
+                        }
+                        chars.add(char);
+                    }
+                }
+                
+                if (chars.size !== SQUARE_SIZE * SQUARE_SIZE) {
+                    throw new Error("Square must contain exactly 36 unique characters");
+                }
             }
         };
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            generateSquares();
-        });
-
-        // Tab switching
+        // UI Functions
         function openTab(event, tabName) {
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            
-            const buttons = document.querySelectorAll('.tab');
-            buttons.forEach(button => button.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
             
             document.getElementById(tabName).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        // Generate Polybius squares based on current settings
         function generateSquares() {
-            // Update settings from UI
-            state.settings.key1 = document.getElementById('key1').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            state.settings.key2 = document.getElementById('key2').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            state.settings.fill1 = document.getElementById('fill1').value;
-            state.settings.fill2 = document.getElementById('fill2').value;
-            state.settings.algorithm = document.querySelector('input[name="algorithm"]:checked').value;
-
-            // Validate keys
-            validateKey('key1', state.settings.key1);
-            validateKey('key2', state.settings.key2);
-
-            // Generate squares
-            state.square1 = createSquare(state.settings.key1, state.settings.fill1);
-            state.square2 = createSquare(state.settings.key2, state.settings.fill2);
-
-            // Display squares
-            displaySquare(state.square1, 'square1');
-            displaySquare(state.square2, 'square2');
-        }
-
-        // Validate key and show error if needed
-        function validateKey(keyId, keyValue) {
-            const errorElement = document.getElementById(`${keyId}-error`);
-            
-            if (keyValue.length < 6) {
-                errorElement.textContent = 'Key should be at least 6 characters for better security';
-                errorElement.style.display = 'block';
-            } else {
-                errorElement.style.display = 'none';
-            }
-        }
-
-        // Create a 6x6 Polybius square
-        function createSquare(key, fillMethod) {
-            // Remove duplicate characters from key
-            const uniqueKey = Array.from(new Set(key.split('').filter(c => CHARSET.includes(c))).join('');
-            
-            // Add remaining characters from charset
-            const remainingChars = CHARSET.split('').filter(c => !uniqueKey.includes(c)).join('');
-            const allChars = uniqueKey + remainingChars;
-            
-            // Initialize empty square
-            const square = Array(SQUARE_SIZE).fill().map(() => Array(SQUARE_SIZE).fill(''));
-
-            // Fill square based on selected method
-            switch (fillMethod) {
-                case 'row':
-                    fillRowWise(square, allChars);
-                    break;
-                case 'column':
-                    fillColumnWise(square, allChars);
-                    break;
-                case 'diagonal':
-                    fillDiagonal(square, allChars);
-                    break;
-                case 'spiral':
-                    fillSpiral(square, allChars);
-                    break;
-                case 'chess':
-                    fillChessPattern(square, allChars);
-                    break;
-                default:
-                    fillRowWise(square, allChars);
-            }
-
-            return square;
-        }
-
-        // Fill square row-wise
-        function fillRowWise(square, chars) {
-            for (let row = 0; row < SQUARE_SIZE; row++) {
-                for (let col = 0; col < SQUARE_SIZE; col++) {
-                    square[row][col] = chars[row * SQUARE_SIZE + col];
+            try {
+                if (cipher.updateSettings()) {
+                    cipher.displaySquares();
+                    showAlert('Squares generated successfully!', 'success', 'settings');
                 }
+            } catch (error) {
+                showAlert(error.message, 'danger', 'settings');
             }
         }
 
-        // Fill square column-wise
-        function fillColumnWise(square, chars) {
-            for (let col = 0; col < SQUARE_SIZE; col++) {
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    square[row][col] = chars[col * SQUARE_SIZE + row];
-                }
-            }
-        }
-
-        // Fill square diagonally
-        function fillDiagonal(square, chars) {
-            let index = 0;
-            for (let d = 0; d < 2 * SQUARE_SIZE - 1; d++) {
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    const col = d - row;
-                    if (col >= 0 && col < SQUARE_SIZE && index < chars.length) {
-                        square[row][col] = chars[index++];
-                    }
-                }
-            }
-        }
-
-        // Fill square in spiral pattern
-        function fillSpiral(square, chars) {
-            const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-            let currentDir = 0;
-            let row = 2, col = 2; // Start near center
-            const visited = new Set();
-            
-            for (let i = 0; i < SQUARE_SIZE * SQUARE_SIZE; i++) {
-                square[row][col] = chars[i];
-                visited.add(`${row},${col}`);
-                
-                // Calculate next position
-                let nextRow = row + directions[currentDir][0];
-                let nextCol = col + directions[currentDir][1];
-                
-                // Change direction if next position is invalid
-                if (visited.has(`${nextRow},${nextCol}`) || 
-                    nextRow < 0 || nextRow >= SQUARE_SIZE || 
-                    nextCol < 0 || nextCol >= SQUARE_SIZE) {
-                    currentDir = (currentDir + 1) % 4;
-                    nextRow = row + directions[currentDir][0];
-                    nextCol = col + directions[currentDir][1];
-                }
-                
-                row = nextRow;
-                col = nextCol;
-            }
-        }
-
-        // Fill square in chess knight's tour pattern
-        function fillChessPattern(square, chars) {
-            const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
-            let pos = [0, 0];
-            const visited = new Set();
-            visited.add(`${pos[0]},${pos[1]}`);
-            square[0][0] = chars[0];
-            
-            for (let i = 1; i < SQUARE_SIZE * SQUARE_SIZE; i++) {
-                let found = false;
-                
-                // Try all possible knight moves
-                for (const [dr, dc] of knightMoves) {
-                    const newRow = pos[0] + dr;
-                    const newCol = pos[1] + dc;
-                    
-                    if (newRow >= 0 && newRow < SQUARE_SIZE && 
-                        newCol >= 0 && newCol < SQUARE_SIZE && 
-                        !visited.has(`${newRow},${newCol}`)) {
-                        pos = [newRow, newCol];
-                        visited.add(`${newRow},${newCol}`);
-                        square[newRow][newCol] = chars[i];
-                        found = true;
-                        break;
-                    }
-                }
-                
-                // If no valid move, find first available spot
-                if (!found) {
-                    outer: for (let r = 0; r < SQUARE_SIZE; r++) {
-                        for (let c = 0; c < SQUARE_SIZE; c++) {
-                            if (!visited.has(`${r},${c}`)) {
-                                pos = [r, c];
-                                visited.add(`${r},${c}`);
-                                square[r][c] = chars[i];
-                                found = true;
-                                break outer;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Display a square in the UI
-        function displaySquare(square, elementId) {
-            const container = document.getElementById(elementId);
-            container.innerHTML = '';
-            
-            // Add empty header corner
-            const corner = document.createElement('div');
-            corner.className = 'square-cell square-header';
-            corner.textContent = '';
-            container.appendChild(corner);
-            
-            // Add column headers
-            for (let col = 0; col < SQUARE_SIZE; col++) {
-                const header = document.createElement('div');
-                header.className = 'square-cell square-header';
-                header.textContent = col + 1;
-                container.appendChild(header);
-            }
-            
-            // Add rows with data
-            for (let row = 0; row < SQUARE_SIZE; row++) {
-                // Row header
-                const rowHeader = document.createElement('div');
-                rowHeader.className = 'square-cell square-header';
-                rowHeader.textContent = row + 1;
-                container.appendChild(rowHeader);
-                
-                // Row cells
-                for (let col = 0; col < SQUARE_SIZE; col++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'square-cell';
-                    cell.textContent = square[row][col];
-                    container.appendChild(cell);
-                }
-            }
-        }
-
-        // Encrypt plaintext
         function encrypt() {
-            const plaintext = document.getElementById('plaintext').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            
-            if (!plaintext) {
-                showAlert('Please enter text to encrypt', 'encrypt-output');
-                return;
+            try {
+                const plaintext = document.getElementById('plaintext').value;
+                const ciphertext = cipher.encrypt(plaintext);
+                document.getElementById('encrypt-output').textContent = ciphertext;
+            } catch (error) {
+                showAlert(error.message, 'danger', 'encrypt-output');
             }
-            
-            // Get coordinates for each character from both squares
-            const coords = [];
-            for (const char of plaintext) {
-                const coord1 = findCoordinate(char, state.square1);
-                const coord2 = findCoordinate(char, state.square2);
-                
-                if (!coord1 || !coord2) {
-                    showAlert(`Character '${char}' not found in squares`, 'encrypt-output');
-                    return;
-                }
-                
-                coords.push({
-                    char: char,
-                    coord1: coord1,
-                    coord2: coord2
-                });
-            }
-            
-            // Apply selected transformation algorithm
-            let ciphertext;
-            switch (state.settings.algorithm) {
-                case 'standard':
-                    ciphertext = standardBifidTransform(coords);
-                    break;
-                case 'diagonal':
-                    ciphertext = diagonalTransform(coords);
-                    break;
-                case 'chess':
-                    ciphertext = chessTransform(coords);
-                    break;
-                default:
-                    ciphertext = standardBifidTransform(coords);
-            }
-            
-            // Display result
-            document.getElementById('encrypt-output').textContent = formatCiphertext(ciphertext);
         }
 
-        // Standard Bifid transformation
-        function standardBifidTransform(coords) {
-            const rowStream = [];
-            const colStream = [];
-            
-            // Split coordinates into row and column streams
-            for (const {coord1, coord2} of coords) {
-                rowStream.push(coord1.row, coord2.row);
-                colStream.push(coord1.col, coord2.col);
-            }
-            
-            // Combine streams
-            const combined = [...rowStream, ...colStream];
-            
-            // Create consistent 4-digit groups
-            return createDigitGroups(combined);
-        }
-
-        // Diagonal transformation
-        function diagonalTransform(coords) {
-            const numbers = [];
-            
-            // Extract all numbers from coordinates
-            for (const {coord1, coord2} of coords) {
-                numbers.push(coord1.row, coord1.col, coord2.row, coord2.col);
-            }
-            
-            // Create a square matrix (pad if necessary)
-            const size = Math.ceil(Math.sqrt(numbers.length));
-            const padded = [...numbers, ...Array(size * size - numbers.length).fill(1)];
-            const matrix = Array(size).fill().map(() => Array(size).fill(null));
-            
-            // Fill matrix diagonally
-            let index = 0;
-            for (let d = 0; d < 2 * size - 1; d++) {
-                for (let row = 0; row < size; row++) {
-                    const col = d - row;
-                    if (col >= 0 && col < size && index < padded.length) {
-                        matrix[row][col] = padded[index++];
-                    }
-                }
-            }
-            
-            // Read numbers back in row-major order
-            const result = [];
-            for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
-                    if (matrix[row][col] !== null) {
-                        result.push(matrix[row][col]);
-                    }
-                }
-            }
-            
-            return createDigitGroups(result);
-        }
-
-        // Chess (knight's move) transformation
-        function chessTransform(coords) {
-            const numbers = [];
-            
-            // Extract all numbers from coordinates
-            for (const {coord1, coord2} of coords) {
-                numbers.push(coord1.row, coord1.col, coord2.row, coord2.col);
-            }
-            
-            // Create a square matrix (pad if necessary)
-            const size = Math.ceil(Math.sqrt(numbers.length));
-            const padded = [...numbers, ...Array(size * size - numbers.length).fill(1)];
-            const matrix = Array(size).fill().map(() => Array(size).fill(null));
-            const visited = new Set();
-            let pos = [0, 0];
-            const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
-            
-            // Fill matrix with knight's moves
-            for (let i = 0; i < size * size; i++) {
-                matrix[pos[0]][pos[1]] = padded[i];
-                visited.add(`${pos[0]},${pos[1]}`);
-                
-                // Find next position with knight's move
-                let found = false;
-                for (const [dr, dc] of knightMoves) {
-                    const newRow = pos[0] + dr;
-                    const newCol = pos[1] + dc;
-                    
-                    if (newRow >= 0 && newRow < size && 
-                        newCol >= 0 && newCol < size && 
-                        !visited.has(`${newRow},${newCol}`)) {
-                        pos = [newRow, newCol];
-                        found = true;
-                        break;
-                    }
-                }
-                
-                // If no valid move, find first available
-                if (!found) {
-                    outer: for (let r = 0; r < size; r++) {
-                        for (let c = 0; c < size; c++) {
-                            if (!visited.has(`${r},${c}`)) {
-                                pos = [r, c];
-                                break outer;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Read numbers back in row-major order
-            const result = [];
-            for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
-                    result.push(matrix[row][col]);
-                }
-            }
-            
-            return createDigitGroups(result);
-        }
-
-        // Create digit groups from numbers array
-        function createDigitGroups(numbers) {
-            const ciphertext = [];
-            let temp = '';
-            
-            for (const num of numbers) {
-                temp += num.toString();
-                if (temp.length === 4) {
-                    ciphertext.push(temp);
-                    temp = '';
-                }
-            }
-            
-            // Add remaining digits if any
-            if (temp.length > 0) {
-                ciphertext.push(temp.padEnd(4, '0'));
-            }
-            
-            return ciphertext.join(' ');
-        }
-
-        // Decrypt ciphertext
         function decrypt() {
-            const ciphertext = document.getElementById('ciphertext').value.replace(/\s/g, '');
-            
-            if (!ciphertext || ciphertext.length % 4 !== 0 || !/^\d+$/.test(ciphertext)) {
-                showAlert('Ciphertext must consist of 4-digit number groups', 'decrypt-output');
-                return;
+            try {
+                const ciphertext = document.getElementById('ciphertext').value;
+                const plaintext = cipher.decrypt(ciphertext);
+                document.getElementById('decrypt-output').textContent = plaintext;
+            } catch (error) {
+                showAlert(error.message, 'danger', 'decrypt-output');
             }
-            
-            // Split into individual digits
-            const digits = Array.from(ciphertext).map(Number);
-            
-            // Apply inverse transformation
-            let numbers;
-            switch (state.settings.algorithm) {
-                case 'standard':
-                    numbers = inverseStandardBifidTransform(digits);
-                    break;
-                case 'diagonal':
-                    numbers = inverseDiagonalTransform(digits);
-                    break;
-                case 'chess':
-                    numbers = inverseChessTransform(digits);
-                    break;
-                default:
-                    numbers = inverseStandardBifidTransform(digits);
-            }
-            
-            // Reconstruct coordinates
-            const coords = [];
-            for (let i = 0; i < numbers.length; i += 4) {
-                if (i + 3 < numbers.length) {
-                    coords.push({
-                        row1: numbers[i],
-                        col1: numbers[i+1],
-                        row2: numbers[i+2],
-                        col2: numbers[i+3]
-                    });
-                }
-            }
-            
-            // Reconstruct plaintext
-            let plaintext = '';
-            for (const {row1, col1, row2, col2} of coords) {
-                // Validate coordinates
-                if (!isValidCoord(row1, col1) || !isValidCoord(row2, col2)) {
-                    plaintext += '?';
-                    continue;
-                }
-                
-                const char1 = state.square1[row1 - 1][col1 - 1];
-                const char2 = state.square2[row2 - 1][col2 - 1];
-                
-                plaintext += (char1 === char2) ? char1 : '?';
-            }
-            
-            document.getElementById('decrypt-output').textContent = plaintext;
         }
 
-        // Check if coordinate is valid
-        function isValidCoord(row, col) {
-            return row >= 1 && row <= SQUARE_SIZE && col >= 1 && col <= SQUARE_SIZE;
+        function showAlert(message, type, elementId) {
+            const element = document.getElementById(elementId);
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            element.innerHTML = '';
+            element.appendChild(alert);
         }
 
-        // Inverse of standard Bifid transformation
-        function inverseStandardBifidTransform(digits) {
-            const half = Math.ceil(digits.length / 2);
-            const rowDigits = digits.slice(0, half);
-            const colDigits = digits.slice(half);
-            
-            // Pad if necessary
-            while (rowDigits.length < colDigits.length) rowDigits.push(1);
-            while (colDigits.length < rowDigits.length) colDigits.push(1);
-            
-            const coords = [];
-            for (let i = 0; i < rowDigits.length; i += 2) {
-                if (i + 1 < rowDigits.length) {
-                    coords.push(
-                        rowDigits[i],
-                        colDigits[i],
-                        rowDigits[i+1],
-                        colDigits[i+1]
-                    );
-                }
-            }
-            
-            return coords.flat();
-        }
-
-        // Inverse of diagonal transformation
-        function inverseDiagonalTransform(digits) {
-            // Create a square matrix
-            const size = Math.ceil(Math.sqrt(digits.length));
-            const matrix = Array(size).fill().map(() => Array(size).fill(null));
-            
-            // Fill matrix in row-major order
-            let index = 0;
-            for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
-                    matrix[row][col] = index < digits.length ? digits[index++] : 1;
-                }
-            }
-            
-            // Read numbers in diagonal order
-            const diagonalNumbers = [];
-            for (let d = 0; d < 2 * size - 1; d++) {
-                for (let row = 0; row < size; row++) {
-                    const col = d - row;
-                    if (col >= 0 && col < size && matrix[row][col] !== null) {
-                        diagonalNumbers.push(matrix[row][col]);
-                    }
-                }
-            }
-            
-            // Now apply standard Bifid inverse
-            return inverseStandardBifidTransform(diagonalNumbers);
-        }
-
-        // Inverse of chess transformation
-        function inverseChessTransform(digits) {
-            // Create a square matrix
-            const size = Math.ceil(Math.sqrt(digits.length));
-            const matrix = Array(size).fill().map(() => Array(size).fill(null));
-            
-            // Fill matrix in row-major order
-            let index = 0;
-            for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
-                    matrix[row][col] = index < digits.length ? digits[index++] : 1;
-                }
-            }
-            
-            // Reconstruct knight's tour path
-            const visited = new Set();
-            let pos = [0, 0];
-            const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
-            const chessNumbers = [];
-            
-            for (let i = 0; i < size * size; i++) {
-                chessNumbers.push(matrix[pos[0]][pos[1]]);
-                visited.add(`${pos[0]},${pos[1]}`);
-                
-                // Find next position with knight's move
-                let found = false;
-                for (const [dr, dc] of knightMoves) {
-                    const newRow = pos[0] + dr;
-                    const newCol = pos[1] + dc;
-                    
-                    if (newRow >= 0 && newRow < size && 
-                        newCol >= 0 && newCol < size && 
-                        !visited.has(`${newRow},${newCol}`)) {
-                        pos = [newRow, newCol];
-                        found = true;
-                        break;
-                    }
-                }
-                
-                // If no valid move, find first available
-                if (!found) {
-                    outer: for (let r = 0; r < size; r++) {
-                        for (let c = 0; c < size; c++) {
-                            if (!visited.has(`${r},${c}`)) {
-                                pos = [r, c];
-                                break outer;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Now apply standard Bifid inverse
-            return inverseStandardBifidTransform(chessNumbers);
-        }
-
-        // Find coordinates of a character in a square
-        function findCoordinate(char, square) {
-            for (let row = 0; row < square.length; row++) {
-                for (let col = 0; col < square[row].length; col++) {
-                    if (square[row][col] === char) {
-                        return { row: row + 1, col: col + 1 };
-                    }
-                }
-            }
-            return null;
-        }
-
-        // Format ciphertext with consistent 4-digit groups
-        function formatCiphertext(ciphertext) {
-            return ciphertext;
-        }
-
-        // Show alert message in output area
-        function showAlert(message, outputId) {
-            document.getElementById(outputId).textContent = message;
-        }
-
-        // Clear output
         function clearOutput(tab) {
             document.getElementById(`${tab}-output`).textContent = '';
         }
 
-        // Reset settings to defaults
         function resetSettings() {
-            document.getElementById('key1').value = 'SECRETKEY1';
-            document.getElementById('key2').value = 'SECRETKEY2';
+            document.getElementById('key1').value = 'BIFIDCIPHER';
+            document.getElementById('key2').value = 'SECONDKEY';
             document.getElementById('fill1').value = 'row';
             document.getElementById('fill2').value = 'row';
             document.getElementById('standard').checked = true;
-            generateSquares();
+            document.getElementById('period').value = '5';
+            cipher.init();
         }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            cipher.init();
+        });
     </script>
 </body>
 </html>
