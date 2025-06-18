@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Bifid Cipher</title>
+    <title>Advanced Bifid Cipher (Fixed)</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -22,6 +22,7 @@
             background-color: var(--light);
             margin: 0;
             padding: 20px;
+            overflow-x: hidden;
         }
         
         .container {
@@ -40,6 +41,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 20px;
+            overflow: visible;
         }
         
         .grid {
@@ -66,6 +68,7 @@
             text-align: center;
             border: 1px solid #ddd;
             font-weight: bold;
+            min-width: 30px;
         }
         
         .square .header {
@@ -80,6 +83,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
+            box-sizing: border-box;
         }
         
         button {
@@ -113,11 +117,14 @@
         
         .tab-container {
             margin-bottom: 20px;
+            overflow: visible;
         }
         
         .tab-buttons {
             display: flex;
             border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+            white-space: nowrap;
         }
         
         .tab-button {
@@ -126,6 +133,7 @@
             border: none;
             cursor: pointer;
             border-bottom: 3px solid transparent;
+            flex-shrink: 0;
         }
         
         .tab-button.active {
@@ -149,6 +157,7 @@
             font-family: monospace;
             white-space: pre-wrap;
             min-height: 100px;
+            overflow-wrap: break-word;
         }
         
         .validation-error {
@@ -180,8 +189,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Advanced Bifid Cipher</h1>
-        <p>A professional implementation of the Bifid cipher with dual 6×6 Polybius squares and multiple transformation algorithms.</p>
+        <h1>Advanced Bifid Cipher (Fixed)</h1>
+        <p>A corrected implementation of the Bifid cipher with dual 6×6 Polybius squares and multiple transformation algorithms.</p>
         
         <div class="tab-container">
             <div class="tab-buttons">
@@ -193,15 +202,15 @@
             <div id="encrypt" class="tab-content active">
                 <div class="card">
                     <h2>Encryption</h2>
-                    <label for="plaintext">Plaintext:</label>
-                    <textarea id="plaintext" rows="4" placeholder="Enter text to encrypt"></textarea>
+                    <label for="plaintext">Plaintext (A-Z, 0-9):</label>
+                    <textarea id="plaintext" rows="4" placeholder="Enter text to encrypt">HELLO</textarea>
                     
                     <div class="btn-group">
                         <button class="process-btn" onclick="encrypt()">Encrypt</button>
                         <button class="reset-btn" onclick="clearOutput('encrypt')">Clear</button>
                     </div>
                     
-                    <h3>Output:</h3>
+                    <h3>Output (4-digit groups):</h3>
                     <div id="encrypt-output" class="output"></div>
                 </div>
             </div>
@@ -209,7 +218,7 @@
             <div id="decrypt" class="tab-content">
                 <div class="card">
                     <h2>Decryption</h2>
-                    <label for="ciphertext">Ciphertext (4-digit groups):</label>
+                    <label for="ciphertext">Ciphertext (4-digit groups, numbers only):</label>
                     <textarea id="ciphertext" rows="4" placeholder="Enter ciphertext to decrypt"></textarea>
                     
                     <div class="btn-group">
@@ -578,33 +587,46 @@
             document.getElementById('encrypt-output').textContent = formatCiphertext(ciphertext);
         }
         
-        // Standard Bifid transformation
+        // Standard Bifid transformation (fixed)
         function standardBifidTransform(coords) {
-            let stream1 = [];
-            let stream2 = [];
+            let rowStream = [];
+            let colStream = [];
             
-            // Split coordinates into two streams
+            // Split coordinates into row and column streams
             for (let item of coords) {
-                stream1.push(item.coord1.row);
-                stream1.push(item.coord2.row);
-                stream2.push(item.coord1.col);
-                stream2.push(item.coord2.col);
+                rowStream.push(item.coord1.row);
+                rowStream.push(item.coord2.row);
+                colStream.push(item.coord1.col);
+                colStream.push(item.coord2.col);
             }
             
             // Combine streams
-            let combined = [...stream1, ...stream2];
+            let combined = [...rowStream, ...colStream];
             
-            // Create 4-digit groups
+            // Create consistent 4-digit groups
             let ciphertext = [];
-            for (let i = 0; i < combined.length; i += 4) {
-                let group = combined.slice(i, i + 4).join('');
-                ciphertext.push(group);
+            let temp = '';
+            for (let num of combined) {
+                temp += num.toString();
+                if (temp.length === 4) {
+                    ciphertext.push(temp);
+                    temp = '';
+                }
+            }
+            
+            // Add remaining digits if any
+            if (temp.length > 0) {
+                // Pad with zeros to make 4 digits
+                while (temp.length < 4) {
+                    temp += '0';
+                }
+                ciphertext.push(temp);
             }
             
             return ciphertext.join(' ');
         }
         
-        // Diagonal transformation
+        // Diagonal transformation (fixed)
         function diagonalTransform(coords) {
             let numbers = [];
             
@@ -620,8 +642,14 @@
             
             // Create a square matrix (pad if necessary)
             let size = Math.ceil(Math.sqrt(numbers.length));
+            let paddedLength = size * size;
+            while (numbers.length < paddedLength) {
+                numbers.push(1); // Pad with 1s (neutral element)
+            }
+            
             let matrix = Array(size).fill().map(() => Array(size).fill(null));
             
+            // Fill matrix diagonally
             let index = 0;
             for (let d = 0; d < 2 * size - 1; d++) {
                 for (let i = 0; i < size; i++) {
@@ -642,17 +670,29 @@
                 }
             }
             
-            // Create 4-digit groups
+            // Create consistent 4-digit groups
             let ciphertext = [];
-            for (let i = 0; i < result.length; i += 4) {
-                let group = result.slice(i, i + 4).join('');
-                ciphertext.push(group);
+            let temp = '';
+            for (let num of result) {
+                temp += num.toString();
+                if (temp.length === 4) {
+                    ciphertext.push(temp);
+                    temp = '';
+                }
+            }
+            
+            // Add remaining digits if any
+            if (temp.length > 0) {
+                while (temp.length < 4) {
+                    temp += '0';
+                }
+                ciphertext.push(temp);
             }
             
             return ciphertext.join(' ');
         }
         
-        // Chess (knight's move) transformation
+        // Chess (knight's move) transformation (fixed)
         function chessTransform(coords) {
             let numbers = [];
             
@@ -666,13 +706,19 @@
                 );
             }
             
-            // Create a knight's tour pattern
+            // Create a square matrix (pad if necessary)
             let size = Math.ceil(Math.sqrt(numbers.length));
+            let paddedLength = size * size;
+            while (numbers.length < paddedLength) {
+                numbers.push(1); // Pad with 1s
+            }
+            
             let matrix = Array(size).fill().map(() => Array(size).fill(null));
             let visited = new Set();
             let pos = [0, 0];
             let knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
             
+            // Fill matrix with knight's moves
             for (let i = 0; i < numbers.length; i++) {
                 matrix[pos[0]][pos[1]] = numbers[i];
                 visited.add(`${pos[0]},${pos[1]}`);
@@ -693,15 +739,13 @@
                 
                 // If no valid move, find first available
                 if (!found) {
-                    for (let r = 0; r < size; r++) {
+                    outer: for (let r = 0; r < size; r++) {
                         for (let c = 0; c < size; c++) {
                             if (!visited.has(`${r},${c}`)) {
                                 pos = [r, c];
-                                found = true;
-                                break;
+                                break outer;
                             }
                         }
-                        if (found) break;
                     }
                 }
             }
@@ -710,109 +754,142 @@
             let result = [];
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    if (matrix[i][j] !== null) {
-                        result.push(matrix[i][j]);
-                    }
+                    result.push(matrix[i][j]);
                 }
             }
             
-            // Create 4-digit groups
+            // Create consistent 4-digit groups
             let ciphertext = [];
-            for (let i = 0; i < result.length; i += 4) {
-                let group = result.slice(i, i + 4).join('');
-                ciphertext.push(group);
+            let temp = '';
+            for (let num of result) {
+                temp += num.toString();
+                if (temp.length === 4) {
+                    ciphertext.push(temp);
+                    temp = '';
+                }
+            }
+            
+            // Add remaining digits if any
+            if (temp.length > 0) {
+                while (temp.length < 4) {
+                    temp += '0';
+                }
+                ciphertext.push(temp);
             }
             
             return ciphertext.join(' ');
         }
         
-        // Decrypt ciphertext
+        // Decrypt ciphertext (fixed)
         function decrypt() {
             const ciphertext = document.getElementById('ciphertext').value.replace(/\s/g, '');
             
-            if (!ciphertext || ciphertext.length % 4 !== 0) {
-                alert('Ciphertext must consist of 4-digit groups');
+            if (!ciphertext || ciphertext.length % 4 !== 0 || !/^\d+$/.test(ciphertext)) {
+                alert('Ciphertext must consist of 4-digit number groups');
                 return;
             }
             
-            // Split into 4-digit groups
-            let groups = [];
-            for (let i = 0; i < ciphertext.length; i += 4) {
-                groups.push(ciphertext.substr(i, 4));
-            }
-            
-            // Reverse the transformation
-            let numbers = [];
-            for (let group of groups) {
-                for (let digit of group) {
-                    numbers.push(parseInt(digit));
-                }
+            // Split into individual digits
+            let digits = [];
+            for (let char of ciphertext) {
+                digits.push(parseInt(char));
             }
             
             // Apply inverse transformation
-            let coords;
+            let numbers;
             switch (settings.algorithm) {
                 case 'standard':
-                    coords = inverseStandardBifidTransform(numbers);
+                    numbers = inverseStandardBifidTransform(digits);
                     break;
                 case 'diagonal':
-                    coords = inverseDiagonalTransform(numbers);
+                    numbers = inverseDiagonalTransform(digits);
                     break;
                 case 'chess':
-                    coords = inverseChessTransform(numbers);
+                    numbers = inverseChessTransform(digits);
                     break;
                 default:
-                    coords = inverseStandardBifidTransform(numbers);
+                    numbers = inverseStandardBifidTransform(digits);
+            }
+            
+            // Reconstruct coordinates
+            let coords = [];
+            for (let i = 0; i < numbers.length; i += 4) {
+                if (i + 3 < numbers.length) {
+                    coords.push({
+                        row1: numbers[i],
+                        col1: numbers[i+1],
+                        row2: numbers[i+2],
+                        col2: numbers[i+3]
+                    });
+                }
             }
             
             // Reconstruct plaintext
             let plaintext = '';
             for (let coord of coords) {
+                // Validate coordinates
+                if (coord.row1 < 1 || coord.row1 > 6 || coord.col1 < 1 || coord.col1 > 6 ||
+                    coord.row2 < 1 || coord.row2 > 6 || coord.col2 < 1 || coord.col2 > 6) {
+                    plaintext += '?';
+                    continue;
+                }
+                
                 let char1 = square1[coord.row1 - 1][coord.col1 - 1];
                 let char2 = square2[coord.row2 - 1][coord.col2 - 1];
                 
                 if (char1 === char2) {
                     plaintext += char1;
                 } else {
-                    plaintext += `[${char1}/${char2}]`;
+                    plaintext += '?'; // Indicate mismatch
                 }
             }
             
             document.getElementById('decrypt-output').textContent = plaintext;
         }
         
-        // Inverse of standard Bifid transformation
-        function inverseStandardBifidTransform(numbers) {
-            let half = numbers.length / 2;
-            let stream1 = numbers.slice(0, half);
-            let stream2 = numbers.slice(half);
+        // Inverse of standard Bifid transformation (fixed)
+        function inverseStandardBifidTransform(digits) {
+            let half = Math.ceil(digits.length / 2);
+            let rowDigits = digits.slice(0, half);
+            let colDigits = digits.slice(half);
+            
+            // Pad if necessary
+            while (rowDigits.length < colDigits.length) {
+                rowDigits.push(1);
+            }
+            while (colDigits.length < rowDigits.length) {
+                colDigits.push(1);
+            }
             
             let coords = [];
-            for (let i = 0; i < stream1.length; i += 2) {
-                if (i + 1 < stream1.length && i + 1 < stream2.length) {
-                    coords.push({
-                        row1: stream1[i],
-                        col1: stream2[i],
-                        row2: stream1[i + 1],
-                        col2: stream2[i + 1]
-                    });
+            for (let i = 0; i < rowDigits.length; i += 2) {
+                if (i + 1 < rowDigits.length) {
+                    coords.push(
+                        rowDigits[i],
+                        colDigits[i],
+                        rowDigits[i+1],
+                        colDigits[i+1]
+                    );
                 }
             }
             
             return coords;
         }
         
-        // Inverse of diagonal transformation
-        function inverseDiagonalTransform(numbers) {
-            let size = Math.ceil(Math.sqrt(numbers.length));
+        // Inverse of diagonal transformation (fixed)
+        function inverseDiagonalTransform(digits) {
+            // Create a square matrix
+            let size = Math.ceil(Math.sqrt(digits.length));
             let matrix = Array(size).fill().map(() => Array(size).fill(null));
             
             // Fill matrix in row-major order
             let index = 0;
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    if (index < numbers.length) {
-                        matrix[i][j] = numbers[index++];
+                    if (index < digits.length) {
+                        matrix[i][j] = digits[index++];
+                    } else {
+                        matrix[i][j] = 1; // Pad with 1s
                     }
                 }
             }
@@ -832,17 +909,20 @@
             return inverseStandardBifidTransform(diagonalNumbers);
         }
         
-        // Inverse of chess transformation
-        function inverseChessTransform(numbers) {
-            let size = Math.ceil(Math.sqrt(numbers.length));
+        // Inverse of chess transformation (fixed)
+        function inverseChessTransform(digits) {
+            // Create a square matrix
+            let size = Math.ceil(Math.sqrt(digits.length));
             let matrix = Array(size).fill().map(() => Array(size).fill(null));
             
             // Fill matrix in row-major order
             let index = 0;
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    if (index < numbers.length) {
-                        matrix[i][j] = numbers[index++];
+                    if (index < digits.length) {
+                        matrix[i][j] = digits[index++];
+                    } else {
+                        matrix[i][j] = 1; // Pad with 1s
                     }
                 }
             }
@@ -853,7 +933,7 @@
             let knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
             let chessNumbers = [];
             
-            for (let i = 0; i < numbers.length; i++) {
+            for (let i = 0; i < size * size; i++) {
                 chessNumbers.push(matrix[pos[0]][pos[1]]);
                 visited.add(`${pos[0]},${pos[1]}`);
                 
@@ -873,15 +953,13 @@
                 
                 // If no valid move, find first available
                 if (!found) {
-                    for (let r = 0; r < size; r++) {
+                    outer: for (let r = 0; r < size; r++) {
                         for (let c = 0; c < size; c++) {
                             if (!visited.has(`${r},${c}`)) {
                                 pos = [r, c];
-                                found = true;
-                                break;
+                                break outer;
                             }
                         }
-                        if (found) break;
                     }
                 }
             }
@@ -905,7 +983,7 @@
             return null;
         }
         
-        // Format ciphertext with 4-digit groups
+        // Format ciphertext with consistent 4-digit groups
         function formatCiphertext(ciphertext) {
             return ciphertext.match(/.{1,4}/g).join(' ');
         }
