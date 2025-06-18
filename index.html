@@ -1,1382 +1,336 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bifid Cipher 2050 | Quantum-Resistant Encryption</title>
+    <title>Bifid-X RealApp</title>
     <style>
         :root {
-            --bg: #0a0a12;
-            --terminal: #121420;
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
             --text: #e0e0ff;
             --accent: #6aff00;
-            --warning: #ff5e5e;
-            --header: #3a3aff;
-            --cell-bg: #1e1e2e;
-            --cell-border: #30304a;
-            --success: #00ff88;
-            --info: #00a8ff;
+            --error: #ff5e5e;
         }
-
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'IBM Plex Mono', monospace;
-            background-color: var(--bg);
+            font-family: 'Courier New', monospace;
+            background: var(--bg);
             color: var(--text);
-            margin: 0;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
             line-height: 1.6;
-            min-height: 100vh;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--header);
-            padding-bottom: 1rem;
-            position: relative;
-        }
-
-        h1 {
-            color: var(--accent);
-            font-size: 2.2rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 0 10px rgba(106, 255, 0, 0.3);
-        }
-
-        .subtitle {
-            color: var(--text);
-            opacity: 0.8;
-            font-size: 1.1rem;
-        }
-
-        .status-bar {
-            position: absolute;
-            top: 0;
-            right: 0;
-            font-size: 0.8rem;
-            color: var(--success);
-        }
-
         .card {
-            background: var(--terminal);
+            background: var(--card);
             border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--cell-border);
-            position: relative;
-            overflow: hidden;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
+        h1, h2, h3 {
+            color: var(--accent);
+        }
+        button {
             background: var(--accent);
-        }
-
-        .card-title {
-            color: var(--accent);
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-        }
-
-        .card-title::before {
-            content: '>>';
-            margin-right: 0.5rem;
-            color: var(--info);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--accent);
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--cell-bg);
-            border: 1px solid var(--cell-border);
-            border-radius: 4px;
-            color: var(--text);
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(106, 255, 0, 0.2);
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
+            color: #000;
             border: none;
-            font-family: inherit;
-            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 4px;
             cursor: pointer;
+            font-weight: bold;
+            margin: 5px 0;
             transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
-
-        .btn svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: var(--bg);
-        }
-
-        .btn-primary:hover {
-            background: #5ce600;
+        button:hover {
+            opacity: 0.9;
             transform: translateY(-1px);
         }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-danger {
-            background: var(--warning);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #ff4a4a;
-        }
-
-        .btn-info {
-            background: var(--info);
-            color: white;
-        }
-
-        .btn-info:hover {
-            background: #0095e0;
-        }
-
-        .output {
-            background: var(--cell-bg);
-            padding: 1rem;
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #333;
             border-radius: 4px;
-            font-family: 'IBM Plex Mono', monospace;
-            white-space: pre-wrap;
-            border: 1px solid var(--cell-border);
-            min-height: 60px;
-            position: relative;
+            color: var(--text);
+            font-family: inherit;
+            margin: 5px 0;
         }
-
-        .output-label {
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            background: var(--terminal);
-            padding: 0 5px;
-            font-size: 0.8rem;
-            color: var(--accent);
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
-
-        /* Terminal-style squares */
-        .square-container {
-            margin: 1.5rem 0;
-            border: 1px solid var(--cell-border);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
         .square {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 1px;
-            background: var(--cell-border);
+            gap: 2px;
+            margin: 10px 0;
         }
-
-        .square-cell {
-            padding: 0.75rem;
+        .square div {
+            padding: 8px;
             text-align: center;
-            background: var(--cell-bg);
-            font-weight: 600;
-            position: relative;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid #333;
         }
-
-        .square-cell.highlight {
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
             background: rgba(106, 255, 0, 0.1);
-            box-shadow: inset 0 0 0 1px var(--accent);
+            border-left: 3px solid var(--accent);
         }
-
-        .square-header {
-            background: var(--header);
-            color: white;
-            font-weight: 600;
+        .error {
+            background: rgba(255, 94, 94, 0.1);
+            border-left: 3px solid var(--error);
         }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--cell-border);
-            margin-bottom: 1.5rem;
-        }
-
-        .tab {
-            padding: 0.75rem 1.5rem;
-            background: none;
-            border: none;
-            color: var(--text);
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 500;
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        .tab:hover {
-            color: var(--accent);
-        }
-
-        .tab.active {
-            border-bottom-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 5px solid var(--accent);
-        }
-
-        /* Animation */
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        .processing {
-            animation: pulse 1.5s infinite;
-            color: var(--accent);
-        }
-
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            margin-left: 0.5rem;
-        }
-
-        .tooltip-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            background: var(--header);
-            color: white;
-            border-radius: 50%;
-            font-size: 0.7rem;
-            cursor: help;
-        }
-
-        .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: var(--terminal);
-            color: var(--text);
-            text-align: center;
-            border-radius: 6px;
-            padding: 0.5rem;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            border: 1px solid var(--cell-border);
-            font-size: 0.8rem;
-            font-weight: normal;
-            text-transform: none;
-            letter-spacing: normal;
-        }
-
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .grid {
                 grid-template-columns: 1fr;
             }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .tabs {
-                overflow-x: auto;
-                padding-bottom: 5px;
-            }
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--terminal);
-            color: var(--text);
-            padding: 1rem;
-            border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border-left: 4px solid var(--accent);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease-out;
-            z-index: 1000;
-            max-width: 300px;
-        }
-
-        .notification.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .notification.success {
-            border-left-color: var(--success);
-        }
-
-        .notification.error {
-            border-left-color: var(--warning);
-        }
-
-        .notification.info {
-            border-left-color: var(--info);
-        }
-
-        /* Loading spinner */
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--text);
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="status-bar" id="status">SYSTEM READY</div>
-            <h1>BIFID CIPHER 2050</h1>
-            <p class="subtitle">Quantum-Resistant Cryptographic Tool | Terminal Mode Active</p>
-        </header>
-
-        <div class="tabs">
-            <button class="tab active" onclick="openTab(event, 'encrypt')">
-                <i class="fas fa-lock"></i> ENCRYPT
-            </button>
-            <button class="tab" onclick="openTab(event, 'decrypt')">
-                <i class="fas fa-lock-open"></i> DECRYPT
-            </button>
-            <button class="tab" onclick="openTab(event, 'settings')">
-                <i class="fas fa-cog"></i> CONFIG
-            </button>
-            <button class="tab" onclick="openTab(event, 'help')">
-                <i class="fas fa-question-circle"></i> HELP
-            </button>
-        </div>
-
-        <div id="encrypt" class="tab-content active">
-            <div class="card">
-                <h2 class="card-title">ENCRYPTION MODE</h2>
-                <div class="form-group">
-                    <label for="plaintext">
-                        PLAINTEXT (A-Z, 0-9)
-                        <span class="tooltip">
-                            <span class="tooltip-icon">i</span>
-                            <span class="tooltip-text">Enter text to encrypt. Only letters A-Z and numbers 0-9 are processed. Other characters will be removed.</span>
-                        </span>
-                    </label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt..." spellcheck="false">ATTACKATDAWN</textarea>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="encrypt()">
-                        <i class="fas fa-key"></i> ENCRYPT
-                    </button>
-                    <button class="btn btn-info" onclick="demoEncrypt()">
-                        <i class="fas fa-magic"></i> DEMO
-                    </button>
-                    <button class="btn btn-danger" onclick="clearOutput('encrypt')">
-                        <i class="fas fa-trash"></i> CLEAR
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <div class="output">
-                        <span class="output-label">CIPHERTEXT OUTPUT</span>
-                        <div id="encrypt-output"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>ENCRYPTION PROCESS</label>
-                    <div class="output">
-                        <div id="encrypt-process"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="decrypt" class="tab-content">
-            <div class="card">
-                <h2 class="card-title">DECRYPTION MODE</h2>
-                <div class="form-group">
-                    <label for="ciphertext">
-                        CIPHERTEXT (DIGIT GROUPS)
-                        <span class="tooltip">
-                            <span class="tooltip-icon">i</span>
-                            <span class="tooltip-text">Enter ciphertext to decrypt. Only digit groups (like '12 34 56') are accepted. Spaces are optional.</span>
-                        </span>
-                    </label>
-                    <textarea id="ciphertext" placeholder="Enter ciphertext to decrypt..." spellcheck="false"></textarea>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="decrypt()">
-                        <i class="fas fa-key"></i> DECRYPT
-                    </button>
-                    <button class="btn btn-info" onclick="demoDecrypt()">
-                        <i class="fas fa-magic"></i> DEMO
-                    </button>
-                    <button class="btn btn-danger" onclick="clearOutput('decrypt')">
-                        <i class="fas fa-trash"></i> CLEAR
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <div class="output">
-                        <span class="output-label">PLAINTEXT OUTPUT</span>
-                        <div id="decrypt-output"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>DECRYPTION PROCESS</label>
-                    <div class="output">
-                        <div id="decrypt-process"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="settings" class="tab-content">
-            <div class="card">
-                <h2 class="card-title">CONFIGURATION</h2>
-                
-                <div class="form-group">
-                    <label for="period">
-                        PERIOD (GROUP SIZE)
-                        <span class="tooltip">
-                            <span class="tooltip-icon">i</span>
-                            <span class="tooltip-text">Determines how many characters are grouped together during encryption. Set to 0 for no grouping.</span>
-                        </span>
-                    </label>
-                    <input type="number" id="period" min="0" max="20" value="5">
-                </div>
-                
-                <div class="grid">
-                    <div>
-                        <h3 class="card-title">KEY 1 PARAMETERS</h3>
-                        <div class="form-group">
-                            <label for="key1">
-                                KEY 1 (MIN 6 CHARS)
-                                <span class="tooltip">
-                                    <span class="tooltip-icon">i</span>
-                                    <span class="tooltip-text">First encryption key used to generate Polybius Square 1. Minimum 6 characters.</span>
-                                </span>
-                            </label>
-                            <input type="text" id="key1" value="BIFID2050" spellcheck="false">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="fill1">
-                                FILL METHOD
-                                <span class="tooltip">
-                                    <span class="tooltip-icon">i</span>
-                                    <span class="tooltip-text">Determines how the square is filled with characters after the key is placed.</span>
-                                </span>
-                            </label>
-                            <select id="fill1">
-                                <option value="row">ROW-WISE</option>
-                                <option value="column">COLUMN-WISE</option>
-                                <option value="spiral">SPIRAL</option>
-                                <option value="random">RANDOM</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>
-                                POLYBIUS SQUARE 1
-                                <span class="tooltip">
-                                    <span class="tooltip-icon">i</span>
-                                    <span class="tooltip-text">6x6 grid mapping characters to row/column coordinates for encryption.</span>
-                                </span>
-                            </label>
-                            <div class="square-container">
-                                <div id="square1" class="square"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h3 class="card-title">KEY 2 PARAMETERS</h3>
-                        <div class="form-group">
-                            <label for="key2">
-                                KEY 2 (MIN 6 CHARS)
-                                <span class="tooltip">
-                                    <span class="tooltip-icon">i</span>
-                                    <span class="tooltip-text">Second encryption key used to generate Polybius Square 2. Minimum 6 characters.</span>
-                                </span>
-                            </label>
-                            <input type="text" id="key2" value="QUANTUM" spellcheck="false">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="fill2">
-                                FILL METHOD
-                                <span class="tooltip">
-                                    <span class="tooltip-icon">i</span>
-                                    <span class="tooltip-text">Determines how the square is filled with characters after the key is placed.</span>
-                                </span>
-                            </label>
-                            <select id="fill2">
-                                <option value="row">ROW-WISE</option>
-                                <option value="column">COLUMN-WISE</option>
-                                <option value="spiral">SPIRAL</option>
-                                <option value="random">RANDOM</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>
-                                POLYBIUS SQUARE 2
-                                <span class="tooltip">
-                                    <span class="tooltip-icon">i</span>
-                                    <span class="tooltip-text">6x6 grid mapping characters to row/column coordinates for encryption.</span>
-                                </span>
-                            </label>
-                            <div class="square-container">
-                                <div id="square2" class="square"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <h3 class="card-title">TRANSFORMATION ALGORITHM</h3>
-                    <div class="algorithm-options">
-                        <label>
-                            <input type="radio" name="algorithm" value="standard" checked> 
-                            STANDARD BIFID
-                            <span class="tooltip">
-                                <span class="tooltip-icon">i</span>
-                                <span class="tooltip-text">Classic Bifid cipher algorithm with row/column transformation.</span>
-                            </span>
-                        </label>
-                        <label>
-                            <input type="radio" name="algorithm" value="extended"> 
-                            EXTENDED TRANSFORM
-                            <span class="tooltip">
-                                <span class="tooltip-icon">i</span>
-                                <span class="tooltip-text">Enhanced algorithm with additional transformation steps for increased security.</span>
-                            </span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="generateSquares()">
-                        <i class="fas fa-sync-alt"></i> GENERATE SQUARES
-                    </button>
-                    <button class="btn btn-info" onclick="randomizeKeys()">
-                        <i class="fas fa-random"></i> RANDOMIZE KEYS
-                    </button>
-                    <button class="btn btn-danger" onclick="resetSettings()">
-                        <i class="fas fa-undo"></i> FACTORY RESET
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="help" class="tab-content">
-            <div class="card">
-                <h2 class="card-title">HELP & DOCUMENTATION</h2>
-                
-                <div class="form-group">
-                    <h3>About Bifid Cipher 2050</h3>
-                    <p>The Bifid cipher is a classical cipher that combines the Polybius square with fractionation to provide stronger encryption than simpler substitution ciphers. This enhanced version includes:</p>
-                    <ul>
-                        <li>Dual Polybius squares for increased complexity</li>
-                        <li>Multiple fill methods for square generation</li>
-                        <li>Extended transformation algorithm option</li>
-                        <li>Period-based digit grouping</li>
-                        <li>Support for alphanumeric characters (A-Z, 0-9)</li>
-                    </ul>
-                </div>
-                
-                <div class="grid">
-                    <div>
-                        <h3>Encryption Process</h3>
-                        <ol>
-                            <li>Enter plaintext in the Encrypt tab</li>
-                            <li>Configure your squares in the Config tab</li>
-                            <li>Click Encrypt to generate ciphertext</li>
-                            <li>The process shows step-by-step transformation</li>
-                        </ol>
-                    </div>
-                    
-                    <div>
-                        <h3>Decryption Process</h3>
-                        <ol>
-                            <li>Enter ciphertext (digit groups) in the Decrypt tab</li>
-                            <li>Ensure your squares match the encryption setup</li>
-                            <li>Click Decrypt to recover the original message</li>
-                            <li>The process shows step-by-step transformation</li>
-                        </ol>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <h3>Security Notes</h3>
-                    <p>While stronger than basic ciphers, the Bifid cipher should not be considered secure against modern cryptanalysis. This implementation is for educational purposes only.</p>
-                    <p>For real security, use modern algorithms like AES (256-bit) with proper key management.</p>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="openTab(null, 'encrypt')">
-                        <i class="fas fa-lock"></i> TRY ENCRYPTION
-                    </button>
-                    <button class="btn btn-primary" onclick="openTab(null, 'decrypt')">
-                        <i class="fas fa-lock-open"></i> TRY DECRYPTION
-                    </button>
-                </div>
-            </div>
-        </div>
+    <div class="card">
+        <h1>Bifid-X RealApp</h1>
+        <p>Усиленный криптостойкий шифратор с динамическим кодированием</p>
     </div>
 
-    <div id="notification" class="notification"></div>
+    <div class="card">
+        <h2>🔑 Ключи</h2>
+        <div class="grid">
+            <div>
+                <h3>Ключ 1</h3>
+                <input id="key1" value="SECRETKEY1" placeholder="Минимум 6 символов">
+                <div id="square1" class="square"></div>
+            </div>
+            <div>
+                <h3>Ключ 2</h3>
+                <input id="key2" value="SECRETKEY2" placeholder="Минимум 6 символов">
+                <div id="square2" class="square"></div>
+            </div>
+        </div>
+        <button onclick="generateSquares()">🔄 Сгенерировать квадраты</button>
+    </div>
+
+    <div class="card">
+        <h2>🔒 Шифрование</h2>
+        <textarea id="plaintext" rows="4" placeholder="Введите текст...">ATTACKATDAWN</textarea>
+        <button onclick="encrypt()">🔐 Зашифровать</button>
+        <div id="encrypt-alert" class="alert" style="display:none;"></div>
+        <h3>Результат:</h3>
+        <textarea id="ciphertext" rows="4" readonly></textarea>
+    </div>
+
+    <div class="card">
+        <h2>🔓 Дешифрование</h2>
+        <textarea id="encryptedText" rows="4" placeholder="Введите цифры..."></textarea>
+        <button onclick="decrypt()">🔓 Расшифровать</button>
+        <div id="decrypt-alert" class="alert" style="display:none;"></div>
+        <h3>Результат:</h3>
+        <textarea id="decryptedText" rows="4" readonly></textarea>
+    </div>
 
     <script>
-        // Constants
+        // Константы
         const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        const SQUARE_SIZE = 6;
-        
-        // Notification system
-        function showNotification(message, type = 'info', duration = 3000) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification show ${type}`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, duration);
-        }
-        
-        // Set status message
-        function setStatus(message, isError = false) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.style.color = isError ? 'var(--warning)' : 'var(--success)';
-        }
-        
-        // Cipher Core
-        const cipher = {
-            square1: [],
-            square2: [],
-            period: 5,
-            algorithm: 'standard',
-            lastOperation: null,
-            
-            init() {
-                this.square1 = this.createSquare("BIFID2050", "row");
-                this.square2 = this.createSquare("QUANTUM", "row");
-                this.displaySquares();
-                setStatus('SYSTEM READY');
-            },
-            
-            createSquare(key, fillMethod) {
-                const cleanKey = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                
-                if (cleanKey.length < 6) {
-                    showNotification('Key must be at least 6 characters', 'error');
-                    throw new Error("Key must be at least 6 characters");
-                }
-                
-                const uniqueKey = [...new Set(cleanKey)].join('');
-                const remainingChars = CHARSET.split('').filter(c => !uniqueKey.includes(c)).join('');
-                const allChars = uniqueKey + remainingChars;
-                
-                const square = Array(SQUARE_SIZE).fill().map(() => Array(SQUARE_SIZE).fill(''));
-                
-                switch(fillMethod) {
-                    case 'column': this.fillColumnWise(square, allChars); break;
-                    case 'spiral': this.fillSpiral(square, allChars); break;
-                    case 'random': this.fillRandom(square, allChars); break;
-                    default: this.fillRowWise(square, allChars);
-                }
-                
-                return square;
-            },
-            
-            fillRowWise(square, chars) {
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    for (let col = 0; col < SQUARE_SIZE; col++) {
-                        square[row][col] = chars[row * SQUARE_SIZE + col];
-                    }
-                }
-            },
-            
-            fillColumnWise(square, chars) {
-                for (let col = 0; col < SQUARE_SIZE; col++) {
-                    for (let row = 0; row < SQUARE_SIZE; row++) {
-                        square[row][col] = chars[col * SQUARE_SIZE + row];
-                    }
-                }
-            },
-            
-            fillSpiral(square, chars) {
-                let directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-                let currentDir = 0;
-                let row = 0, col = 0;
-                let visited = new Set();
-                
-                for (let i = 0; i < SQUARE_SIZE * SQUARE_SIZE; i++) {
-                    square[row][col] = chars[i];
-                    visited.add(`${row},${col}`);
-                    
-                    let nextRow = row + directions[currentDir][0];
-                    let nextCol = col + directions[currentDir][1];
-                    
-                    if (nextRow < 0 || nextRow >= SQUARE_SIZE || 
-                        nextCol < 0 || nextCol >= SQUARE_SIZE || 
-                        visited.has(`${nextRow},${nextCol}`)) {
-                        currentDir = (currentDir + 1) % 4;
-                        nextRow = row + directions[currentDir][0];
-                        nextCol = col + directions[currentDir][1];
-                    }
-                    
-                    row = nextRow;
-                    col = nextCol;
-                }
-            },
-            
-            fillRandom(square, chars) {
-                // Fisher-Yates shuffle
-                const shuffled = [...chars].sort(() => Math.random() - 0.5);
-                
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    for (let col = 0; col < SQUARE_SIZE; col++) {
-                        square[row][col] = shuffled[row * SQUARE_SIZE + col];
-                    }
-                }
-            },
-            
-            findCoordinates(char, square) {
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    for (let col = 0; col < SQUARE_SIZE; col++) {
-                        if (square[row][col] === char) {
-                            return { row: row + 1, col: col + 1 };
-                        }
-                    }
-                }
-                return null;
-            },
-            
-            encrypt(plaintext) {
-                this.lastOperation = 'encrypt';
-                const cleanText = plaintext.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (!cleanText) {
-                    showNotification('No valid characters to encrypt', 'error');
-                    throw new Error("No valid characters to encrypt");
-                }
-                
-                // Highlight squares for each character
-                this.highlightSquares(cleanText);
-                
-                const coords = [];
-                let processText = "CHARACTER COORDINATES:\n";
-                
-                for (const char of cleanText) {
-                    const coord1 = this.findCoordinates(char, this.square1);
-                    const coord2 = this.findCoordinates(char, this.square2);
-                    
-                    if (!coord1 || !coord2) {
-                        showNotification(`Character '${char}' not found in squares`, 'error');
-                        throw new Error(`Character '${char}' not found in squares`);
-                    }
-                    
-                    coords.push({ coord1, coord2 });
-                    processText += `${char}: Square1 (${coord1.row},${coord1.col}), Square2 (${coord2.row},${coord2.col})\n`;
-                }
-                
-                document.getElementById('encrypt-process').textContent = processText;
-                
-                if (this.algorithm === 'extended') {
-                    return this.extendedTransform(coords, cleanText);
-                }
-                return this.standardTransform(coords, cleanText);
-            },
-            
-            highlightSquares(text) {
-                // Clear previous highlights
-                document.querySelectorAll('.square-cell').forEach(cell => {
-                    cell.classList.remove('highlight');
-                });
-                
-                // Highlight each character in both squares
-                const chars = [...new Set(text.toUpperCase().replace(/[^A-Z0-9]/g, ''))];
-                
-                chars.forEach(char => {
-                    // Highlight in square1
-                    for (let row = 0; row < SQUARE_SIZE; row++) {
-                        for (let col = 0; col < SQUARE_SIZE; col++) {
-                            if (this.square1[row][col] === char) {
-                                const cell = document.querySelector(`#square1 .square-cell:nth-child(${col + 2})`, 
-                                    `.square-cell:nth-child(${row * (SQUARE_SIZE + 1) + col + 2})`);
-                                if (cell) cell.classList.add('highlight');
-                            }
-                        }
-                    }
-                    
-                    // Highlight in square2
-                    for (let row = 0; row < SQUARE_SIZE; row++) {
-                        for (let col = 0; col < SQUARE_SIZE; col++) {
-                            if (this.square2[row][col] === char) {
-                                const cell = document.querySelector(`#square2 .square-cell:nth-child(${col + 2})`, 
-                                    `.square-cell:nth-child(${row * (SQUARE_SIZE + 1) + col + 2})`);
-                                if (cell) cell.classList.add('highlight');
-                            }
-                        }
-                    }
-                });
-            },
-            
-            standardTransform(coords, originalText) {
-                let rows = [], cols = [];
-                let processText = document.getElementById('encrypt-process').textContent;
-                processText += "\nCOORDINATE STREAMS:\n";
-                
-                for (const { coord1, coord2 } of coords) {
-                    rows.push(coord1.row, coord2.row);
-                    cols.push(coord1.col, coord2.col);
-                }
-                
-                processText += `Rows: ${rows.join(' ')}\nCols: ${cols.join(' ')}\n`;
-                
-                if (this.period > 0) {
-                    const originalRows = [...rows];
-                    const originalCols = [...cols];
-                    
-                    rows = this.applyPeriod(rows, this.period);
-                    cols = this.applyPeriod(cols, this.period);
-                    
-                    processText += `\nAFTER PERIOD (${this.period}) APPLICATION:\n`;
-                    processText += `Rows: ${rows.join(' ')}\nCols: ${cols.join(' ')}\n`;
-                }
-                
-                const merged = [];
-                for (let i = 0; i < rows.length; i++) {
-                    merged.push(rows[i], cols[i]);
-                }
-                
-                processText += `\nMERGED DIGITS: ${merged.join(' ')}\n`;
-                document.getElementById('encrypt-process').textContent = processText;
-                
-                return this.groupDigits(merged);
-            },
-            
-            extendedTransform(coords, originalText) {
-                const digitStream = [];
-                let processText = document.getElementById('encrypt-process').textContent;
-                processText += "\nEXTENDED TRANSFORMATION:\n";
-                
-                for (const { coord1, coord2 } of coords) {
-                    digitStream.push(
-                        coord1.row, coord2.row,
-                        coord1.col, coord2.col
-                    );
-                }
-                
-                processText += `Digit Stream: ${digitStream.join(' ')}\n`;
-                
-                if (this.period > 0) {
-                    processText += `\nAFTER PERIOD (${this.period}) APPLICATION:\n`;
-                    const grouped = this.applyPeriod(digitStream, this.period * 2);
-                    processText += `Grouped: ${grouped.join(' ')}\n`;
-                    document.getElementById('encrypt-process').textContent = processText;
-                    return this.groupDigits(grouped);
-                }
-                
-                document.getElementById('encrypt-process').textContent = processText;
-                return this.groupDigits(digitStream);
-            },
-            
-            applyPeriod(digits, period) {
-                if (period <= 0) return digits;
-                
-                const result = [];
-                for (let i = 0; i < digits.length; i += period) {
-                    const block = digits.slice(i, i + period);
-                    result.push(...block);
-                }
-                return result;
-            },
-            
-            groupDigits(digits) {
-                const groups = [];
-                let currentGroup = '';
-                
-                for (let i = 0; i < digits.length; i++) {
-                    currentGroup += digits[i];
-                    
-                    if (currentGroup.length === this.period || i === digits.length - 1) {
-                        groups.push(currentGroup);
-                        currentGroup = '';
-                    }
-                }
-                
-                return groups.join(' ');
-            },
-            
-            decrypt(ciphertext) {
-                this.lastOperation = 'decrypt';
-                const cleanText = ciphertext.replace(/\s/g, '');
-                
-                if (!cleanText || !/^\d+$/.test(cleanText)) {
-                    showNotification("Invalid ciphertext - numbers only", 'error');
-                    throw new Error("Invalid ciphertext - numbers only");
-                }
-                
-                const digits = Array.from(cleanText).map(Number);
-                let processText = "DIGIT STREAM:\n" + digits.join(' ') + "\n";
-                
-                const coords = this.reverseTransformation(digits, processText);
-                
-                let plaintext = '';
-                for (const coord of coords) {
-                    const char1 = this.square1[coord.row1 - 1][coord.col1 - 1];
-                    const char2 = this.square2[coord.row2 - 1][coord.col2 - 1];
-                    
-                    // For decryption, we can only use one character - standard bifid uses same char in both squares
-                    plaintext += char1 || char2 || '�';
-                    
-                    processText += `Coordinates (${coord.row1},${coord.col1}) & (${coord.row2},${coord.col2}) -> ${char1}\n`;
-                }
-                
-                document.getElementById('decrypt-process').textContent = processText;
-                return plaintext;
-            },
-            
-            reverseTransformation(digits, processText) {
-                if (this.algorithm === 'extended') {
-                    return this.reverseExtendedTransform(digits, processText);
-                }
-                return this.reverseStandardTransform(digits, processText);
-            },
-            
-            reverseStandardTransform(digits, processText) {
-                // Need even number of digits
-                if (digits.length % 2 !== 0) {
-                    showNotification("Ciphertext must have even number of digits", 'error');
-                    throw new Error("Ciphertext must have even number of digits");
-                }
-                
-                const mid = digits.length / 2;
-                const rowDigits = digits.slice(0, mid);
-                const colDigits = digits.slice(mid);
-                
-                processText += `\nSPLIT DIGITS:\nRows: ${rowDigits.join(' ')}\nCols: ${colDigits.join(' ')}\n`;
-                
-                const coords = [];
-                for (let i = 0; i < rowDigits.length; i++) {
-                    coords.push({
-                        row1: rowDigits[i],
-                        col1: colDigits[i],
-                        row2: rowDigits[i], // In standard bifid, same coords for both squares
-                        col2: colDigits[i]
-                    });
-                }
-                
-                return coords;
-            },
-            
-            reverseExtendedTransform(digits, processText) {
-                if (digits.length % 4 !== 0) {
-                    showNotification("Extended ciphertext length must be multiple of 4", 'error');
-                    throw new Error("Extended ciphertext length must be multiple of 4");
-                }
-                
-                const coords = [];
-                for (let i = 0; i < digits.length; i += 4) {
-                    if (i + 3 >= digits.length) break;
-                    coords.push({
-                        row1: digits[i],
-                        col1: digits[i+2],
-                        row2: digits[i+1],
-                        col2: digits[i+3]
-                    });
-                    
-                    processText += `Group ${i/4 + 1}: ${digits[i]}${digits[i+1]}${digits[i+2]}${digits[i+3]} -> ` +
-                                  `(${digits[i]},${digits[i+2]}) & (${digits[i+1]},${digits[i+3]})\n`;
-                }
-                
-                return coords;
-            },
-            
-            displaySquares() {
-                this.displaySquare(this.square1, 'square1');
-                this.displaySquare(this.square2, 'square2');
-            },
-            
-            displaySquare(square, elementId) {
-                const container = document.getElementById(elementId);
-                container.innerHTML = '';
-                
-                // Add headers
-                const headerRow = document.createElement('div');
-                headerRow.style.display = 'contents';
-                container.appendChild(headerRow);
-                
-                const corner = document.createElement('div');
-                corner.className = 'square-cell square-header';
-                corner.textContent = '';
-                headerRow.appendChild(corner);
-                
-                for (let col = 0; col < SQUARE_SIZE; col++) {
-                    const th = document.createElement('div');
-                    th.className = 'square-cell square-header';
-                    th.textContent = col + 1;
-                    headerRow.appendChild(th);
-                }
-                
-                // Add rows
-                for (let row = 0; row < SQUARE_SIZE; row++) {
-                    const rowDiv = document.createElement('div');
-                    rowDiv.style.display = 'contents';
-                    container.appendChild(rowDiv);
-                    
-                    const rowHeader = document.createElement('div');
-                    rowHeader.className = 'square-cell square-header';
-                    rowHeader.textContent = row + 1;
-                    rowDiv.appendChild(rowHeader);
-                    
-                    for (let col = 0; col < SQUARE_SIZE; col++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'square-cell';
-                        cell.textContent = square[row][col];
-                        cell.dataset.row = row + 1;
-                        cell.dataset.col = col + 1;
-                        cell.dataset.char = square[row][col];
-                        rowDiv.appendChild(cell);
-                    }
-                }
-            },
-            
-            updateSettings() {
-                this.period = parseInt(document.getElementById('period').value) || 5;
-                this.algorithm = document.querySelector('input[name="algorithm"]:checked').value;
-                return true;
-            }
-        };
+        const SIZE = 6;
+        let square1 = [];
+        let square2 = [];
 
-        // UI Functions
-        function openTab(event, tabName) {
-            if (event) event.preventDefault();
+        // Показать уведомление
+        function showAlert(elementId, message, isError = false) {
+            const alert = document.getElementById(elementId);
+            alert.textContent = message;
+            alert.className = `alert ${isError ? 'error' : 'success'}`;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 3000);
+        }
+
+        // Генерация квадрата с криптостойким заполнением
+        function createSquare(key) {
+            const cleanKey = [...new Set(key.toUpperCase().replace(/[^A-Z0-9]/g, ''))];
             
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
-            
-            document.getElementById(tabName).classList.add('active');
-            
-            if (event) {
-                event.currentTarget.classList.add('active');
-            } else {
-                // Find the button for this tab and activate it
-                document.querySelectorAll('.tab').forEach(button => {
-                    if (button.textContent.includes(tabName.toUpperCase())) {
-                        button.classList.add('active');
-                    }
-                });
+            if (cleanKey.length < 6) {
+                showAlert('encrypt-alert', 'Ключ должен содержать минимум 6 уникальных символов', true);
+                throw new Error("Слишком короткий ключ");
             }
             
-            // If going to encrypt/decrypt, highlight squares from last operation
-            if (tabName === 'encrypt' && cipher.lastOperation === 'encrypt') {
-                const plaintext = document.getElementById('plaintext').value;
-                cipher.highlightSquares(plaintext);
-            } else if (tabName === 'decrypt' && cipher.lastOperation === 'decrypt') {
-                const ciphertext = document.getElementById('ciphertext').value;
-                // For decryption, we can't highlight specific chars, but can show the squares
+            const remaining = CHARSET.split('').filter(c => !cleanKey.includes(c));
+            
+            // Криптостойкое перемешивание
+            const shuffled = [...remaining];
+            const randomValues = new Uint32Array(shuffled.length);
+            crypto.getRandomValues(randomValues);
+            
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = randomValues[i] % (i + 1);
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            
+            const fullChars = [...cleanKey, ...shuffled];
+            const square = [];
+            
+            for (let i = 0; i < SIZE; i++) {
+                square.push(fullChars.slice(i * SIZE, (i + 1) * SIZE));
+            }
+            
+            return square;
+        }
+
+        // Отображение квадрата
+        function displaySquare(square, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            
+            for (let row = 0; row < SIZE; row++) {
+                for (let col = 0; col < SIZE; col++) {
+                    const cell = document.createElement('div');
+                    cell.textContent = square[row][col];
+                    container.appendChild(cell);
+                }
             }
         }
 
+        // Генерация квадратов
         function generateSquares() {
             try {
                 const key1 = document.getElementById('key1').value;
                 const key2 = document.getElementById('key2').value;
-                const fill1 = document.getElementById('fill1').value;
-                const fill2 = document.getElementById('fill2').value;
                 
-                cipher.square1 = cipher.createSquare(key1, fill1);
-                cipher.square2 = cipher.createSquare(key2, fill2);
-                cipher.updateSettings();
-                cipher.displaySquares();
+                square1 = createSquare(key1);
+                square2 = createSquare(key2);
                 
-                showNotification('Polybius squares generated successfully', 'success');
-                setStatus('SQUARES GENERATED');
-            } catch (error) {
-                showNotification(error.message, 'error');
-                setStatus('ERROR: ' + error.message, true);
+                displaySquare(square1, 'square1');
+                displaySquare(square2, 'square2');
+                
+                showAlert('encrypt-alert', 'Квадраты успешно сгенерированы!');
+            } catch (e) {
+                console.error(e);
             }
         }
 
+        // Динамическое кодирование символа
+        function encodeChar(char, square, position) {
+            for (let row = 0; row < SIZE; row++) {
+                for (let col = 0; col < SIZE; col++) {
+                    if (square[row][col] === char) {
+                        // Динамическое смещение на основе позиции
+                        const dynamicRow = (row + 1 + position) % SIZE;
+                        const dynamicCol = (col + 1 + position) % SIZE;
+                        return `${dynamicRow + 1}${dynamicCol + 1}`;
+                    }
+                }
+            }
+            return '';
+        }
+
+        // Шифрование
         function encrypt() {
             try {
-                setStatus('ENCRYPTING...');
-                document.getElementById('encrypt-output').innerHTML = '<span class="processing"><span class="spinner"></span> Processing...</span>';
+                if (square1.length === 0 || square2.length === 0) {
+                    showAlert('encrypt-alert', 'Сначала сгенерируйте квадраты!', true);
+                    return;
+                }
                 
-                // Small delay to allow UI to update
-                setTimeout(() => {
-                    try {
-                        const plaintext = document.getElementById('plaintext').value;
-                        const ciphertext = cipher.encrypt(plaintext);
-                        document.getElementById('encrypt-output').textContent = ciphertext;
-                        setStatus('ENCRYPTION COMPLETE');
-                        showNotification('Message encrypted successfully', 'success');
-                    } catch (error) {
-                        document.getElementById('encrypt-output').textContent = `ERROR: ${error.message}`;
-                        setStatus('ENCRYPTION FAILED', true);
-                    }
-                }, 50);
-            } catch (error) {
-                document.getElementById('encrypt-output').textContent = `ERROR: ${error.message}`;
-                setStatus('ENCRYPTION FAILED', true);
+                const plaintext = document.getElementById('plaintext').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                
+                if (!plaintext) {
+                    showAlert('encrypt-alert', 'Введите текст для шифрования', true);
+                    return;
+                }
+                
+                let cipherDigits = '';
+                
+                for (let i = 0; i < plaintext.length; i++) {
+                    const char = plaintext[i];
+                    const pos = i + 1;
+                    
+                    const digits1 = encodeChar(char, square1, pos);
+                    const digits2 = encodeChar(char, square2, pos);
+                    
+                    // XOR преобразование
+                    const xorDigit = (parseInt(digits1) ^ parseInt(digits2)).toString().padStart(2, '0');
+                    cipherDigits += xorDigit;
+                }
+                
+                // Группировка по 4 цифры для удобства
+                document.getElementById('ciphertext').value = cipherDigits.match(/.{1,4}/g).join(' ');
+                showAlert('encrypt-alert', 'Текст успешно зашифрован!');
+            } catch (e) {
+                showAlert('encrypt-alert', 'Ошибка при шифровании: ' + e.message, true);
             }
         }
 
+        // Дешифрование
         function decrypt() {
             try {
-                setStatus('DECRYPTING...');
-                document.getElementById('decrypt-output').innerHTML = '<span class="processing"><span class="spinner"></span> Processing...</span>';
+                if (square1.length === 0 || square2.length === 0) {
+                    showAlert('decrypt-alert', 'Сначала сгенерируйте квадраты!', true);
+                    return;
+                }
                 
-                // Small delay to allow UI to update
-                setTimeout(() => {
-                    try {
-                        const ciphertext = document.getElementById('ciphertext').value;
-                        const plaintext = cipher.decrypt(ciphertext);
-                        document.getElementById('decrypt-output').textContent = plaintext;
-                        setStatus('DECRYPTION COMPLETE');
-                        showNotification('Message decrypted successfully', 'success');
-                    } catch (error) {
-                        document.getElementById('decrypt-output').textContent = `ERROR: ${error.message}`;
-                        setStatus('DECRYPTION FAILED', true);
+                const ciphertext = document.getElementById('encryptedText').value.replace(/\s/g, '');
+                
+                if (!ciphertext || !/^\d+$/.test(ciphertext)) {
+                    showAlert('decrypt-alert', 'Введите цифры для расшифровки', true);
+                    return;
+                }
+                
+                let plaintext = '';
+                
+                // Обработка по 2 цифры (так как каждая буква кодируется 2 цифрами)
+                for (let i = 0; i < ciphertext.length; i += 2) {
+                    const digits = ciphertext.substr(i, 2);
+                    if (digits.length < 2) break;
+                    
+                    // Обратный XOR
+                    const xorValue = parseInt(digits);
+                    const pos = (i / 2) + 1;
+                    
+                    // Находим возможные варианты
+                    let foundChar = null;
+                    
+                    for (let row1 = 0; row1 < SIZE && !foundChar; row1++) {
+                        for (let col1 = 0; col1 < SIZE && !foundChar; col1++) {
+                            const dynamicRow1 = (row1 + 1 + pos) % SIZE;
+                            const dynamicCol1 = (col1 + 1 + pos) % SIZE;
+                            const code1 = `${dynamicRow1 + 1}${dynamicCol1 + 1}`;
+                            
+                            for (let row2 = 0; row2 < SIZE && !foundChar; row2++) {
+                                for (let col2 = 0; col2 < SIZE && !foundChar; col2++) {
+                                    const dynamicRow2 = (row2 + 1 + pos) % SIZE;
+                                    const dynamicCol2 = (col2 + 1 + pos) % SIZE;
+                                    const code2 = `${dynamicRow2 + 1}${dynamicCol2 + 1}`;
+                                    
+                                    if ((parseInt(code1) ^ parseInt(code2)) === xorValue) {
+                                        // Проверяем, что символ одинаков в обоих квадратах
+                                        if (square1[row1][col1] === square2[row2][col2]) {
+                                            foundChar = square1[row1][col1];
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                }, 50);
-            } catch (error) {
-                document.getElementById('decrypt-output').textContent = `ERROR: ${error.message}`;
-                setStatus('DECRYPTION FAILED', true);
-            }
-        }
-
-        function clearOutput(tab) {
-            if (tab === 'encrypt') {
-                document.getElementById('plaintext').value = '';
-                document.getElementById('encrypt-output').textContent = '';
-                document.getElementById('encrypt-process').textContent = '';
-            } else if (tab === 'decrypt') {
-                document.getElementById('ciphertext').value = '';
-                document.getElementById('decrypt-output').textContent = '';
-                document.getElementById('decrypt-process').textContent = '';
-            }
-            
-            // Clear highlights
-            document.querySelectorAll('.square-cell').forEach(cell => {
-                cell.classList.remove('highlight');
-            });
-            
-            showNotification('Output cleared', 'info');
-            setStatus('READY');
-        }
-
-        function resetSettings() {
-            document.getElementById('key1').value = 'BIFID2050';
-            document.getElementById('key2').value = 'QUANTUM';
-            document.getElementById('fill1').value = 'row';
-            document.getElementById('fill2').value = 'row';
-            document.getElementById('period').value = '5';
-            document.querySelector('input[name="algorithm"][value="standard"]').checked = true;
-            
-            cipher.init();
-            showNotification('Settings reset to defaults', 'success');
-            setStatus('DEFAULTS RESTORED');
-        }
-
-        function randomizeKeys() {
-            // Generate random keys
-            const randomKey1 = generateRandomKey();
-            const randomKey2 = generateRandomKey();
-            
-            document.getElementById('key1').value = randomKey1;
-            document.getElementById('key2').value = randomKey2;
-            document.getElementById('fill1').value = ['row', 'column', 'spiral', 'random'][Math.floor(Math.random() * 4)];
-            document.getElementById('fill2').value = ['row', 'column', 'spiral', 'random'][Math.floor(Math.random() * 4)];
-            document.getElementById('period').value = Math.floor(Math.random() * 10) + 1;
-            
-            generateSquares();
-            showNotification('Random keys generated', 'success');
-        }
-
-        function generateRandomKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            const length = Math.floor(Math.random() * 10) + 6; // 6-15 chars
-            let result = '';
-            
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            return result;
-        }
-
-        function demoEncrypt() {
-            document.getElementById('plaintext').value = 'SECRETMESSAGE123';
-            document.getElementById('key1').value = 'CRYPTO2023';
-            document.getElementById('key2').value = 'QUANTUMKEY';
-            document.getElementById('fill1').value = 'spiral';
-            document.getElementById('fill2').value = 'random';
-            document.getElementById('period').value = '4';
-            document.querySelector('input[name="algorithm"][value="extended"]').checked = true;
-            
-            generateSquares();
-            
-            // Small delay to allow squares to generate
-            setTimeout(() => {
-                encrypt();
-                showNotification('Demo encryption loaded', 'info');
-            }, 100);
-        }
-
-        function demoDecrypt() {
-            document.getElementById('ciphertext').value = '3233 2114 4133 2114 4133 2114 1112 1112 1112';
-            document.getElementById('key1').value = 'DEMOKEY1';
-            document.getElementById('key2').value = 'DEMOKEY2';
-            document.getElementById('fill1').value = 'row';
-            document.getElementById('fill2').value = 'column';
-            document.getElementById('period').value = '4';
-            document.querySelector('input[name="algorithm"][value="standard"]').checked = true;
-            
-            generateSquares();
-            
-            // Small delay to allow squares to generate
-            setTimeout(() => {
-                decrypt();
-                showNotification('Demo decryption loaded', 'info');
-            }, 100);
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            cipher.init();
-            
-            // Add event listeners for real-time validation
-            document.getElementById('key1').addEventListener('input', function() {
-                if (this.value.length < 6) {
-                    this.setCustomValidity('Key must be at least 6 characters');
-                } else {
-                    this.setCustomValidity('');
+                    
+                    plaintext += foundChar || '�';
                 }
-            });
-            
-            document.getElementById('key2').addEventListener('input', function() {
-                if (this.value.length < 6) {
-                    this.setCustomValidity('Key must be at least 6 characters');
-                } else {
-                    this.setCustomValidity('');
-                }
-            });
-            
-            // Generate squares when fill method changes
-            document.getElementById('fill1').addEventListener('change', generateSquares);
-            document.getElementById('fill2').addEventListener('change', generateSquares);
-            
-            // Load demo if no hash in URL
-            if (!window.location.hash) {
-                openTab(null, 'encrypt');
+                
+                document.getElementById('decryptedText').value = plaintext;
+                showAlert('decrypt-alert', 'Текст успешно расшифрован!');
+            } catch (e) {
+                showAlert('decrypt-alert', 'Ошибка при расшифровке: ' + e.message, true);
             }
-        });
+        }
+
+        // Инициализация при загрузке
+        window.onload = function() {
+            generateSquares();
+        };
     </script>
 </body>
 </html>
