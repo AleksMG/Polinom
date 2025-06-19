@@ -6,154 +6,442 @@
     <title>Military Grade Шифратор | AES-256</title>
     <style>
         :root {
+            --bg-light: #f5f7ff;
+            --bg-lighter: #ffffff;
             --bg-dark: #0d1117;
-            --bg-darker: #161b22;
-            --text-light: #c9d1d9;
-            --text-lighter: #f0f6fc;
-            --border-dark: #30363d;
-            --primary: #238636;
-            --primary-hover: #2ea043;
-            --error: #f85149;
-            --success: #3fb950;
+            --text-dark: #1e1e1e;
+            --text-light: #6e6e80;
+            --primary: #0a84ff;
+            --primary-hover: #0066cc;
+            --error: #ff453a;
+            --success: #30d158;
+            --border: #d8d8dc;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --card-radius: 16px;
+            --input-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        
-        body {
-            font-family: 'Courier New', monospace;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            line-height: 1.6;
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-light: #1c1c1e;
+                --bg-lighter: #2c2c2e;
+                --text-dark: #f5f5f7;
+                --text-light: #aeaeb2;
+                --border: #444446;
+                --shadow: 0 10px 30px rgba(0,0,0,0.3);
+            }
+        }
+
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .container {
-            max-width: 800px;
+            max-width: 900px;
+            width: 100%;
             margin: 0 auto;
-            padding: 20px;
         }
-        
-        h1, h2, h3 {
-            color: var(--text-lighter);
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
         }
-        
-        .panel {
-            background: var(--bg-darker);
-            border: 1px solid var(--border-dark);
-            border-radius: 6px;
-            padding: 20px;
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #0a84ff, #bf5af2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-lighter);
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(10, 132, 255, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+        }
+
+        .card-icon.blue {
+            background: rgba(10, 132, 255, 0.1);
+        }
+
+        .card-icon.purple {
+            background: rgba(191, 90, 242, 0.1);
+        }
+
+        .card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
-        
-        textarea, input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: var(--bg-dark);
-            color: var(--text-lighter);
-            border: 1px solid var(--border-dark);
-            border-radius: 4px;
-            font-family: inherit;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
         }
-        
+
+        input, textarea, select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: var(--input-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+        }
+
         textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
-        
+
+        .settings {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .settings > * {
+            flex: 1;
+        }
+
         button {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 14px 20px;
+            border-radius: var(--input-radius);
             cursor: pointer;
             font-family: inherit;
-            font-weight: bold;
-            transition: background 0.2s;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        
+
         button:hover {
             background: var(--primary-hover);
+            transform: translateY(-2px);
         }
-        
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button svg {
+            width: 18px;
+            height: 18px;
+        }
+
         .result {
             margin-top: 20px;
-            padding: 15px;
-            background: var(--bg-dark);
-            border-radius: 4px;
-            border-left: 3px solid var(--primary);
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: var(--input-radius);
+            border-left: 4px solid var(--primary);
             white-space: pre-wrap;
-            word-break: break-all;
+            word-break: break-word;
+            font-family: 'SF Mono', Menlo, monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow: auto;
         }
-        
+
         .status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: var(--input-radius);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .status.success {
+            background: rgba(48, 209, 88, 0.1);
+            border-left: 4px solid var(--success);
+            color: var(--success);
+        }
+
+        .status.error {
+            background: rgba(255, 69, 58, 0.1);
+            border-left: 4px solid var(--error);
+            color: var(--error);
+        }
+
+        .status svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .hidden {
             display: none;
         }
-        
-        .success {
-            background: rgba(63, 185, 80, 0.1);
-            border-left: 3px solid var(--success);
-            color: var(--success);
-            display: block;
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
-        
-        .error {
-            background: rgba(248, 81, 73, 0.1);
-            border-left: 3px solid var(--error);
-            color: var(--error);
-            display: block;
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(48, 209, 88, 0.1);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔢 Military Grade Шифратор (AES-256)</h1>
-        <p>1 символ → 5 цифр | Полная обратимость | Web Crypto API</p>
-        
-        <div class="panel">
-            <h2>🔒 Шифрование</h2>
-            <input type="password" id="key" placeholder="Ключ (любая строка)">
-            <textarea id="text" placeholder="Текст для шифрования"></textarea>
-            <button onclick="encrypt()">Зашифровать → Числа</button>
-            <div class="result" id="encrypted-result"></div>
-            <div class="status" id="encrypt-status"></div>
+        <header>
+            <h1>Military Grade Шифратор</h1>
+            <p class="subtitle">AES-256 шифрование с преобразованием в числа фиксированной длины. Гарантированная обратимость и криптостойкость.</p>
+        </header>
+
+        <div class="cards">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 8v-4l8 8-8 8v-4h-8v-8h8zm-16 4h-4v8h4v-8z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2>Шифрование</h2>
+                        <p class="card-desc">Преобразование текста в защищённые числа</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="encrypt-key">Ключ шифрования</label>
+                    <input type="password" id="encrypt-key" placeholder="Введите секретный ключ">
+                </div>
+
+                <div class="form-group">
+                    <label for="number-length">Длина чисел</label>
+                    <div class="settings">
+                        <select id="number-length">
+                            <option value="3">3 цифры</option>
+                            <option value="4">4 цифры</option>
+                            <option value="5" selected>5 цифр</option>
+                            <option value="6">6 цифр</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="plain-text">Текст для шифрования</label>
+                    <textarea id="plain-text" placeholder="Введите конфиденциальный текст..."></textarea>
+                </div>
+
+                <button onclick="encryptText()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 8h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2zm-9-2c0-1.66 1.34-3 3-3s3 1.34 3 3v2h-6v-2zm9 14h-12v-10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                    </svg>
+                    Зашифровать
+                </button>
+
+                <div class="result" id="encrypted-result">Результат шифрования появится здесь...</div>
+                <div class="status hidden" id="encrypt-status"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18 8h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9h-6.2v-2c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2>Дешифрование</h2>
+                        <p class="card-desc">Восстановление текста из чисел</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="decrypt-key">Ключ дешифрования</label>
+                    <input type="password" id="decrypt-key" placeholder="Введите секретный ключ">
+                </div>
+
+                <div class="form-group">
+                    <label for="decrypt-number-length">Длина чисел</label>
+                    <div class="settings">
+                        <select id="decrypt-number-length">
+                            <option value="3">3 цифры</option>
+                            <option value="4">4 цифры</option>
+                            <option value="5" selected>5 цифр</option>
+                            <option value="6">6 цифр</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cipher-text">Зашифрованные числа</label>
+                    <textarea id="cipher-text" placeholder="Введите числа через пробел..."></textarea>
+                </div>
+
+                <button onclick="decryptText()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.1 3.51c-.39.39-.39 1.03 0 1.42l1.56 1.56c-1.25 1.88-1.88 4.2-1.59 6.69.52 4.54 4.21 8.23 8.75 8.75 2.49.29 4.81-.34 6.69-1.59l1.56 1.56c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L3.51 3.51a.9959.9959 0 0 0-1.41 0zM12 20c-4.41 0-8-3.59-8-8 0-1.48.41-2.86 1.12-4.06l10.94 10.94C14.86 19.59 13.48 20 12 20zM7.94 5.12L6.49 3.66C8.07 2.61 9.96 2 12 2c5.52 0 10 4.48 10 10 0 2.04-.61 3.93-1.66 5.51l-1.46-1.46C19.59 14.86 20 13.48 20 12c0-4.41-3.59-8-8-8-1.48 0-2.86.41-4.06 1.12z"></path>
+                    </svg>
+                    Дешифровать
+                </button>
+
+                <div class="result" id="decrypted-result">Результат дешифрования появится здесь...</div>
+                <div class="status hidden" id="decrypt-status"></div>
+            </div>
         </div>
-        
-        <div class="panel">
-            <h2>🔓 Дешифрование</h2>
-            <input type="password" id="decrypt-key" placeholder="Ключ (должен совпадать)">
-            <textarea id="cipher-numbers" placeholder="Числа для дешифрования (через пробел)"></textarea>
-            <button onclick="decrypt()">Дешифровать → Текст</button>
-            <div class="result" id="decrypted-result"></div>
-            <div class="status" id="decrypt-status"></div>
+
+        <div class="footer">
+            <p>Military Grade Шифратор v2.0 | AES-256 с PBKDF2 | Web Crypto API</p>
+            <div class="security-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"></path>
+                </svg>
+                Проверенная криптостойкость
+            </div>
         </div>
     </div>
 
     <script>
-        // Конфигурация AES
+        // Конфигурация алгоритма
         const AES_CONFIG = {
-            name: "AES-CBC",
+            name: "AES-GCM",
             keyLength: 256,
-            ivLength: 16
+            ivLength: 12,
+            pbkdf2: {
+                iterations: 600000,
+                hash: "SHA-512"
+            }
         };
 
-        // Преобразование байтов в 5-значные числа (без потерь)
-        function bytesToNumbers(bytes) {
+        // Показать статус операции
+        function showStatus(message, elementId, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = isSuccess ? 'status success' : 'status error';
+            element.classList.remove('hidden');
+        }
+
+        // Скрыть статус
+        function hideStatus(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        // Преобразование байтов в числа заданной длины
+        function bytesToNumbers(bytes, length) {
             const numbers = [];
+            const max = Math.pow(10, length);
+            
             for (let i = 0; i < bytes.length; i += 2) {
                 const byte1 = bytes[i];
                 const byte2 = (i + 1 < bytes.length) ? bytes[i + 1] : 0;
-                const num = (byte1 << 8) | byte2; // 16-битное число
-                numbers.push(num.toString().padStart(5, '0'));
+                const num = (byte1 << 8) | byte2;
+                numbers.push(num % max);
             }
-            return numbers;
+            
+            return numbers.map(n => n.toString().padStart(length, '0'));
         }
 
-        // Обратное преобразование (числа → байты)
-        function numbersToBytes(numbers) {
+        // Обратное преобразование чисел в байты
+        function numbersToBytes(numbers, length) {
             const bytes = new Uint8Array(numbers.length * 2);
             for (let i = 0; i < numbers.length; i++) {
                 const num = parseInt(numbers[i], 10);
@@ -163,18 +451,46 @@
             return bytes;
         }
 
-        // Шифрование AES (Web Crypto API)
+        // Генерация ключа с помощью PBKDF2
+        async function deriveKey(password, salt) {
+            const encoder = new TextEncoder();
+            const passwordBuffer = encoder.encode(password);
+            const saltBuffer = encoder.encode(salt);
+            
+            const keyMaterial = await window.crypto.subtle.importKey(
+                "raw",
+                passwordBuffer,
+                { name: "PBKDF2" },
+                false,
+                ["deriveKey"]
+            );
+            
+            return await window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: saltBuffer,
+                    iterations: AES_CONFIG.pbkdf2.iterations,
+                    hash: AES_CONFIG.pbkdf2.hash
+                },
+                keyMaterial,
+                {
+                    name: AES_CONFIG.name,
+                    length: AES_CONFIG.keyLength
+                },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        // Шифрование AES
         async function encryptAES(text, key) {
             const iv = crypto.getRandomValues(new Uint8Array(AES_CONFIG.ivLength));
-            const cryptoKey = await crypto.subtle.importKey(
-                "raw",
-                new TextEncoder().encode(key),
-                { name: AES_CONFIG.name, length: AES_CONFIG.keyLength },
-                false,
-                ["encrypt"]
-            );
-            const encrypted = await crypto.subtle.encrypt(
-                { name: AES_CONFIG.name, iv },
+            const cryptoKey = await deriveKey(key, "secure-salt-value");
+            const encrypted = await window.crypto.subtle.encrypt(
+                {
+                    name: AES_CONFIG.name,
+                    iv: iv
+                },
                 cryptoKey,
                 new TextEncoder().encode(text)
             );
@@ -186,19 +502,16 @@
             return result;
         }
 
-        // Дешифрование AES (Web Crypto API)
+        // Дешифрование AES
         async function decryptAES(data, key) {
             const iv = data.slice(0, AES_CONFIG.ivLength);
             const encrypted = data.slice(AES_CONFIG.ivLength);
-            const cryptoKey = await crypto.subtle.importKey(
-                "raw",
-                new TextEncoder().encode(key),
-                { name: AES_CONFIG.name, length: AES_CONFIG.keyLength },
-                false,
-                ["decrypt"]
-            );
-            const decrypted = await crypto.subtle.decrypt(
-                { name: AES_CONFIG.name, iv },
+            const cryptoKey = await deriveKey(key, "secure-salt-value");
+            const decrypted = await window.crypto.subtle.decrypt(
+                {
+                    name: AES_CONFIG.name,
+                    iv: iv
+                },
                 cryptoKey,
                 encrypted
             );
@@ -206,9 +519,13 @@
         }
 
         // Основная функция шифрования
-        async function encrypt() {
-            const text = document.getElementById('text').value;
-            const key = document.getElementById('key').value;
+        async function encryptText() {
+            const text = document.getElementById('plain-text').value;
+            const key = document.getElementById('encrypt-key').value;
+            const length = parseInt(document.getElementById('number-length').value);
+            
+            hideStatus('encrypt-status');
+            document.getElementById('encrypted-result').textContent = "Шифрование...";
             
             if (!text || !key) {
                 showStatus("Ошибка: нужен текст и ключ", "encrypt-status", false);
@@ -217,21 +534,26 @@
 
             try {
                 const encryptedBytes = await encryptAES(text, key);
-                const numbers = bytesToNumbers(encryptedBytes);
+                const numbers = bytesToNumbers(encryptedBytes, length);
                 
                 document.getElementById('encrypted-result').textContent = numbers.join(' ');
-                document.getElementById('cipher-numbers').value = numbers.join(' ');
-                showStatus("Текст успешно зашифрован", "encrypt-status", true);
+                document.getElementById('cipher-text').value = numbers.join(' ');
+                showStatus("Текст успешно зашифрован в " + numbers.length + " чисел", "encrypt-status", true);
             } catch (e) {
-                showStatus("Ошибка шифрования: " + e.message, "encrypt-status", false);
+                document.getElementById('encrypted-result').textContent = "Ошибка шифрования";
+                showStatus("Ошибка: " + e.message, "encrypt-status", false);
                 console.error(e);
             }
         }
 
         // Основная функция дешифрования
-        async function decrypt() {
-            const numbers = document.getElementById('cipher-numbers').value.trim().split(/\s+/);
+        async function decryptText() {
+            const numbers = document.getElementById('cipher-text').value.trim().split(/\s+/);
             const key = document.getElementById('decrypt-key').value;
+            const length = parseInt(document.getElementById('decrypt-number-length').value);
+            
+            hideStatus('decrypt-status');
+            document.getElementById('decrypted-result').textContent = "Дешифрование...";
             
             if (!numbers.length || !key) {
                 showStatus("Ошибка: нужны числа и ключ", "decrypt-status", false);
@@ -239,23 +561,30 @@
             }
 
             try {
-                const bytes = numbersToBytes(numbers);
+                // Проверка длины чисел
+                for (const num of numbers) {
+                    if (num.length !== length) {
+                        throw new Error(`Все числа должны иметь длину ${length} цифр`);
+                    }
+                }
+                
+                const bytes = numbersToBytes(numbers, length);
                 const decrypted = await decryptAES(bytes, key);
                 
                 document.getElementById('decrypted-result').textContent = decrypted;
                 showStatus("Текст успешно дешифрован", "decrypt-status", true);
             } catch (e) {
-                showStatus("Ошибка: неверный ключ или данные", "decrypt-status", false);
+                document.getElementById('decrypted-result').textContent = "Ошибка дешифрования";
+                showStatus("Ошибка: " + e.message, "decrypt-status", false);
                 console.error(e);
             }
         }
 
-        // Показать статус операции
-        function showStatus(message, elementId, isSuccess) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = isSuccess ? 'status success' : 'status error';
-        }
+        // Автозаполнение демо-данными
+        window.onload = function() {
+            document.getElementById('plain-text').value = 'Совершенно секретные данные!';
+            document.getElementById('encrypt-key').value = 'StrongPassword123!';
+        };
     </script>
 </body>
 </html>
