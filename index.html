@@ -2,371 +2,130 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Цифровой Шифратор | Military Grade</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <title>🔢 Шифратор (1 символ = 5 цифр) | AES</title>
     <style>
-        :root {
-            --bg-dark: #0d1117;
-            --bg-darker: #161b22;
-            --text-light: #c9d1d9;
-            --text-lighter: #f0f6fc;
-            --border-dark: #30363d;
-            --primary: #238636;
-            --primary-hover: #2ea043;
-            --error: #f85149;
-            --success: #3fb950;
-        }
-        
-        body {
-            font-family: 'Courier New', monospace;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        h1, h2, h3 {
-            color: var(--text-lighter);
-        }
-        
-        .panel {
-            background: var(--bg-darker);
-            border: 1px solid var(--border-dark);
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        textarea, input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: var(--bg-dark);
-            color: var(--text-lighter);
-            border: 1px solid var(--border-dark);
-            border-radius: 4px;
-            font-family: inherit;
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        
-        button:hover {
-            background: var(--primary-hover);
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background: var(--bg-dark);
-            border-radius: 4px;
-            border-left: 3px solid var(--primary);
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        
-        .status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 4px;
-            display: none;
-        }
-        
-        .success {
-            background: rgba(63, 185, 80, 0.1);
-            border-left: 3px solid var(--success);
-            color: var(--success);
-            display: block;
-        }
-        
-        .error {
-            background: rgba(248, 81, 73, 0.1);
-            border-left: 3px solid var(--error);
-            color: var(--error);
-            display: block;
-        }
-        
-        .settings {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .settings > * {
-            flex: 1;
-        }
-        
-        @media (max-width: 600px) {
-            .settings {
-                flex-direction: column;
-            }
-        }
+        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
+        textarea, input, button { width: 100%; margin: 10px 0; padding: 10px; }
+        button { background: #4CAF50; color: white; border: none; cursor: pointer; }
+        .result { background: #f4f4f4; padding: 15px; margin-top: 10px; word-break: break-all; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔢 Профессиональный цифровой шифратор</h1>
-        <p>Шифрование текста в числа фиксированной длины с гарантированной обратимостью</p>
-        
-        <div class="panel">
-            <h2>🔒 Шифрование</h2>
-            <div class="settings">
-                <div>
-                    <label for="encrypt-key">Ключ шифрования</label>
-                    <input type="password" id="encrypt-key" placeholder="Минимум 16 символов">
-                </div>
-                <div>
-                    <label for="number-length">Длина чисел</label>
-                    <select id="number-length">
-                        <option value="4">4 цифры</option>
-                        <option value="5">5 цифр</option>
-                        <option value="6">6 цифр</option>
-                    </select>
-                </div>
-            </div>
-            
-            <label for="plain-text">Текст для шифрования</label>
-            <textarea id="plain-text" placeholder="Введите текст..."></textarea>
-            
-            <button onclick="encryptText()">Зашифровать</button>
-            
-            <div class="status" id="encrypt-status"></div>
-            
-            <div class="result" id="encrypted-result">
-                Здесь появится результат шифрования...
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2>🔓 Дешифрование</h2>
-            <div class="settings">
-                <div>
-                    <label for="decrypt-key">Ключ дешифрования</label>
-                    <input type="password" id="decrypt-key" placeholder="Введите ключ">
-                </div>
-                <div>
-                    <label for="decrypt-number-length">Длина чисел</label>
-                    <select id="decrypt-number-length">
-                        <option value="4">4 цифры</option>
-                        <option value="5">5 цифр</option>
-                        <option value="6">6 цифр</option>
-                    </select>
-                </div>
-            </div>
-            
-            <label for="cipher-text">Зашифрованные числа</label>
-            <textarea id="cipher-text" placeholder="Введите числа через пробел..."></textarea>
-            
-            <button onclick="decryptText()">Дешифровать</button>
-            
-            <div class="status" id="decrypt-status"></div>
-            
-            <div class="result" id="decrypted-result">
-                Здесь появится результат дешифрования...
-            </div>
-        </div>
+    <h1>🔢 Шифратор (1 символ = 5 цифр)</h1>
+    <p><strong>Алгоритм: AES (Web Crypto API)</strong></p>
+    
+    <div>
+        <h2>🔒 Шифрование</h2>
+        <input type="password" id="key" placeholder="Ключ (любая строка)">
+        <textarea id="text" placeholder="Текст для шифрования"></textarea>
+        <button onclick="encrypt()">Зашифровать → Числа</button>
+        <div class="result" id="encoded"></div>
+    </div>
+    
+    <div>
+        <h2>🔓 Дешифрование</h2>
+        <input type="password" id="decode-key" placeholder="Ключ (должен совпадать)">
+        <textarea id="numbers" placeholder="Числа для дешифрования (через пробел)"></textarea>
+        <button onclick="decrypt()">Дешифровать → Текст</button>
+        <div class="result" id="decoded"></div>
     </div>
 
     <script>
-        // Конфигурация
-        const CONFIG = {
-            keyIterations: 100000,
-            saltSize: 16, // bytes
-            ivSize: 16,   // bytes
-            minKeyLength: 16
-        };
-        
-        // Преобразование строки в массив чисел
-        function stringToNumbers(str, length) {
+        // Конвертация байтов в 5-значные числа (без потерь)
+        function bytesToNumbers(bytes) {
             const numbers = [];
-            const max = Math.pow(10, length);
-            
-            // Используем хеш для равномерного распределения
-            const hash = CryptoJS.SHA256(str).toString();
-            
-            for (let i = 0; i < hash.length; i += 4) {
-                const chunk = hash.substr(i, 4);
-                let num = 0;
-                
-                // Создаем число из 4 символов хеша
-                for (let j = 0; j < chunk.length; j++) {
-                    num = (num * 256) + chunk.charCodeAt(j);
-                }
-                
-                // Приводим к нужной длине
-                num = num % max;
-                numbers.push(num.toString().padStart(length, '0'));
+            for (let i = 0; i < bytes.length; i += 2) {
+                // Берем 2 байта = 65535 вариантов (вмещается в 5 цифр)
+                const byte1 = bytes[i];
+                const byte2 = i + 1 < bytes.length ? bytes[i + 1] : 0;
+                const num = (byte1 << 8) | byte2; // Объединяем в 16-битное число
+                numbers.push(num.toString().padStart(5, '0')); // 5 цифр
             }
-            
             return numbers;
         }
-        
-        // Обратное преобразование чисел в строку (упрощенное)
-        function numbersToString(numbers) {
-            let result = '';
-            for (const num of numbers) {
-                const n = parseInt(num, 10);
-                result += String.fromCharCode((n >> 8) & 0xFF, n & 0xFF);
+
+        // Обратная конвертация (из чисел в байты)
+        function numbersToBytes(numbers) {
+            const bytes = new Uint8Array(numbers.length * 2);
+            for (let i = 0; i < numbers.length; i++) {
+                const num = parseInt(numbers[i], 10);
+                bytes[i * 2] = (num >> 8) & 0xFF; // Старший байт
+                bytes[i * 2 + 1] = num & 0xFF;    // Младший байт
             }
+            return bytes;
+        }
+
+        // Шифрование AES (Web Crypto API)
+        async function encryptAES(text, keyStr) {
+            const key = await crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(keyStr),
+                { name: 'AES-CBC', length: 256 },
+                false,
+                ['encrypt']
+            );
+            const iv = crypto.getRandomValues(new Uint8Array(16));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-CBC', iv },
+                key,
+                new TextEncoder().encode(text)
+            );
+            // Объединяем IV + данные для передачи
+            const result = new Uint8Array(iv.length + encrypted.byteLength);
+            result.set(iv, 0);
+            result.set(new Uint8Array(encrypted), iv.length);
             return result;
         }
-        
-        // Основная функция шифрования
-        async function encryptText() {
+
+        // Дешифрование AES (Web Crypto API)
+        async function decryptAES(data, keyStr) {
+            const key = await crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(keyStr),
+                { name: 'AES-CBC', length: 256 },
+                false,
+                ['decrypt']
+            );
+            const iv = data.slice(0, 16);
+            const encrypted = data.slice(16);
+            const decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-CBC', iv },
+                key,
+                encrypted
+            );
+            return new TextDecoder().decode(decrypted);
+        }
+
+        // Шифрование текста → числа
+        async function encrypt() {
+            const text = document.getElementById('text').value;
+            const key = document.getElementById('key').value;
+            if (!text || !key) return alert("Нужен текст и ключ!");
+
             try {
-                const text = document.getElementById('plain-text').value;
-                const key = document.getElementById('encrypt-key').value;
-                const length = parseInt(document.getElementById('number-length').value);
-                
-                // Валидация
-                if (!key || key.length < CONFIG.minKeyLength) {
-                    throw new Error(`Ключ должен содержать не менее ${CONFIG.minKeyLength} символов`);
-                }
-                if (!text) {
-                    throw new Error('Введите текст для шифрования');
-                }
-                if (length < 4 || length > 6) {
-                    throw new Error('Длина чисел должна быть от 4 до 6 цифр');
-                }
-                
-                // 1. Генерация соли и ключа
-                const salt = CryptoJS.lib.WordArray.random(CONFIG.saltSize);
-                const derivedKey = CryptoJS.PBKDF2(key, salt, {
-                    keySize: 256/32,
-                    iterations: CONFIG.keyIterations
-                });
-                
-                // 2. Шифрование AES
-                const iv = CryptoJS.lib.WordArray.random(CONFIG.ivSize);
-                const encrypted = CryptoJS.AES.encrypt(text, derivedKey, {
-                    iv: iv,
-                    padding: CryptoJS.pad.Pkcs7,
-                    mode: CryptoJS.mode.CBC
-                });
-                
-                // 3. Формирование бинарного блока
-                const binaryData = salt.toString() + iv.toString() + encrypted.toString();
-                
-                // 4. Преобразование в числа
-                const numbers = stringToNumbers(binaryData, length);
-                
-                // Вывод результата
-                document.getElementById('encrypted-result').textContent = numbers.join(' ');
-                document.getElementById('cipher-text').value = numbers.join(' ');
-                showStatus('Текст успешно зашифрован!', 'encrypt-status', true);
-                
-            } catch (error) {
-                showStatus('Ошибка: ' + error.message, 'encrypt-status', false);
-                console.error('Ошибка шифрования:', error);
+                const encryptedBytes = await encryptAES(text, key);
+                const numbers = bytesToNumbers(encryptedBytes);
+                document.getElementById('encoded').textContent = numbers.join(' ');
+                document.getElementById('numbers').value = numbers.join(' ');
+            } catch (e) {
+                alert("Ошибка шифрования: " + e.message);
             }
         }
-        
-        // Основная функция дешифрования
-        async function decryptText() {
+
+        // Дешифрование чисел → текст
+        async function decrypt() {
+            const numbers = document.getElementById('numbers').value.trim().split(/\s+/);
+            const key = document.getElementById('decode-key').value;
+            if (!numbers.length || !key) return alert("Нужны числа и ключ!");
+
             try {
-                const ciphertext = document.getElementById('cipher-text').value.trim();
-                const key = document.getElementById('decrypt-key').value;
-                const length = parseInt(document.getElementById('decrypt-number-length').value);
-                
-                // Валидация
-                if (!key) {
-                    throw new Error('Введите ключ дешифрования');
-                }
-                if (!ciphertext) {
-                    throw new Error('Введите числа для дешифрования');
-                }
-                
-                // Преобразование введенных чисел в массив
-                const numbers = ciphertext.split(/\s+/).filter(n => n.trim() !== '');
-                
-                // Проверка длины чисел
-                for (const num of numbers) {
-                    if (num.length !== length) {
-                        throw new Error(`Все числа должны иметь длину ${length} цифр`);
-                    }
-                }
-                
-                // 1. Восстановление бинарных данных (упрощенное)
-                const binaryData = numbersToString(numbers);
-                
-                // 2. Извлечение соли, IV и зашифрованных данных
-                const salt = CryptoJS.enc.Hex.parse(binaryData.substr(0, 32));
-                const iv = CryptoJS.enc.Hex.parse(binaryData.substr(32, 32));
-                const encryptedData = binaryData.substr(64);
-                
-                // 3. Генерация ключа
-                const derivedKey = CryptoJS.PBKDF2(key, salt, {
-                    keySize: 256/32,
-                    iterations: CONFIG.keyIterations
-                });
-                
-                // 4. Дешифрование
-                const decrypted = CryptoJS.AES.decrypt(
-                    { ciphertext: CryptoJS.enc.Base64.parse(encryptedData) },
-                    derivedKey,
-                    { iv: iv }
-                );
-                
-                const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-                
-                if (!plaintext) {
-                    throw new Error('Неверный ключ или поврежденные данные');
-                }
-                
-                // Вывод результата
-                document.getElementById('decrypted-result').textContent = plaintext;
-                showStatus('Текст успешно дешифрован!', 'decrypt-status', true);
-                
-            } catch (error) {
-                showStatus('Ошибка: ' + error.message, 'decrypt-status', false);
-                console.error('Ошибка дешифрования:', error);
+                const bytes = numbersToBytes(numbers);
+                const decrypted = await decryptAES(bytes, key);
+                document.getElementById('decoded').textContent = decrypted;
+            } catch (e) {
+                alert("Ошибка дешифрования: неверный ключ или данные");
             }
         }
-        
-        // Показать статус операции
-        function showStatus(message, elementId, isSuccess) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = isSuccess ? 'status success' : 'status error';
-            
-            // Автоскрытие через 5 секунд
-            setTimeout(() => {
-                element.style.opacity = '0';
-                setTimeout(() => {
-                    element.className = 'status';
-                    element.style.opacity = '';
-                }, 500);
-            }, 5000);
-        }
-        
-        // Автоматическое шифрование примера при загрузке
-        window.onload = function() {
-            document.getElementById('plain-text').value = 'HELLO';
-            document.getElementById('encrypt-key').value = 'MySuperSecretKey12345';
-            setTimeout(encryptText, 500);
-        };
     </script>
 </body>
 </html>
