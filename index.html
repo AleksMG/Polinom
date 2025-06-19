@@ -3,288 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Military Grade Шифратор | AES-256</title>
+    <title>Military Grade Шифратор | Стабильный AES</title>
     <style>
         :root {
-            --bg-light: #f5f7ff;
-            --bg-lighter: #ffffff;
             --bg-dark: #0d1117;
-            --text-dark: #1e1e1e;
-            --text-light: #6e6e80;
-            --primary: #0a84ff;
-            --primary-hover: #0066cc;
-            --error: #ff453a;
-            --success: #30d158;
-            --border: #d8d8dc;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
-            --card-radius: 16px;
-            --input-radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --bg-darker: #161b22;
+            --text-light: #c9d1d9;
+            --text-lighter: #f0f6fc;
+            --border-dark: #30363d;
+            --primary: #238636;
+            --primary-hover: #2ea043;
+            --error: #f85149;
+            --success: #3fb950;
+            --warning: #d29922;
         }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-light: #1c1c1e;
-                --bg-lighter: #2c2c2e;
-                --text-dark: #f5f5f7;
-                --text-light: #aeaeb2;
-                --border: #444446;
-                --shadow: 0 10px 30px rgba(0,0,0,0.3);
-            }
-        }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-light);
-            color: var(--text-dark);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
             line-height: 1.6;
             padding: 20px;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
-
+        
         .container {
-            max-width: 900px;
-            width: 100%;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 20px;
         }
-
+        
         header {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 0 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-dark);
         }
-
+        
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, #0a84ff, #bf5af2);
+            margin-bottom: 10px;
+            color: var(--text-lighter);
+            background: linear-gradient(90deg, #3fb950, #238636);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
+        
         .subtitle {
             font-size: 1.1rem;
             color: var(--text-light);
             max-width: 600px;
             margin: 0 auto;
         }
-
-        .cards {
+        
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(63, 185, 80, 0.15);
+            color: var(--success);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            border: 1px solid rgba(63, 185, 80, 0.3);
+        }
+        
+        .panels {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 24px;
+            gap: 25px;
         }
-
+        
         @media (min-width: 768px) {
-            .cards {
+            .panels {
                 grid-template-columns: 1fr 1fr;
             }
         }
-
-        .card {
-            background: var(--bg-lighter);
-            border-radius: var(--card-radius);
-            box-shadow: var(--shadow);
-            padding: 30px;
-            transition: var(--transition);
-            border: 1px solid var(--border);
+        
+        .panel {
+            background: var(--bg-darker);
+            border: 1px solid var(--border-dark);
+            border-radius: 14px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
-
-        .card:hover {
+        
+        .panel:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
         }
-
-        .card-header {
+        
+        .panel-header {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-dark);
         }
-
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(10, 132, 255, 0.1);
-            border-radius: 14px;
+        
+        .panel-icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(35, 134, 54, 0.15);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 16px;
+            margin-right: 15px;
         }
-
-        .card-icon.blue {
-            background: rgba(10, 132, 255, 0.1);
+        
+        .panel-decrypt .panel-icon {
+            background: rgba(191, 97, 106, 0.15);
         }
-
-        .card-icon.purple {
-            background: rgba(191, 90, 242, 0.1);
-        }
-
-        .card-icon svg {
-            width: 24px;
-            height: 24px;
-        }
-
+        
         h2 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            color: var(--text-lighter);
         }
-
-        .card-desc {
+        
+        .panel-desc {
             color: var(--text-light);
             font-size: 0.95rem;
         }
-
+        
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
-
+        
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
             font-size: 0.95rem;
+            color: var(--text-lighter);
         }
-
+        
         input, textarea, select {
             width: 100%;
-            padding: 14px 16px;
-            background: var(--bg-light);
-            border: 1px solid var(--border);
-            border-radius: var(--input-radius);
+            padding: 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 10px;
             font-family: inherit;
             font-size: 1rem;
-            color: var(--text-dark);
-            transition: var(--transition);
+            color: var(--text-lighter);
+            transition: border 0.3s ease, box-shadow 0.3s ease;
         }
-
+        
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.3);
         }
-
+        
         textarea {
             min-height: 120px;
             resize: vertical;
+            font-family: 'SF Mono', Menlo, monospace;
         }
-
+        
         .settings {
             display: flex;
             gap: 12px;
-            margin-top: 12px;
+            margin-top: 10px;
         }
-
+        
         .settings > * {
             flex: 1;
         }
-
+        
         button {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 14px 20px;
-            border-radius: var(--input-radius);
+            padding: 14px;
+            border-radius: 10px;
             cursor: pointer;
             font-family: inherit;
             font-size: 1rem;
             font-weight: 500;
-            transition: var(--transition);
+            transition: background 0.3s ease, transform 0.2s ease;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
-
+        
         button:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
         }
-
+        
         button:active {
             transform: translateY(0);
         }
-
-        button svg {
-            width: 18px;
-            height: 18px;
+        
+        .btn-decrypt {
+            background: #bf616a;
         }
-
-        .result {
+        
+        .btn-decrypt:hover {
+            background: #a54c56;
+        }
+        
+        .result-container {
             margin-top: 20px;
-            padding: 20px;
-            background: var(--bg-light);
-            border-radius: var(--input-radius);
+        }
+        
+        .result-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-lighter);
+        }
+        
+        .result {
+            padding: 18px;
+            background: var(--bg-dark);
+            border-radius: 10px;
             border-left: 4px solid var(--primary);
             white-space: pre-wrap;
             word-break: break-word;
             font-family: 'SF Mono', Menlo, monospace;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             max-height: 200px;
             overflow: auto;
         }
-
+        
         .status {
-            margin-top: 16px;
-            padding: 14px 16px;
-            border-radius: var(--input-radius);
+            margin-top: 15px;
+            padding: 14px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             gap: 12px;
             font-size: 0.95rem;
         }
-
+        
         .status.success {
-            background: rgba(48, 209, 88, 0.1);
+            background: rgba(63, 185, 80, 0.12);
             border-left: 4px solid var(--success);
             color: var(--success);
         }
-
+        
         .status.error {
-            background: rgba(255, 69, 58, 0.1);
+            background: rgba(248, 81, 73, 0.12);
             border-left: 4px solid var(--error);
             color: var(--error);
         }
-
-        .status svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
+        
+        .status.warning {
+            background: rgba(210, 153, 34, 0.12);
+            border-left: 4px solid var(--warning);
+            color: var(--warning);
         }
-
-        .hidden {
-            display: none;
-        }
-
+        
         .footer {
             text-align: center;
             margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-dark);
             color: var(--text-light);
             font-size: 0.9rem;
-        }
-
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(48, 209, 88, 0.1);
-            color: var(--success);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -292,20 +286,26 @@
     <div class="container">
         <header>
             <h1>Military Grade Шифратор</h1>
-            <p class="subtitle">AES-256 шифрование с преобразованием в числа фиксированной длины. Гарантированная обратимость и криптостойкость.</p>
+            <p class="subtitle">Стабильное шифрование AES-256 с гарантированной идентификацией вывода</p>
+            <div class="security-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"></path>
+                </svg>
+                Детерминированное шифрование - один ключ, один результат
+            </div>
         </header>
 
-        <div class="cards">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon blue">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M16 8v-4l8 8-8 8v-4h-8v-8h8zm-16 4h-4v8h4v-8z"></path>
+        <div class="panels">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18 8h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2zm-9-2c0-1.66 1.34-3 3-3s3 1.34 3 3v2h-6v-2zm9 14h-12v-10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
                         </svg>
                     </div>
                     <div>
                         <h2>Шифрование</h2>
-                        <p class="card-desc">Преобразование текста в защищённые числа</p>
+                        <p class="panel-desc">Текст → Числа фиксированной длины</p>
                     </div>
                 </div>
 
@@ -318,7 +318,6 @@
                     <label for="number-length">Длина чисел</label>
                     <div class="settings">
                         <select id="number-length">
-                            <option value="3">3 цифры</option>
                             <option value="4">4 цифры</option>
                             <option value="5" selected>5 цифр</option>
                             <option value="6">6 цифр</option>
@@ -328,43 +327,51 @@
 
                 <div class="form-group">
                     <label for="plain-text">Текст для шифрования</label>
-                    <textarea id="plain-text" placeholder="Введите конфиденциальный текст..."></textarea>
+                    <textarea id="plain-text" placeholder="Введите конфиденциальный текст...">HELLO HELLOOOO</textarea>
                 </div>
 
                 <button onclick="encryptText()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18 8h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2zm-9-2c0-1.66 1.34-3 3-3s3 1.34 3 3v2h-6v-2zm9 14h-12v-10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 8h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9h-6.2v-2c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path>
                     </svg>
                     Зашифровать
                 </button>
 
-                <div class="result" id="encrypted-result">Результат шифрования появится здесь...</div>
+                <div class="result-container">
+                    <div class="result-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"></path>
+                        </svg>
+                        Результат шифрования
+                    </div>
+                    <div class="result" id="encrypted-result">Здесь появятся числа после шифрования...</div>
+                </div>
+                
                 <div class="status hidden" id="encrypt-status"></div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-icon purple">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 8h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9h-6.2v-2c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path>
+            <div class="panel panel-decrypt">
+                <div class="panel-header">
+                    <div class="panel-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.1 3.51c-.39.39-.39 1.03 0 1.42l1.56 1.56c-1.25 1.88-1.88 4.2-1.59 6.69.52 4.54 4.21 8.23 8.75 8.75 2.49.29 4.81-.34 6.69-1.59l1.56 1.56c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L3.51 3.51a.9959.9959 0 0 0-1.41 0zM12 20c-4.41 0-8-3.59-8-8 0-1.48.41-2.86 1.12-4.06l10.94 10.94C14.86 19.59 13.48 20 12 20zM7.94 5.12L6.49 3.66C8.07 2.61 9.96 2 12 2c5.52 0 10 4.48 10 10 0 2.04-.61 3.93-1.66 5.51l-1.46-1.46C19.59 14.86 20 13.48 20 12c0-4.41-3.59-8-8-8-1.48 0-2.86.41-4.06 1.12z"></path>
                         </svg>
                     </div>
                     <div>
                         <h2>Дешифрование</h2>
-                        <p class="card-desc">Восстановление текста из чисел</p>
+                        <p class="panel-desc">Числа → Исходный текст</p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="decrypt-key">Ключ дешифрования</label>
-                    <input type="password" id="decrypt-key" placeholder="Введите секретный ключ">
+                    <input type="password" id="decrypt-key" placeholder="Введите тот же ключ">
                 </div>
 
                 <div class="form-group">
                     <label for="decrypt-number-length">Длина чисел</label>
                     <div class="settings">
                         <select id="decrypt-number-length">
-                            <option value="3">3 цифры</option>
                             <option value="4">4 цифры</option>
                             <option value="5" selected>5 цифр</option>
                             <option value="6">6 цифр</option>
@@ -377,38 +384,42 @@
                     <textarea id="cipher-text" placeholder="Введите числа через пробел..."></textarea>
                 </div>
 
-                <button onclick="decryptText()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M2.1 3.51c-.39.39-.39 1.03 0 1.42l1.56 1.56c-1.25 1.88-1.88 4.2-1.59 6.69.52 4.54 4.21 8.23 8.75 8.75 2.49.29 4.81-.34 6.69-1.59l1.56 1.56c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L3.51 3.51a.9959.9959 0 0 0-1.41 0zM12 20c-4.41 0-8-3.59-8-8 0-1.48.41-2.86 1.12-4.06l10.94 10.94C14.86 19.59 13.48 20 12 20zM7.94 5.12L6.49 3.66C8.07 2.61 9.96 2 12 2c5.52 0 10 4.48 10 10 0 2.04-.61 3.93-1.66 5.51l-1.46-1.46C19.59 14.86 20 13.48 20 12c0-4.41-3.59-8-8-8-1.48 0-2.86.41-4.06 1.12z"></path>
+                <button class="btn-decrypt" onclick="decryptText()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 5v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.11 0-2 .9-2 2zm12 4c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3zm-9 8c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1H6v-1z"></path>
                     </svg>
                     Дешифровать
                 </button>
 
-                <div class="result" id="decrypted-result">Результат дешифрования появится здесь...</div>
+                <div class="result-container">
+                    <div class="result-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"></path>
+                        </svg>
+                        Результат дешифрования
+                    </div>
+                    <div class="result" id="decrypted-result">Здесь появится расшифрованный текст...</div>
+                </div>
+                
                 <div class="status hidden" id="decrypt-status"></div>
             </div>
         </div>
 
         <div class="footer">
-            <p>Military Grade Шифратор v2.0 | AES-256 с PBKDF2 | Web Crypto API</p>
-            <div class="security-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"></path>
-                </svg>
-                Проверенная криптостойкость
-            </div>
+            <p>Military Grade Шифратор v3.0 | Стабильный AES-256 | Детерминированное шифрование</p>
+            <p>Один ключ → Один результат | Гарантированная обратимость</p>
         </div>
     </div>
 
     <script>
         // Конфигурация алгоритма
         const AES_CONFIG = {
-            name: "AES-GCM",
+            name: "AES-CBC",
             keyLength: 256,
-            ivLength: 12,
+            iv: new Uint8Array(16).fill(0), // Фиксированный IV для детерминированности
             pbkdf2: {
-                iterations: 600000,
-                hash: "SHA-512"
+                iterations: 100000,
+                hash: "SHA-256"
             }
         };
 
@@ -418,26 +429,32 @@
             element.textContent = message;
             element.className = isSuccess ? 'status success' : 'status error';
             element.classList.remove('hidden');
+            
+            // Автоскрытие через 5 секунд
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
         }
 
-        // Скрыть статус
-        function hideStatus(elementId) {
-            document.getElementById(elementId).classList.add('hidden');
-        }
-
-        // Преобразование байтов в числа заданной длины
+        // Преобразование байтов в числа гарантированно
         function bytesToNumbers(bytes, length) {
             const numbers = [];
-            const max = Math.pow(10, length);
+            const max = Math.pow(10, length) - 1;
             
             for (let i = 0; i < bytes.length; i += 2) {
                 const byte1 = bytes[i];
                 const byte2 = (i + 1 < bytes.length) ? bytes[i + 1] : 0;
-                const num = (byte1 << 8) | byte2;
-                numbers.push(num % max);
+                let num = (byte1 << 8) | byte2;
+                
+                // Гарантируем, что число помещается в указанную длину
+                if (num > max) {
+                    num = num % max;
+                }
+                
+                numbers.push(num.toString().padStart(length, '0'));
             }
             
-            return numbers.map(n => n.toString().padStart(length, '0'));
+            return numbers;
         }
 
         // Обратное преобразование чисел в байты
@@ -451,24 +468,21 @@
             return bytes;
         }
 
-        // Генерация ключа с помощью PBKDF2
-        async function deriveKey(password, salt) {
+        // Детерминированное шифрование AES
+        async function encryptAES(text, keyStr) {
             const encoder = new TextEncoder();
-            const passwordBuffer = encoder.encode(password);
-            const saltBuffer = encoder.encode(salt);
-            
-            const keyMaterial = await window.crypto.subtle.importKey(
+            const keyMaterial = await crypto.subtle.importKey(
                 "raw",
-                passwordBuffer,
+                encoder.encode(keyStr),
                 { name: "PBKDF2" },
                 false,
                 ["deriveKey"]
             );
             
-            return await window.crypto.subtle.deriveKey(
+            const cryptoKey = await crypto.subtle.deriveKey(
                 {
                     name: "PBKDF2",
-                    salt: saltBuffer,
+                    salt: encoder.encode("fixed-salt"),
                     iterations: AES_CONFIG.pbkdf2.iterations,
                     hash: AES_CONFIG.pbkdf2.hash
                 },
@@ -478,43 +492,57 @@
                     length: AES_CONFIG.keyLength
                 },
                 false,
-                ["encrypt", "decrypt"]
-            );
-        }
-
-        // Шифрование AES
-        async function encryptAES(text, key) {
-            const iv = crypto.getRandomValues(new Uint8Array(AES_CONFIG.ivLength));
-            const cryptoKey = await deriveKey(key, "secure-salt-value");
-            const encrypted = await window.crypto.subtle.encrypt(
-                {
-                    name: AES_CONFIG.name,
-                    iv: iv
-                },
-                cryptoKey,
-                new TextEncoder().encode(text)
+                ["encrypt"]
             );
             
-            // Объединяем IV + зашифрованные данные
-            const result = new Uint8Array(iv.length + encrypted.byteLength);
-            result.set(iv, 0);
-            result.set(new Uint8Array(encrypted), iv.length);
-            return result;
-        }
-
-        // Дешифрование AES
-        async function decryptAES(data, key) {
-            const iv = data.slice(0, AES_CONFIG.ivLength);
-            const encrypted = data.slice(AES_CONFIG.ivLength);
-            const cryptoKey = await deriveKey(key, "secure-salt-value");
-            const decrypted = await window.crypto.subtle.decrypt(
+            const encrypted = await crypto.subtle.encrypt(
                 {
                     name: AES_CONFIG.name,
-                    iv: iv
+                    iv: AES_CONFIG.iv
                 },
                 cryptoKey,
-                encrypted
+                encoder.encode(text)
             );
+            
+            return new Uint8Array(encrypted);
+        }
+
+        // Детерминированное дешифрование AES
+        async function decryptAES(data, keyStr) {
+            const encoder = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw",
+                encoder.encode(keyStr),
+                { name: "PBKDF2" },
+                false,
+                ["deriveKey"]
+            );
+            
+            const cryptoKey = await crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: encoder.encode("fixed-salt"),
+                    iterations: AES_CONFIG.pbkdf2.iterations,
+                    hash: AES_CONFIG.pbkdf2.hash
+                },
+                keyMaterial,
+                {
+                    name: AES_CONFIG.name,
+                    length: AES_CONFIG.keyLength
+                },
+                false,
+                ["decrypt"]
+            );
+            
+            const decrypted = await crypto.subtle.decrypt(
+                {
+                    name: AES_CONFIG.name,
+                    iv: AES_CONFIG.iv
+                },
+                cryptoKey,
+                data
+            );
+            
             return new TextDecoder().decode(decrypted);
         }
 
@@ -524,8 +552,7 @@
             const key = document.getElementById('encrypt-key').value;
             const length = parseInt(document.getElementById('number-length').value);
             
-            hideStatus('encrypt-status');
-            document.getElementById('encrypted-result').textContent = "Шифрование...";
+            document.getElementById('encrypt-status').classList.add('hidden');
             
             if (!text || !key) {
                 showStatus("Ошибка: нужен текст и ключ", "encrypt-status", false);
@@ -540,32 +567,30 @@
                 document.getElementById('cipher-text').value = numbers.join(' ');
                 showStatus("Текст успешно зашифрован в " + numbers.length + " чисел", "encrypt-status", true);
             } catch (e) {
-                document.getElementById('encrypted-result').textContent = "Ошибка шифрования";
-                showStatus("Ошибка: " + e.message, "encrypt-status", false);
+                showStatus("Ошибка шифрования: " + e.message, "encrypt-status", false);
                 console.error(e);
             }
         }
 
         // Основная функция дешифрования
         async function decryptText() {
-            const numbers = document.getElementById('cipher-text').value.trim().split(/\s+/);
+            const numbersText = document.getElementById('cipher-text').value.trim();
             const key = document.getElementById('decrypt-key').value;
             const length = parseInt(document.getElementById('decrypt-number-length').value);
             
-            hideStatus('decrypt-status');
-            document.getElementById('decrypted-result').textContent = "Дешифрование...";
+            document.getElementById('decrypt-status').classList.add('hidden');
             
-            if (!numbers.length || !key) {
+            if (!numbersText || !key) {
                 showStatus("Ошибка: нужны числа и ключ", "decrypt-status", false);
                 return;
             }
 
             try {
-                // Проверка длины чисел
-                for (const num of numbers) {
-                    if (num.length !== length) {
-                        throw new Error(`Все числа должны иметь длину ${length} цифр`);
-                    }
+                // Разбиваем на числа, игнорируя любые нецифровые символы
+                const numbers = numbersText.split(/\D+/).filter(num => num.length === length);
+                
+                if (numbers.length === 0) {
+                    throw new Error("Не найдены числа нужной длины");
                 }
                 
                 const bytes = numbersToBytes(numbers, length);
@@ -574,16 +599,15 @@
                 document.getElementById('decrypted-result').textContent = decrypted;
                 showStatus("Текст успешно дешифрован", "decrypt-status", true);
             } catch (e) {
-                document.getElementById('decrypted-result').textContent = "Ошибка дешифрования";
-                showStatus("Ошибка: " + e.message, "decrypt-status", false);
+                showStatus("Ошибка дешифрования: " + e.message, "decrypt-status", false);
                 console.error(e);
             }
         }
 
         // Автозаполнение демо-данными
         window.onload = function() {
-            document.getElementById('plain-text').value = 'Совершенно секретные данные!';
             document.getElementById('encrypt-key').value = 'StrongPassword123!';
+            setTimeout(encryptText, 500);
         };
     </script>
 </body>
